@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Why a Knowledge Management Layer Still Matters</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17202a;
+        --muted: #5b6472;
+        --line: #d8dde6;
+        --panel: #ffffff;
+        --soft: #f6f7f9;
+        --soft-2: #eef5f0;
+        --accent: #1f6f5b;
+        --accent-2: #315f9b;
+        --warning: #aa5d14;
+        --danger: #a43d4b;
+        --good: #27724f;
+        --shadow: 0 18px 48px rgba(23, 32, 42, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #fbfbfc;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: var(--accent-2);
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 56px 24px 34px;
+        color: #fff;
+        background:
+          linear-gradient(rgba(12, 28, 41, 0.8), rgba(12, 28, 41, 0.78)),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Crect width='1600' height='900' fill='%23243843'/%3E%3Cg opacity='0.42' stroke='%23c7d3d1' stroke-width='2' fill='none'%3E%3Cpath d='M130 180h290v120H130zM580 120h330v120H580zM1080 170h360v120h-360zM210 500h360v130H210zM720 450h300v130H720zM1140 530h280v110h-280z'/%3E%3Cpath d='M420 240c80 0 80-60 160-60M910 180c90 0 80 50 170 50M570 565c80 0 70-50 150-50M1020 515c65 0 55 70 120 70M355 300c0 110-60 90-60 200M1260 290c0 130 20 120 20 240'/%3E%3C/g%3E%3Cg fill='%23ffffff' opacity='0.22'%3E%3Ccircle cx='130' cy='180' r='6'/%3E%3Ccircle cx='580' cy='180' r='6'/%3E%3Ccircle cx='910' cy='180' r='6'/%3E%3Ccircle cx='1080' cy='230' r='6'/%3E%3Ccircle cx='570' cy='565' r='6'/%3E%3Ccircle cx='720' cy='515' r='6'/%3E%3Ccircle cx='1020' cy='515' r='6'/%3E%3Ccircle cx='1140' cy='585' r='6'/%3E%3C/g%3E%3C/svg%3E");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .hero-inner,
+      main,
+      footer {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        font-size: 0.78rem;
+        font-weight: 760;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: #bfe4d8;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 840px;
+        margin-bottom: 16px;
+        font-size: clamp(2.05rem, 5vw, 4.9rem);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .hero-copy {
+        max-width: 760px;
+        margin-bottom: 28px;
+        color: #e7edf0;
+        font-size: 1.12rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.38);
+        border-radius: 6px;
+        padding: 9px 14px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .button.primary {
+        border-color: #caebdd;
+        color: #13241f;
+        background: #caebdd;
+      }
+
+      .hero-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 38px;
+      }
+
+      .hero-stat {
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 8px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-stat strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 1rem;
+      }
+
+      .hero-stat span {
+        color: #d6e0e3;
+        font-size: 0.92rem;
+      }
+
+      main {
+        padding: 34px 0 64px;
+      }
+
+      section {
+        margin: 34px 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 16px;
+      }
+
+      .section-head h2 {
+        margin-bottom: 0;
+        font-size: clamp(1.55rem, 3vw, 2.25rem);
+        line-height: 1.12;
+      }
+
+      .section-head p {
+        max-width: 560px;
+        margin-bottom: 0;
+        color: var(--muted);
+      }
+
+      .scenario {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .panel,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 1px 0 rgba(23, 32, 42, 0.03);
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .ticket {
+        display: grid;
+        gap: 14px;
+      }
+
+      .ticket-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 5px 9px;
+        color: #193125;
+        background: #ddf0e7;
+        font-size: 0.78rem;
+        font-weight: 760;
+        white-space: nowrap;
+      }
+
+      .tag.warn {
+        color: #4a2c0a;
+        background: #f7e4c9;
+      }
+
+      .tag.blue {
+        color: #17375f;
+        background: #dce8f8;
+      }
+
+      .ticket h3 {
+        margin-bottom: 4px;
+        font-size: 1.35rem;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .meta {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px;
+        background: var(--soft);
+      }
+
+      .meta span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .meta strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.96rem;
+      }
+
+      .artifact {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid #cdd7df;
+        border-radius: 8px;
+        padding: 12px;
+        background: #f9fbfc;
+      }
+
+      .thumb {
+        display: grid;
+        height: 54px;
+        place-items: center;
+        border-radius: 6px;
+        color: #fff;
+        background: #425363;
+        font-weight: 800;
+      }
+
+      .artifact p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .definition {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .definition .card {
+        min-height: 148px;
+        padding: 16px;
+      }
+
+      .definition strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .definition p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .path {
+        display: flex;
+        min-height: 100%;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .path-head {
+        padding: 18px;
+        color: #fff;
+      }
+
+      .path-head.no-km {
+        background: #713c45;
+      }
+
+      .path-head.search {
+        background: #315f9b;
+      }
+
+      .path-head.km {
+        background: #1f6f5b;
+      }
+
+      .path-head h3 {
+        margin-bottom: 6px;
+        font-size: 1.16rem;
+      }
+
+      .path-head p {
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 0.9rem;
+      }
+
+      .path-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .output {
+        border-left: 4px solid var(--line);
+        padding: 4px 0 4px 12px;
+      }
+
+      .output strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .risk {
+        margin-top: auto;
+        border-radius: 6px;
+        padding: 12px;
+        background: var(--soft);
+      }
+
+      .risk strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .risk p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 0.91rem;
+      }
+
+      .failure-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .failure {
+        padding: 16px;
+      }
+
+      .failure .num {
+        display: inline-grid;
+        width: 30px;
+        height: 30px;
+        margin-bottom: 12px;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--danger);
+        font-weight: 800;
+      }
+
+      .failure h3 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .failure p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .step {
+        position: relative;
+        min-height: 210px;
+        padding: 16px;
+        overflow: hidden;
+      }
+
+      .step::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--accent);
+      }
+
+      .step span {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      .step h3 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .step p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .scorecard {
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 13px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: #253445;
+        background: #edf1f4;
+        font-size: 0.88rem;
+      }
+
+      td {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      td:first-child {
+        color: var(--ink);
+        font-weight: 760;
+      }
+
+      .mark {
+        display: inline-flex;
+        min-width: 72px;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 3px 8px;
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .mark.low {
+        background: var(--danger);
+      }
+
+      .mark.mid {
+        background: var(--warning);
+      }
+
+      .mark.high {
+        background: var(--good);
+      }
+
+      .blueprint {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 16px;
+      }
+
+      .blueprint-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .blueprint-row {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 13px;
+        background: #fff;
+      }
+
+      .blueprint-row strong {
+        color: var(--accent);
+      }
+
+      .blueprint-row p {
+        margin-bottom: 0;
+        color: var(--muted);
+      }
+
+      .callout {
+        border: 1px solid #b7d9cd;
+        border-radius: 8px;
+        padding: 18px;
+        background: var(--soft-2);
+      }
+
+      .callout p:last-child {
+        margin-bottom: 0;
+      }
+
+      .sources {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .sources .card {
+        padding: 16px;
+      }
+
+      .sources h3 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .sources li {
+        overflow-wrap: anywhere;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0 36px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      @media (max-width: 980px) {
+        .hero-strip,
+        .scenario,
+        .comparison,
+        .definition,
+        .timeline,
+        .blueprint,
+        .sources {
+          grid-template-columns: 1fr;
+        }
+
+        .failure-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .definition .card {
+          min-height: auto;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .hero {
+          padding: 36px 18px 28px;
+        }
+
+        .hero-inner,
+        main,
+        footer {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .section-head {
+          display: block;
+        }
+
+        .section-head p {
+          margin-top: 8px;
+        }
+
+        .meta-grid,
+        .failure-grid,
+        .blueprint-row {
+          grid-template-columns: 1fr;
+        }
+
+        .panel,
+        .path-body,
+        .path-head {
+          padding: 15px;
+        }
+
+        .artifact {
+          grid-template-columns: 1fr;
+        }
+
+        .thumb {
+          width: 74px;
+        }
+
+        .scorecard {
+          overflow: visible;
+        }
+
+        .scorecard table,
+        .scorecard thead,
+        .scorecard tbody,
+        .scorecard tr,
+        .scorecard th,
+        .scorecard td {
+          display: block;
+          min-width: 0;
+        }
+
+        .scorecard thead {
+          display: none;
+        }
+
+        .scorecard table {
+          border: 0;
+          background: transparent;
+        }
+
+        .scorecard tr {
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          margin-bottom: 12px;
+          overflow: hidden;
+          background: #fff;
+        }
+
+        .scorecard td {
+          display: grid;
+          grid-template-columns: 118px 1fr;
+          gap: 10px;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .scorecard td::before {
+          content: attr(data-label);
+          color: var(--ink);
+          font-weight: 800;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div class="hero-inner">
+          <p class="eyebrow">Agent platform operating model tutorial</p>
+          <h1>Why a Knowledge Management Layer Still Matters</h1>
+          <p class="hero-copy">
+            This tutorial uses a generic agent platform support setup to show the
+            practical gap between no KM, search-only retrieval, and a structured KM
+            layer that lets agents operate safely and consistently.
+          </p>
+          <div class="hero-actions" aria-label="Page navigation">
+            <a class="button primary" href="#comparison">Compare the outputs</a>
+            <a class="button" href="#blueprint">See the KM blueprint</a>
+          </div>
+          <div class="hero-strip" aria-label="Main idea">
+            <div class="hero-stat">
+              <strong>No KM</strong>
+              <span>The model guesses the process from the prompt.</span>
+            </div>
+            <div class="hero-stat">
+              <strong>Connectors and search</strong>
+              <span>The model finds facts, tickets, docs, and code references.</span>
+            </div>
+            <div class="hero-stat">
+              <strong>Structured KM</strong>
+              <span>The model follows role, policy, workflow, and evidence rules.</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section id="scenario" aria-labelledby="scenario-title">
+          <div class="section-head">
+            <h2 id="scenario-title">Exchange Operations Scenario</h2>
+            <p>
+              The example is written for an exchange operations context. The Support
+              Agent handles intake and Support CRM workflow; the Coding Agent handles
+              engineering diagnostics, dependency analysis, DB investigation, RCA, and
+              PR handoff.
+            </p>
+          </div>
+          <div class="scenario">
+            <article class="panel ticket">
+              <div class="ticket-top">
+                <span class="tag">Support CRM</span>
+                <span class="tag warn">P2 support ticket</span>
+              </div>
+              <div>
+                <h3>OPS-2026-0142: Market close report shows mismatched totals</h3>
+                <p>
+                  A user reports that the equity market close report shows a mismatch
+                  between traded value in the dashboard and the official end-of-day
+                  report. They attached a screenshot of both values for the same trade
+                  date.
+                </p>
+              </div>
+              <div class="meta-grid">
+                <div class="meta">
+                  <span>Service</span>
+                  <strong>Market Operations</strong>
+                </div>
+                <div class="meta">
+                  <span>Request type</span>
+                  <strong>Data Discrepancy</strong>
+                </div>
+                <div class="meta">
+                  <span>Requesting team</span>
+                  <strong>Exchange Operations Team</strong>
+                </div>
+                <div class="meta">
+                  <span>Source</span>
+                  <strong>Email with screenshot</strong>
+                </div>
+              </div>
+              <div class="artifact">
+                <div class="thumb">PNG</div>
+                <p>
+                  Attachment shows trade date 2026-05-12, dashboard traded value
+                  12,480,000.00, official close report traded value 12,240,000.00.
+                </p>
+              </div>
+            </article>
+
+            <aside class="panel">
+              <h3>What the agent is asked</h3>
+              <p>
+                "This report total does not match the dashboard after market close. Please
+                investigate and move this forward."
+              </p>
+              <h3>What matters operationally</h3>
+              <ul>
+                <li>Should this route to engineering or manual triage?</li>
+                <li>Who owns the next step: Support Agent, Coding Agent, User, or Manager?</li>
+                <li>Which repo, branch, environment, and database lane are valid?</li>
+                <li>What evidence is required before calling the root cause?</li>
+                <li>Who may approve production diagnostics or changes?</li>
+              </ul>
+            </aside>
+          </div>
+        </section>
+
+        <section aria-labelledby="definition-title">
+          <div class="section-head">
+            <h2 id="definition-title">What KM Means Here</h2>
+            <p>
+              In this operating model, KM is not just tagged documents. It is the layer
+              that converts data access into disciplined action.
+            </p>
+          </div>
+          <div class="definition">
+            <div class="card">
+              <strong>Skills</strong>
+              <p>Task-specific instructions the agent must load before doing specialized work.</p>
+            </div>
+            <div class="card">
+              <strong>Runbooks</strong>
+              <p>Step order, commands, evidence bars, handoff shapes, and stop conditions.</p>
+            </div>
+            <div class="card">
+              <strong>Permissions</strong>
+              <p>Role, user, channel, tool, sandbox, and approval rules.</p>
+            </div>
+            <div class="card">
+              <strong>Workflow State</strong>
+              <p>Ledgers, memory files, active investigations, PR records, and audit trails.</p>
+            </div>
+            <div class="card">
+              <strong>Source Metadata</strong>
+              <p>Tagged source-system data: services, ticket types, repos, entities, owners, and ACLs.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="comparison" aria-labelledby="comparison-title">
+          <div class="section-head">
+            <h2 id="comparison-title">Head-to-Head Output</h2>
+            <p>
+              Same ticket. Same model quality. Different operating knowledge available.
+            </p>
+          </div>
+
+          <div class="comparison">
+            <article class="card path">
+              <div class="path-head no-km">
+                <h3>1. No KM</h3>
+                <p>Only the prompt and generic AI knowledge.</p>
+              </div>
+              <div class="path-body">
+                <div class="output">
+                  <strong>Likely AI response</strong>
+                  <ul>
+                    <li>"Check recent code changes around report aggregation."</li>
+                    <li>"Ask the operations user for reproduction steps."</li>
+                    <li>"Query the trade, adjustment, and report snapshot tables."</li>
+                    <li>"Create a Jira or GitHub issue if it looks like a bug."</li>
+                  </ul>
+                </div>
+                <div class="output">
+                  <strong>What is missing</strong>
+                  <ul>
+                    <li>No knowledge that the Support Agent owns intake and the Coding Agent owns engineering.</li>
+                    <li>No reliable direct-route rule for market operations + data discrepancy.</li>
+                    <li>No service-lane resolver before repo, branch, or deploy decisions.</li>
+                    <li>No production DB approval rule or read-only diagnostic boundary.</li>
+                    <li>No required RCA, ledger, or handoff format.</li>
+                  </ul>
+                </div>
+                <div class="risk">
+                  <strong>Operational result</strong>
+                  <p>
+                    Plausible answer, inconsistent execution. The agent can sound helpful
+                    while skipping policy, guessing authority, and leaving no durable audit
+                    trail.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="card path">
+              <div class="path-head search">
+                <h3>2. Connectors and Search</h3>
+                <p>SharePoint, Jira, Confluence, Support CRM, and dependency graph data are indexed.</p>
+              </div>
+              <div class="path-body">
+                <div class="output">
+                  <strong>Likely AI response</strong>
+                  <ul>
+                    <li>Finds similar report discrepancy tickets and related RCA notes.</li>
+                    <li>Finds service map entries for market operations and related repository docs.</li>
+                    <li>Finds dependency graph nodes for close report aggregation and trade adjustments.</li>
+                    <li>Summarizes possible backend, SQL, and data-pipeline causes.</li>
+                  </ul>
+                </div>
+                <div class="output">
+                  <strong>What is still missing</strong>
+                  <ul>
+                    <li>Search does not decide which rule is binding.</li>
+                    <li>Search does not enforce who may approve production diagnostics.</li>
+                    <li>Search does not require dependency analysis before DB or code work.</li>
+                    <li>Search does not update the ticket, collaboration channel, RCA, PR, and memory ledgers in order.</li>
+                  </ul>
+                </div>
+                <div class="risk">
+                  <strong>Operational result</strong>
+                  <p>
+                    Better factual grounding, but the agent still has to infer the operating
+                    procedure from retrieved chunks. That inference can vary by prompt,
+                    model, and search ranking.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="card path">
+              <div class="path-head km">
+                <h3>3. Structured KM Layer</h3>
+                <p>Search plus skills, runbooks, permissions, state, and approvals.</p>
+              </div>
+              <div class="path-body">
+                <div class="output">
+                  <strong>Likely AI response</strong>
+                  <ul>
+                    <li>The Support Agent classifies market operations + data discrepancy as engineering-routed.</li>
+                    <li>The Support Agent moves the ticket to To Dev and creates the engineering issue in the mapped repo.</li>
+                    <li>The Coding Agent resolves the service lane before branch, endpoint, DB, or PR decisions.</li>
+                    <li>The Coding Agent runs dependency impact analysis before DB queries or code changes.</li>
+                    <li>Production diagnostics are read-only, approval-gated, and audit-reasoned.</li>
+                    <li>RCA, active investigation ledger, PR evidence, and Support Agent handoff are updated.</li>
+                  </ul>
+                </div>
+                <div class="risk">
+                  <strong>Operational result</strong>
+                  <p>
+                    Consistent execution. The agent knows the procedure, follows authority
+                    boundaries, records evidence, and produces a traceable operations and
+                    engineering handoff.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="no-km-title">
+          <div class="section-head">
+            <h2 id="no-km-title">What Happens With No KM</h2>
+            <p>
+              No KM does not mean the AI is useless. It means every operational decision
+              is reconstructed from scratch, usually from incomplete prompt context.
+            </p>
+          </div>
+          <div class="failure-grid">
+            <article class="card failure">
+              <span class="num">1</span>
+              <h3>Role confusion</h3>
+              <p>
+                The agent may investigate directly, assign a User, or ask a Manager,
+                because it does not know the Support Agent to Coding Agent split.
+              </p>
+            </article>
+            <article class="card failure">
+              <span class="num">2</span>
+              <h3>Unsafe authority</h3>
+              <p>
+                It may suggest production SQL or status changes without channel, user, or
+                approval context.
+              </p>
+            </article>
+            <article class="card failure">
+              <span class="num">3</span>
+              <h3>Weak traceability</h3>
+              <p>
+                It may summarize findings in chat but fail to update the durable RCA,
+                active investigation ledger, ticket comment, or PR evidence.
+              </p>
+            </article>
+            <article class="card failure">
+              <span class="num">4</span>
+              <h3>Inconsistent reasoning</h3>
+              <p>
+                One run may search tickets first, another may query the DB first, and
+                another may jump to code changes.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="timeline-title">
+          <div class="section-head">
+            <h2 id="timeline-title">What the KM Layer Makes Repeatable</h2>
+            <p>
+              This is the operating shape the tutorial is trying to make tangible for
+              SGX: KM is the layer that coordinates the work.
+            </p>
+          </div>
+          <div class="timeline">
+            <article class="card step">
+              <span>01</span>
+              <h3>Intake</h3>
+              <p>
+                The Support Agent reads the operational evidence, captures required
+                fields, creates or updates the Support CRM ticket, and classifies service
+                and request type.
+              </p>
+            </article>
+            <article class="card step">
+              <span>02</span>
+              <h3>Route</h3>
+              <p>
+                Service map plus request-type rules decide engineering route vs manual
+                triage. Market operations + data discrepancy routes to the Coding Agent.
+              </p>
+            </article>
+            <article class="card step">
+              <span>03</span>
+              <h3>Resolve Lane</h3>
+              <p>
+                The Coding Agent resolves service, channel profile, repo, branch base, PR
+                target, environment context, and allowed diagnostic surface.
+              </p>
+            </article>
+            <article class="card step">
+              <span>04</span>
+              <h3>Investigate</h3>
+              <p>
+                Dependency analysis comes first. DB diagnostics are read-only, reasoned,
+                and gated. Findings are recorded as they happen.
+              </p>
+            </article>
+            <article class="card step">
+              <span>05</span>
+              <h3>Handoff</h3>
+              <p>
+                RCA, ticket update, channel report, PR evidence, and Support Agent
+                handoff use a consistent output shape.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="score-title">
+          <div class="section-head">
+            <h2 id="score-title">Scorecard</h2>
+            <p>
+              The KM layer is not always required. It matters most when the answer must
+              become a governed action.
+            </p>
+          </div>
+          <div class="scorecard">
+            <table>
+              <thead>
+                <tr>
+                  <th>Capability</th>
+                  <th>No KM</th>
+                  <th>Connectors and Search</th>
+                  <th>Structured KM Layer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Capability">Find related information</td>
+                  <td data-label="No KM"><span class="mark low">Low</span><br />Depends on prompt context.</td>
+                  <td data-label="Search"><span class="mark high">High</span><br />Indexes tickets, docs, and dependency graph data.</td>
+                  <td data-label="KM Layer"><span class="mark high">High</span><br />Uses search when it is the right tool.</td>
+                </tr>
+                <tr>
+                  <td data-label="Capability">Choose the right workflow</td>
+                  <td data-label="No KM"><span class="mark low">Low</span><br />Guesses from general patterns.</td>
+                  <td data-label="Search"><span class="mark mid">Medium</span><br />Can retrieve rules but must infer precedence.</td>
+                  <td data-label="KM Layer"><span class="mark high">High</span><br />Loads the relevant skill and follows the runbook.</td>
+                </tr>
+                <tr>
+                  <td data-label="Capability">Respect permissions</td>
+                  <td data-label="No KM"><span class="mark low">Low</span><br />No role or channel authority model.</td>
+                  <td data-label="Search"><span class="mark mid">Medium</span><br />Can see ACL metadata if indexed.</td>
+                  <td data-label="KM Layer"><span class="mark high">High</span><br />Enforces channel, role, tool, sandbox, and approval gates.</td>
+                </tr>
+                <tr>
+                  <td data-label="Capability">Produce audit trail</td>
+                  <td data-label="No KM"><span class="mark low">Low</span><br />Chat answer may be the only artifact.</td>
+                  <td data-label="Search"><span class="mark mid">Medium</span><br />Can cite retrieved sources.</td>
+                  <td data-label="KM Layer"><span class="mark high">High</span><br />Updates ticket, RCA, memory, ledgers, and PR evidence.</td>
+                </tr>
+                <tr>
+                  <td data-label="Capability">Operate consistently</td>
+                  <td data-label="No KM"><span class="mark low">Low</span><br />Different runs produce different next steps.</td>
+                  <td data-label="Search"><span class="mark mid">Medium</span><br />Better context, but still variable execution.</td>
+                  <td data-label="KM Layer"><span class="mark high">High</span><br />Procedure and stop conditions are explicit.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="blueprint" aria-labelledby="blueprint-title">
+          <div class="section-head">
+            <h2 id="blueprint-title">What SGX's KM Should Contain</h2>
+            <p>
+              If the end state is AI agents that assist daily operations, the KM layer
+              must be more than source tagging.
+            </p>
+          </div>
+          <div class="blueprint">
+            <div class="callout">
+              <h3>Practical definition</h3>
+              <p>
+                A KM layer is the operational knowledge substrate that lets agents turn
+                retrieved information into governed work.
+              </p>
+              <p>
+                It includes source metadata, but also the skills, policies, state, and
+                runbooks that make an agent behave like a trained team member rather than
+                a search box.
+              </p>
+            </div>
+            <div class="blueprint-list">
+              <div class="blueprint-row">
+                <strong>Entity Map</strong>
+                <p>Business services, systems, tickets, repos, controls, owners, and environments.</p>
+              </div>
+              <div class="blueprint-row">
+                <strong>Procedures</strong>
+                <p>Skills and runbooks for intake, triage, diagnostics, PRs, releases, and support replies.</p>
+              </div>
+              <div class="blueprint-row">
+                <strong>Permissions</strong>
+                <p>Role, user, channel, system, tool, and approval rules. Yes, permissioning belongs in KM.</p>
+              </div>
+              <div class="blueprint-row">
+                <strong>State</strong>
+                <p>Durable ledgers for active work, handoffs, evidence, audit, and unresolved unknowns.</p>
+              </div>
+              <div class="blueprint-row">
+                <strong>Observability</strong>
+                <p>What was retrieved, what rule was applied, who approved it, and what artifact changed.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="sources-title">
+          <div class="section-head">
+            <h2 id="sources-title">Grounding References</h2>
+            <p>
+              These references explain the two sides being compared: connector/search
+              capability and the agent platform's operational KM mechanics.
+            </p>
+          </div>
+          <div class="sources">
+            <div class="card">
+              <h3>Google Gemini Enterprise</h3>
+              <ul>
+                <li>
+                  <a href="https://cloud.google.com/gemini/enterprise/docs/introduction-to-connectors-and-data-stores" target="_blank" rel="noreferrer">Connectors and data stores</a>
+                </li>
+                <li>
+                  <a href="https://cloud.google.com/gemini/enterprise/docs/custom-connector" target="_blank" rel="noreferrer">Custom connectors</a>
+                </li>
+                <li>
+                  <a href="https://cloud.google.com/gemini/enterprise/docs/use-knowledge-graph-search" target="_blank" rel="noreferrer">Knowledge Graph search</a>
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Agent Platform Capabilities</h3>
+              <ul>
+                <li>Skill catalog and on-demand runbook loading.</li>
+                <li>Channel and thread routing for isolated operational context.</li>
+                <li>Tool, sandbox, role, and approval policy enforcement.</li>
+                <li>Workflow ledgers for ticket, RCA, PR, and handoff state.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          Demo tutorial artifact. No live operational data, credentials, channel IDs, or
+          production configuration are included.
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
