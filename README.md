@@ -1,4 +1,4 @@
-# SGX KM Layer Tutorial
+# Stock Exchange KM Layer Tutorial
 
 Static tutorial page explaining why a structured Knowledge Management layer matters for agent platforms.
 
