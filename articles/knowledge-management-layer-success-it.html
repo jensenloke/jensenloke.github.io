@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Why a Knowledge Management Layer Still Matters - Jensen Loke</title>
+    <meta
+      name="description"
+      content="A Success IT-inspired example showing why agent platforms need structured KM beyond connectors and search."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="article-header">
+        <nav class="article-nav" aria-label="Article navigation">
+          <a href="../">Jensen Loke</a>
+        </nav>
+        <p class="eyebrow">Knowledge systems - Agent platforms</p>
+        <h1 class="article-title">Why a Knowledge Management Layer Still Matters</h1>
+        <p class="article-subtitle">
+          A Success IT-inspired example showing where no KM fails, where connectors
+          and search help, and where a structured KM layer materially improves
+          consistency, reasoning quality, traceability, and permissioning.
+        </p>
+      </div>
+    </header>
+
+    <main class="article">
+      <section>
+        <p class="note">
+          Public note: this article uses fictionalized support details and simplified
+          names. It is intended to explain the operating model, not expose live customer
+          data, private tickets, credentials, channel IDs, or production configuration.
+        </p>
+      </section>
+
+      <section id="scenario" aria-labelledby="scenario-title">
+        <div class="section-head">
+          <h2 id="scenario-title">The Success IT Scenario</h2>
+          <p>
+            Imagine a support team using an agent platform for day-to-day operations.
+            A Support Agent owns intake and Support CRM workflow. A Coding Agent owns
+            engineering diagnostics, CodeGraph, database investigation, RCA, and PR
+            handoff.
+          </p>
+        </div>
+
+        <div class="scenario">
+          <article class="panel ticket">
+            <div class="ticket-top">
+              <span class="tag">Support CRM</span>
+              <span class="tag warn">P2 support ticket</span>
+            </div>
+            <div>
+              <h3>SUP-2026-0142: Invoice total differs after posting</h3>
+              <p>
+                A user reports that a posted invoice total differs from the previewed
+                total in a web application. They attached a screenshot showing the
+                expected and actual totals for the same document.
+              </p>
+            </div>
+            <div class="meta-grid">
+              <div class="meta">
+                <span>Product</span>
+                <strong>Success IT Web Product</strong>
+              </div>
+              <div class="meta">
+                <span>Request type</span>
+                <strong>Bug / Data Issue</strong>
+              </div>
+              <div class="meta">
+                <span>Requester</span>
+                <strong>Example Operations User</strong>
+              </div>
+              <div class="meta">
+                <span>Source</span>
+                <strong>Email with screenshot</strong>
+              </div>
+            </div>
+            <div class="artifact">
+              <div class="thumb">PNG</div>
+              <p>
+                Attachment shows document DEMO-INV-2026-014, preview total 12,240.00,
+                posted total 12,480.00, and the screen path used by the user.
+              </p>
+            </div>
+          </article>
+
+          <aside class="panel">
+            <h3>What the agent is asked</h3>
+            <p>
+              "This invoice total does not match after posting. Please investigate and
+              move this forward."
+            </p>
+            <h3>What matters operationally</h3>
+            <ul>
+              <li>Should this route to engineering or manual triage?</li>
+              <li>Who owns the next step: Support Agent, Coding Agent, User, or Manager?</li>
+              <li>Which product, repo, branch, tenant, and database lane are valid?</li>
+              <li>What evidence is required before calling the root cause?</li>
+              <li>Who may approve production diagnostics or changes?</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section aria-labelledby="definition-title">
+        <div class="section-head">
+          <h2 id="definition-title">What KM Means Here</h2>
+          <p>
+            In this operating model, KM is not just document tagging. It is the layer
+            that converts data access into disciplined action.
+          </p>
+        </div>
+        <div class="definition">
+          <div class="card">
+            <strong>Skills</strong>
+            <p>Task-specific instructions the agent must load before specialized work.</p>
+          </div>
+          <div class="card">
+            <strong>Runbooks</strong>
+            <p>Step order, commands, evidence bars, handoff shapes, and stop conditions.</p>
+          </div>
+          <div class="card">
+            <strong>Permissions</strong>
+            <p>Role, user, channel, tool, sandbox, and approval rules.</p>
+          </div>
+          <div class="card">
+            <strong>Workflow State</strong>
+            <p>Ledgers, memory files, active investigations, PR records, and audit trails.</p>
+          </div>
+          <div class="card">
+            <strong>Source Metadata</strong>
+            <p>Tagged source-system data: products, ticket types, repos, entities, owners, and ACLs.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="comparison" aria-labelledby="comparison-title">
+        <div class="section-head">
+          <h2 id="comparison-title">Head-to-Head Output</h2>
+          <p>Same ticket. Same model quality. Different operating knowledge available.</p>
+        </div>
+
+        <div class="comparison">
+          <article class="card path">
+            <div class="path-head no-km">
+              <h3>1. No KM</h3>
+              <p>Only the prompt and generic AI knowledge.</p>
+            </div>
+            <div class="path-body">
+              <div class="output">
+                <strong>Likely AI response</strong>
+                <ul>
+                  <li>"Check recent code changes around invoice posting."</li>
+                  <li>"Ask the user for reproduction steps."</li>
+                  <li>"Query invoice header, line, tax, and posting tables."</li>
+                  <li>"Create a Jira or GitHub issue if it looks like a bug."</li>
+                </ul>
+              </div>
+              <div class="output">
+                <strong>What is missing</strong>
+                <ul>
+                  <li>No knowledge that the Support Agent owns intake and the Coding Agent owns engineering.</li>
+                  <li>No reliable direct-route rule for product + request type.</li>
+                  <li>No lane resolver before repo, branch, endpoint, or deploy decisions.</li>
+                  <li>No production DB approval rule or read-only diagnostic boundary.</li>
+                  <li>No required RCA, ledger, or handoff format.</li>
+                </ul>
+              </div>
+              <div class="risk">
+                <strong>Operational result</strong>
+                <p>
+                  Plausible answer, inconsistent execution. The agent can sound helpful
+                  while skipping policy, guessing authority, and leaving no durable audit
+                  trail.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="card path">
+            <div class="path-head search">
+              <h3>2. Connectors and Search</h3>
+              <p>SharePoint, Jira, Confluence, Support CRM, SuccessGraph, and CodeGraph are indexed.</p>
+            </div>
+            <div class="path-body">
+              <div class="output">
+                <strong>Likely AI response</strong>
+                <ul>
+                  <li>Finds similar invoice discrepancy tickets and related RCA notes.</li>
+                  <li>Finds product map entries and related repository docs.</li>
+                  <li>Finds CodeGraph nodes for posting, tax calculation, and invoice totals.</li>
+                  <li>Summarizes possible backend, SQL, and UI causes.</li>
+                </ul>
+              </div>
+              <div class="output">
+                <strong>What is still missing</strong>
+                <ul>
+                  <li>Search does not decide which rule is binding.</li>
+                  <li>Search does not enforce who may approve production diagnostics.</li>
+                  <li>Search does not require CodeGraph before DB or code work.</li>
+                  <li>Search does not update the ticket, channel report, RCA, PR, and memory ledgers in order.</li>
+                </ul>
+              </div>
+              <div class="risk">
+                <strong>Operational result</strong>
+                <p>
+                  Better factual grounding, but the agent still has to infer the operating
+                  procedure from retrieved chunks. That inference can vary by prompt,
+                  model, search ranking, and source freshness.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="card path">
+            <div class="path-head km">
+              <h3>3. Structured KM Layer</h3>
+              <p>Search plus skills, runbooks, permissions, state, and approvals.</p>
+            </div>
+            <div class="path-body">
+              <div class="output">
+                <strong>Likely AI response</strong>
+                <ul>
+                  <li>The Support Agent classifies product + bug/data issue as engineering-routed.</li>
+                  <li>The Support Agent moves the ticket to To Dev and creates the engineering issue in the mapped repo.</li>
+                  <li>The Coding Agent resolves the product lane before branch, endpoint, DB, or PR decisions.</li>
+                  <li>The Coding Agent runs CodeGraph blast-radius analysis before DB queries or code changes.</li>
+                  <li>Production diagnostics are read-only, approval-gated, and audit-reasoned.</li>
+                  <li>RCA, active investigation ledger, PR evidence, and Support Agent handoff are updated.</li>
+                </ul>
+              </div>
+              <div class="risk">
+                <strong>Operational result</strong>
+                <p>
+                  Consistent execution. The agent knows the procedure, follows authority
+                  boundaries, records evidence, and produces a traceable support and
+                  engineering handoff.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="no-km-title">
+        <div class="section-head">
+          <h2 id="no-km-title">What Happens With No KM</h2>
+          <p>
+            No KM does not mean the AI is useless. It means every operational decision
+            is reconstructed from scratch, usually from incomplete prompt context.
+          </p>
+        </div>
+        <div class="failure-grid">
+          <article class="card failure">
+            <span class="num">1</span>
+            <h3>Role confusion</h3>
+            <p>
+              The agent may investigate directly, assign a User, or ask a Manager,
+              because it does not know the Support Agent to Coding Agent split.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">2</span>
+            <h3>Unsafe authority</h3>
+            <p>
+              It may suggest production SQL or status changes without channel, user, or
+              approval context.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">3</span>
+            <h3>Weak traceability</h3>
+            <p>
+              It may summarize findings in chat but fail to update the durable RCA,
+              active investigation ledger, ticket comment, or PR evidence.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">4</span>
+            <h3>Inconsistent reasoning</h3>
+            <p>
+              One run may search tickets first, another may query the DB first, and
+              another may jump to code changes.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="timeline-title">
+        <div class="section-head">
+          <h2 id="timeline-title">What the KM Layer Makes Repeatable</h2>
+          <p>
+            The key point: KM is the layer that coordinates the work, not just the layer
+            that stores documents.
+          </p>
+        </div>
+        <div class="timeline">
+          <article class="card step">
+            <span>01</span>
+            <h3>Intake</h3>
+            <p>
+              The Support Agent reads the user evidence, captures required fields,
+              creates or updates the Support CRM ticket, and classifies product and type.
+            </p>
+          </article>
+          <article class="card step">
+            <span>02</span>
+            <h3>Route</h3>
+            <p>
+              Product map plus request-type rules decide engineering route vs manual
+              triage.
+            </p>
+          </article>
+          <article class="card step">
+            <span>03</span>
+            <h3>Resolve Lane</h3>
+            <p>
+              The Coding Agent resolves product, channel profile, repo, branch base, PR
+              target, tenant context, and allowed diagnostic surface.
+            </p>
+          </article>
+          <article class="card step">
+            <span>04</span>
+            <h3>Investigate</h3>
+            <p>
+              CodeGraph comes first. DB diagnostics are read-only, reasoned, and gated.
+              Findings are recorded as they happen.
+            </p>
+          </article>
+          <article class="card step">
+            <span>05</span>
+            <h3>Handoff</h3>
+            <p>
+              RCA, ticket update, channel report, PR evidence, and Support Agent handoff
+              use a consistent output shape.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="score-title">
+        <div class="section-head">
+          <h2 id="score-title">Scorecard</h2>
+          <p>
+            The KM layer matters most when the answer must become a governed action.
+          </p>
+        </div>
+        <div class="scorecard">
+          <table>
+            <thead>
+              <tr>
+                <th>Capability</th>
+                <th>No KM</th>
+                <th>Connectors and Search</th>
+                <th>Structured KM Layer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Capability">Find related information</td>
+                <td data-label="No KM"><span class="mark low">Low</span><br />Depends on prompt context.</td>
+                <td data-label="Search"><span class="mark high">High</span><br />Indexes tickets, docs, source metadata, SuccessGraph, and CodeGraph.</td>
+                <td data-label="KM Layer"><span class="mark high">High</span><br />Uses search when it is the right tool.</td>
+              </tr>
+              <tr>
+                <td data-label="Capability">Choose the right workflow</td>
+                <td data-label="No KM"><span class="mark low">Low</span><br />Guesses from general patterns.</td>
+                <td data-label="Search"><span class="mark mid">Medium</span><br />Can retrieve rules but must infer precedence.</td>
+                <td data-label="KM Layer"><span class="mark high">High</span><br />Loads the relevant skill and follows the runbook.</td>
+              </tr>
+              <tr>
+                <td data-label="Capability">Respect permissions</td>
+                <td data-label="No KM"><span class="mark low">Low</span><br />No role or channel authority model.</td>
+                <td data-label="Search"><span class="mark mid">Medium</span><br />Can see ACL metadata if indexed.</td>
+                <td data-label="KM Layer"><span class="mark high">High</span><br />Enforces channel, role, tool, sandbox, and approval gates.</td>
+              </tr>
+              <tr>
+                <td data-label="Capability">Produce audit trail</td>
+                <td data-label="No KM"><span class="mark low">Low</span><br />Chat answer may be the only artifact.</td>
+                <td data-label="Search"><span class="mark mid">Medium</span><br />Can cite retrieved sources.</td>
+                <td data-label="KM Layer"><span class="mark high">High</span><br />Updates ticket, RCA, memory, ledgers, and PR evidence.</td>
+              </tr>
+              <tr>
+                <td data-label="Capability">Operate consistently</td>
+                <td data-label="No KM"><span class="mark low">Low</span><br />Different runs produce different next steps.</td>
+                <td data-label="Search"><span class="mark mid">Medium</span><br />Better context, but still variable execution.</td>
+                <td data-label="KM Layer"><span class="mark high">High</span><br />Procedure and stop conditions are explicit.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="blueprint" aria-labelledby="blueprint-title">
+        <div class="section-head">
+          <h2 id="blueprint-title">What the KM Layer Should Contain</h2>
+          <p>
+            If the end state is AI agents that assist daily operations, the KM layer must
+            be more than source tagging.
+          </p>
+        </div>
+        <div class="blueprint">
+          <div class="callout">
+            <h3>Practical definition</h3>
+            <p>
+              A KM layer is the operational knowledge substrate that lets agents turn
+              retrieved information into governed work.
+            </p>
+            <p>
+              It includes source metadata, but also the skills, policies, state, and
+              runbooks that make an agent behave like a trained team member rather than a
+              search box.
+            </p>
+          </div>
+          <div class="blueprint-list">
+            <div class="blueprint-row">
+              <strong>Entity Map</strong>
+              <p>Products, customers, systems, tickets, repos, services, owners, and environments.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>Procedures</strong>
+              <p>Skills and runbooks for intake, triage, diagnostics, PRs, releases, and support replies.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>Permissions</strong>
+              <p>Role, user, channel, system, tool, and approval rules.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>State</strong>
+              <p>Durable ledgers for active work, handoffs, evidence, audit, and unresolved unknowns.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>Observability</strong>
+              <p>What was retrieved, what rule was applied, who approved it, and what artifact changed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="sources-title">
+        <div class="section-head">
+          <h2 id="sources-title">Further Reading</h2>
+          <p>
+            Connector/search platforms are still important. The point is that retrieval
+            should be paired with an operational layer for action.
+          </p>
+        </div>
+        <div class="sources">
+          <div class="card">
+            <h3>Connector/Search Layer</h3>
+            <ul>
+              <li>
+                <a href="https://cloud.google.com/gemini/enterprise/docs/introduction-to-connectors-and-data-stores" target="_blank" rel="noreferrer">Gemini Enterprise connectors and data stores</a>
+              </li>
+              <li>
+                <a href="https://cloud.google.com/gemini/enterprise/docs/custom-connector" target="_blank" rel="noreferrer">Custom connectors</a>
+              </li>
+              <li>
+                <a href="https://cloud.google.com/gemini/enterprise/docs/use-knowledge-graph-search" target="_blank" rel="noreferrer">Knowledge Graph search</a>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Operational KM Layer</h3>
+            <ul>
+              <li>Skills and runbooks that encode how work is done.</li>
+              <li>Permissions and approval gates that encode who may do it.</li>
+              <li>Workflow ledgers that encode what happened and what remains unknown.</li>
+              <li>Audit trails that connect source evidence to operational actions.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Copyright 2026 Jensen Loke. Built as a static GitHub Pages site.</p>
+    </footer>
+  </body>
+</html>
