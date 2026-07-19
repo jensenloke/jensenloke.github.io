@@ -194,6 +194,19 @@ li {
   padding: 0 0 72px;
 }
 
+.talks-section {
+  margin-top: 44px;
+  scroll-margin-top: 32px;
+}
+
+.talk-card {
+  border-left: 6px solid #0170b9;
+}
+
+.talk-card .article-meta {
+  color: #0170b9;
+}
+
 .section-label {
   margin-bottom: 16px;
   color: var(--slate-1);
