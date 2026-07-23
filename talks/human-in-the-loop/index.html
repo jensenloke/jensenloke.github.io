@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Human in the Loop — Preliminary Conference Draft</title>
+  <link rel="icon" href="data:," />
+  <title>Human in the Loop — Intersections 2026</title>
   <style>
     :root {
       --ink: #11151c;
@@ -208,6 +209,35 @@
     .bio-fact span { display: block; margin-bottom: 5px; font: 700 11px var(--mono); letter-spacing: .09em; text-transform: uppercase; opacity: .58; }
     .bio-fact h3 { font-size: clamp(18px, 1.8vw, 28px); }
 
+    .philosophy-tagline {
+      margin-top: 18px;
+      font-size: clamp(19px, 1.7vw, 27px);
+      line-height: 1.38;
+      max-width: 1040px;
+    }
+    .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 28px; }
+    .philosophy-panel {
+      min-height: 300px;
+      padding: 28px;
+      border: 2px solid #ccced0;
+      border-radius: 14px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(44,56,74,.06);
+    }
+    .philosophy-panel.client { border-left: 8px solid var(--orange); }
+    .philosophy-panel.team { border-left: 8px solid var(--blue); background: #eef7fd; }
+    .philosophy-panel ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .philosophy-panel li { padding-left: 23px; position: relative; font-size: clamp(15px,1.2vw,19px); line-height: 1.3; }
+    .philosophy-panel li::before { content: "→"; position: absolute; left: 0; font-weight: 900; color: var(--blue); }
+    .capability-chain { display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr; gap: 8px; align-items: stretch; margin-top: 18px; }
+    .capability-step { padding: 14px; border-radius: 10px; background: white; border: 1px solid #b8d9ee; }
+    .capability-step strong { display: block; font-family: var(--display); font-size: clamp(16px,1.3vw,20px); }
+    .capability-step span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.3; color: var(--muted); }
+    .capability-arrow { align-self: center; text-align: center; color: var(--blue); font: 800 24px var(--display); }
+
     .company-layout { display: grid; grid-template-columns: 1.15fr .85fr; gap: 6vw; align-items: center; }
     .company-stats { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid currentColor; }
     .company-stat { min-height: 175px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
@@ -383,6 +413,43 @@
     .promise { min-height: 320px; padding: 30px; border: 2px solid currentColor; display: flex; flex-direction: column; justify-content: space-between; }
     .promise.customer { background: var(--orange); color: var(--ink); border-color: var(--orange); }
     .promise.staff { background: var(--mint); color: var(--ink); border-color: var(--mint); }
+
+    .decoder-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+    .decoder-card {
+      min-height: 160px;
+      padding: 20px;
+      border: 1px solid #ccced0;
+      border-top: 6px solid var(--blue);
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 8px 24px rgba(44,56,74,.06);
+    }
+    .decoder-card:nth-child(2), .decoder-card:nth-child(5) { border-top-color: var(--orange); }
+    .decoder-card code { display: block; font: 800 12px var(--mono); color: var(--blue); text-transform: uppercase; letter-spacing: .08em; }
+    .decoder-card strong { display: block; margin-top: 12px; font: 700 clamp(18px,1.55vw,24px)/1.15 var(--display); }
+    .decoder-card span { display: block; margin-top: 8px; font-size: clamp(14px,1.05vw,17px); line-height: 1.32; color: var(--muted); }
+
+    .community-layout { display: grid; grid-template-columns: 1.25fr .75fr; gap: 5vw; align-items: center; }
+    .community-facts { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 30px; border-top: 1px solid currentColor; }
+    .community-fact { padding: 18px 16px 0 0; }
+    .community-fact + .community-fact { padding-left: 16px; border-left: 1px solid currentColor; }
+    .community-fact strong { display: block; font: 800 clamp(28px,3vw,46px)/1 var(--display); color: var(--mint); }
+    .community-fact span { display: block; margin-top: 8px; font-size: 15px; line-height: 1.3; color: rgba(255,255,255,.68); }
+    .qr-card {
+      display: block;
+      color: var(--ink);
+      text-decoration: none;
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 16px 16px 0 var(--orange);
+    }
+    .qr-card img { display: block; width: min(100%, 320px); margin: 0 auto; aspect-ratio: 1; }
+    .qr-card strong { display: block; margin-top: 16px; font-family: var(--display); font-size: 22px; }
+    .qr-card span { display: block; margin-top: 5px; font: 13px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+    .questions-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 6vw; align-items: center; }
+    .questions-layout .qr-card { box-shadow: 14px 14px 0 rgba(255,255,255,.18); }
+    .questions-copy p { margin-top: 28px; }
 
     .capacity { display: grid; grid-template-columns: .8fr 1.2fr; gap: 6vw; align-items: center; }
     .big-five { font: 900 clamp(170px, 25vw, 360px)/.72 var(--display); color: var(--orange); letter-spacing: -.08em; }
@@ -572,6 +639,14 @@
 
     .slide[data-title="Agenda"] h2 { font-size: clamp(44px, 5.7vw, 82px); }
     .slide[data-title="Agenda"] .agenda-item { padding: 12px 0; }
+    .slide[data-title="The service philosophy"] { gap: 12px; }
+    .slide[data-title="The service philosophy"] h2 { font-size: clamp(40px, 5vw, 68px) !important; }
+    .slide[data-title="The service philosophy"] .philosophy-tagline { margin-top: 10px; }
+    .slide[data-title="The service philosophy"] .philosophy-grid { margin-top: 18px; }
+    .slide[data-title="The service philosophy"] .philosophy-panel { min-height: 260px; padding: 22px 26px; }
+    .slide[data-title="The service philosophy"] .philosophy-panel ul { margin-top: 12px; gap: 7px; }
+    .slide[data-title="The service philosophy"] .capability-chain { margin-top: 12px; }
+    .slide[data-title="The service philosophy"] .capability-step { padding: 12px; }
     .slide[data-title="The Success IT team"] .person-row { padding: 6px 0; }
     .slide[data-title="Insa adds technical depth"] .quote-box p { font-size: clamp(42px, 5.7vw, 82px); }
     .slide[data-title="Insa adds technical depth"] .machine-row { padding: 13px 0; }
@@ -582,6 +657,7 @@
     .slide[data-title="Authority remains human"] .authority { margin-top: 24px !important; }
     .slide[data-title="Authority remains human"] .authority-col { min-height: 315px; padding: 26px; }
     .slide[data-title="Authority remains human"] .check-list { gap: 11px; margin-top: 18px; }
+    .slide[data-title="Zach workflow map"] h2 { margin-bottom: 18px !important; }
     .slide[data-title="Insa product router map"] .diagram-shell { padding: 20px 24px; }
     .slide[data-title="Insa product router map"] .diagram-caption { margin-top: 12px; }
 
@@ -653,16 +729,42 @@
 
     @media (max-width: 900px) {
       .slide { overflow-y: auto; }
-      .title-layout, .bio-layout, .company-layout, .people-layout, .iris-hero, .split, .capacity, .calculator, .closing { grid-template-columns: 1fr; }
+      .title-layout, .bio-layout, .company-layout, .people-layout, .iris-hero, .split, .capacity, .calculator, .closing, .philosophy-grid, .community-layout, .questions-layout { grid-template-columns: 1fr; }
       .team-grid, .metric-grid { grid-template-columns: 1fr 1fr; }
       .flow { grid-template-columns: 1fr; }
       .flow-arrow { transform: rotate(90deg); }
-      .human-pair, .jz-flow, .profile-pair, .authority, .claim-grid, .system-stack, .graph-map, .lane-grid, .owner-loop, .promise-grid, .diagram-main, .router-grid, .screenshot-layout { grid-template-columns: 1fr; }
+      .human-pair, .jz-flow, .profile-pair, .authority, .claim-grid, .system-stack, .graph-map, .lane-grid, .owner-loop, .promise-grid, .diagram-main, .router-grid, .screenshot-layout, .decoder-grid, .capability-chain { grid-template-columns: 1fr; }
       .diagram-arrow { transform: rotate(90deg); }
       .diagram-branches, .router-output { grid-template-columns: 1fr; }
       .gates { grid-template-columns: 1fr; }
       .stage-rail { display: none; }
       .footer { padding-bottom: 42px; }
+    }
+
+    @media (max-height: 760px) and (min-width: 901px) {
+      .slide { padding-top: 28px; padding-bottom: 30px; gap: 10px; }
+      .topline { padding-bottom: 8px; }
+      .kicker { margin-bottom: 12px; }
+      .bio-mark { max-width: 330px; }
+      .bio-facts { margin-top: 18px; }
+      .bio-fact { padding: 10px 0; }
+      .company-stat { min-height: 145px; padding: 20px; }
+      .slide[data-title="The service philosophy"] .philosophy-panel { min-height: 230px; padding: 18px 22px; }
+      .slide[data-title="The service philosophy"] .philosophy-panel li { font-size: 14px; }
+      .slide[data-title="The service philosophy"] .capability-step { padding: 9px; }
+      .slide[data-title="The Success IT team"] .person-row { padding: 3px 0; }
+      .slide[data-title="A plain-language decoder"] .decoder-grid { margin-top: 18px; gap: 12px; }
+      .slide[data-title="A plain-language decoder"] .decoder-card { min-height: 135px; padding: 16px; }
+      .slide[data-title="Zach workflow map"] .diagram-shell,
+      .slide[data-title="Insa product router map"] .diagram-shell { padding: 14px 18px; }
+      .slide[data-title="Insa product router map"] h2 { font-size: 52px !important; margin-bottom: 14px !important; }
+      .slide[data-title="Insa product router map"] .diagram-node { min-height: 104px; padding: 14px; }
+      .slide[data-title="Insa product router map"] .router-chip { min-height: 72px; padding: 10px; }
+      .slide[data-title="Insa product router map"] .diagram-branches { margin-top: 10px; padding-top: 10px; }
+      .slide[data-title="Insa product router map"] .diagram-caption { margin-top: 8px; }
+      .slide[data-title="Staff adoption"] .staff-table { margin-top: 14px; }
+      .slide[data-title="Staff adoption"] .staff-table th,
+      .slide[data-title="Staff adoption"] .staff-table td { padding-top: 7px; padding-bottom: 7px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -681,7 +783,7 @@
   <main class="deck" aria-label="Human in the Loop presentation">
 
     <section class="slide dark active" data-title="Human in the Loop" data-notes="Open on the contrast: customers experience a human relationship, while agents operate backstage. Do not start with product architecture. Start with what the customer feels.">
-      <div class="topline"><span>INTERSECTIONS:CONFERENCE · Preliminary draft</span><span>Singapore · July 2026</span></div>
+      <div class="topline"><span>INTERSECTIONS · Service Design Conference</span><span>Singapore · 23–24 July 2026</span></div>
       <div class="content title-layout">
         <div class="title-copy">
           <span class="kicker hot">High-touch service at machine scale</span>
@@ -693,27 +795,27 @@
           <p class="body muted">CEO, Success IT</p>
         </div>
       </div>
-      <div class="footer"><span class="source">Working conference narrative — internal evidence through 19 July 2026</span><span>01</span></div>
+      <div class="footer"><span class="source">Jensen Loke · Success IT · Human in the Loop</span><span>01</span></div>
       <div class="stage-rail" aria-hidden="true"></div>
     </section>
 
-    <section class="slide" data-title="About Jensen Loke" data-notes="Keep this to roughly 30 seconds. The point is not a full CV; it is why you care about the intersection of enterprise systems, service operations and AI. You took over a long-running software business and are modernizing both its products and the way the team works.">
-      <div class="topline"><span>Your speaker</span><span>Operator · architect · service-system builder</span></div>
+    <section class="slide" data-title="About Jensen Loke" data-notes="Spend about 45 seconds here. Your career has crossed consumer and corporate digital products: customer-facing banking journeys, internal platforms and enterprise operations. The thread is not the employers; it is designing products, workflows, teams and software that solve business problems. Today you apply that practice at Success IT and help convene Singapore's 1,000+ member Agentic Builders Collective.">
+      <div class="topline"><span>Your speaker</span><span>Product · service · organisation · software</span></div>
       <div class="content bio-layout">
         <div class="bio-mark"><span>JL</span><small>Jensen Loke · Singapore</small></div>
         <div>
-          <span class="kicker accent">CEO &amp; Managing Director, Success IT</span>
-          <h2 style="font-size:clamp(44px,5.2vw,68px)">I build systems that help small teams carry complex work.</h2>
-          <p class="body" style="margin-top:20px">Enterprise software modernization, AI-enabled operations and the human judgment that makes both useful.</p>
+          <span class="kicker accent">CEO, product builder and community organiser</span>
+          <h2 style="font-size:clamp(40px,4.7vw,64px)">I design products, workflows and teams that make complex services work better.</h2>
+          <p class="body" style="margin-top:18px">Across consumer and corporate digital products, the goal has stayed the same: use technology to solve real business problems and improve outcomes.</p>
           <div class="bio-facts">
-            <div class="bio-fact"><span>Leadership</span><h3>Success IT since 2021</h3></div>
-            <div class="bio-fact"><span>Education</span><h3>NTU · Carnegie Mellon MBA</h3></div>
-            <div class="bio-fact"><span>Earlier chapters</span><h3>Temasek · Ant Financial</h3></div>
-            <div class="bio-fact"><span>Also</span><h3>DBS Bank · Amazon</h3></div>
+            <div class="bio-fact"><span>Consumer products</span><h3>DBS digital banking</h3></div>
+            <div class="bio-fact"><span>Corporate platforms</span><h3>Temasek · Ant Financial · Amazon</h3></div>
+            <div class="bio-fact"><span>Now</span><h3>CEO, Success IT</h3></div>
+            <div class="bio-fact"><span>Community</span><h3>1,000+ Agentic Builders</h3></div>
           </div>
         </div>
       </div>
-      <div class="footer"><span class="source">Sources: GBrain and Obsidian profile, 30 Knowledge/People/Jensen Loke</span><span>02</span></div>
+      <div class="footer"><span class="source">linkedin.com/in/jensenloke · agenticbuilders.sg/community</span><span>02</span></div>
     </section>
 
     <section class="slide dark" data-title="About Success IT" data-notes="Success IT is not an AI lab. It is a twenty-year operating software company with real legacy systems, real customers and a small regional team. That makes it a useful test bed for whether agent-assisted work survives contact with daily operations. Metrics shown are from the February 2025 company snapshot.">
@@ -734,6 +836,42 @@
       <div class="footer"><span class="source">Sources: GBrain and Obsidian company profile; company metrics snapshot dated February 2025</span><span>03</span></div>
     </section>
 
+    <section class="slide paper-grid" data-title="The service philosophy" data-notes="This is the thesis for the whole talk. Success IT makes two promises: software should be easy to use and configurable, and support should remain accountable and human. Explain why a customer-facing bot is not the default answer for B2B: requests are incomplete, history and exceptions matter, and somebody must own the escalation. AI coding tools have also changed your own role. As management, you can now work as a hands-on software engineer—building Zach, Insa, their tools and their guardrails. Those agents then give non-technical staff greater reach.">
+      <div class="topline"><span>Our operating philosophy</span><span>Design the service before adding the agents</span></div>
+      <div class="content">
+        <span class="kicker accent">Two promises to every B2B customer</span>
+        <h2 style="font-size:clamp(42px,5.4vw,76px)">Easy, configurable software.<br>Human, accountable support.</h2>
+        <p class="philosophy-tagline">Clients should not have to prompt a bot, supervise it or fight through it to reach someone who owns the outcome.</p>
+        <div class="philosophy-grid">
+          <article class="philosophy-panel client">
+            <div>
+              <span class="kicker hot">Why people stay at the front door</span>
+              <h3>B2B requests arrive with history, ambiguity and consequences.</h3>
+              <ul>
+                <li>Customers often describe symptoms, not the underlying problem.</li>
+                <li>Exceptions require judgment across data, product and relationship context.</li>
+                <li>A support subscription buys accountability—not another queue to navigate.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="philosophy-panel team">
+            <div>
+              <span class="kicker accent">What AI changes backstage</span>
+              <h3>Management can now engineer the tools that expand staff capability.</h3>
+              <div class="capability-chain">
+                <div class="capability-step"><strong>Jensen + coding agents</strong><span>Hands-on software engineering from management</span></div>
+                <div class="capability-arrow">→</div>
+                <div class="capability-step"><strong>Zach + Insa</strong><span>Purpose-built tools, context and guardrails</span></div>
+                <div class="capability-arrow">→</div>
+                <div class="capability-step"><strong>Iris + Jianzhi</strong><span>More technical reach without becoming engineers</span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="footer"><span class="source">Success IT operating model: agents expand staff capability while people retain the client relationship.</span><span>04</span></div>
+    </section>
+
     <section class="slide paper-grid" data-title="Agenda" data-notes="This agenda is a narrative path, not a list of product features. We begin with the operating context, follow one support issue through Zach and Insa, examine staff adoption, then return to the design principles and business impact.">
       <div class="topline"><span>Today’s route</span><span>Follow one customer issue backstage</span></div>
       <div class="content">
@@ -741,8 +879,8 @@
         <h2>One issue. Two agents.<br>Several human decisions.</h2>
         <div class="agenda-list">
           <div class="agenda-item"><span class="beat">ACT I</span><h3>Meet Iris and Jianzhi</h3><span class="question">Two people · two human loops</span></div>
-          <div class="agenda-item"><span class="beat">ACT II</span><h3>OpenClaw, Zach and SuccessGraph</h3><span class="question">From shorthand to customer context</span></div>
-          <div class="agenda-item"><span class="beat">ACT III</span><h3>Insa and the Discord product lanes</h3><span class="question">From support knowledge to a web fix</span></div>
+          <div class="agenda-item"><span class="beat">ACT II</span><h3>Zach and the customer map</h3><span class="question">From shorthand to customer context</span></div>
+          <div class="agenda-item"><span class="beat">ACT III</span><h3>Insa and configured workrooms</h3><span class="question">From support knowledge to a web fix</span></div>
           <div class="agenda-item"><span class="beat">ACT IV</span><h3>Adoption across the team</h3><span class="question">Why non-engineers lead agent adoption</span></div>
           <div class="agenda-item"><span class="beat">ACT V</span><h3>Boundaries and business impact</h3><span class="question">What remains human—and what it may save</span></div>
         </div>
@@ -759,7 +897,7 @@
           <article class="system-layer"><span class="layer-no">01 · SURFACE</span><div><h3>Discord, WhatsApp, email</h3><p class="small">Staff speak in the tools they already use.</p></div></article>
           <article class="system-layer"><span class="layer-no">02 · ROLE</span><div><h3>Zach, Insa, Laylah</h3><p class="small">Each agent has a job, memory and operating boundaries.</p></div></article>
           <article class="system-layer"><span class="layer-no">03 · WORKFLOW</span><div><h3>Graphs, tools, checkpoints</h3><p class="small">Routing, diagnostics and approvals become auditable steps.</p></div></article>
-          <article class="system-layer"><span class="layer-no">04 · AUTHORITY</span><div><h3>Success IT people</h3><p class="small">Humans correct, approve, deploy, test and communicate.</p></div></article>
+          <article class="system-layer"><span class="layer-no">04 · AUTHORITY</span><div><h3>Success IT people</h3><p class="small">Humans correct, approve, release, test and communicate.</p></div></article>
         </div>
       </div>
       <div class="footer"><span class="source">Sources: OpenClaw agent routing, Zach/Insa workflow plugins and support-to-codeflow runbooks</span><span>06</span></div>
@@ -821,6 +959,22 @@
       <div class="footer"><span class="source">Human leads: customer-service judgment and legacy-product knowledge, amplified through different agent workflows</span><span>07</span></div>
     </section>
 
+    <section class="slide paper-grid" data-title="A plain-language decoder" data-notes="This slide is a compact decoder for a mixed service-design audience. Do not teach software engineering. Give one sentence per term, then keep using the plain-language meaning first for the rest of the talk. The most important definition is the pull request: it is not a release; it is a proposed change waiting for human review.">
+      <div class="topline"><span>Thirty-second decoder</span><span>Five terms used in the case study</span></div>
+      <div class="content">
+        <span class="kicker accent">Plain language first</span>
+        <h2 style="font-size:clamp(42px,5.2vw,74px)">Enough technical vocabulary<br>to follow what happens backstage.</h2>
+        <div class="decoder-grid">
+          <article class="decoder-card"><code>SuccessGraph</code><strong>The customer map</strong><span>Shows the client, their products and related companies.</span></article>
+          <article class="decoder-card"><code>CodeGraph</code><strong>The software impact map</strong><span>Shows which parts of the product a change could affect.</span></article>
+          <article class="decoder-card"><code>Database · DB</code><strong>The business records</strong><span>Where customer transactions and operational data are stored.</span></article>
+          <article class="decoder-card"><code>Pull request · PR</code><strong>A proposed code change</strong><span>Prepared for a human to review—never the same as releasing it live.</span></article>
+          <article class="decoder-card"><code>Product lane</code><strong>A configured workroom</strong><span>A dedicated chat tied to one person, product and set of permissions.</span></article>
+        </div>
+      </div>
+      <div class="footer"><span class="source">Working rule for the talk: describe what each mechanism does before naming how it is implemented.</span><span>09</span></div>
+    </section>
+
     <section class="slide paper-grid" data-title="Zach structures the work" data-notes="Use a synthetic example on stage. Iris can type naturally, but the conversational layer normalizes the request before the deterministic workflow processes it. Show Iris reviewing the structured draft. That correction is the first visible human gate.">
       <div class="topline"><span>Iris · Level 1 support</span><span>Unstructured report → structured work</span></div>
       <div class="content">
@@ -877,7 +1031,7 @@
           <h2 style="font-size:clamp(42px,5.2vw,72px)">It tells Zach<br>where to look.</h2>
           <div class="graph-facts" style="margin-top:26px">
             <div class="graph-fact"><span>Customer</span><h3>Client + related companies</h3></div>
-            <div class="graph-fact"><span>System</span><h3>Tenant + mapped platform</h3></div>
+            <div class="graph-fact"><span>System</span><h3>Customer account + platform</h3></div>
             <div class="graph-fact"><span>Commercial</span><h3>Products + subscription</h3></div>
             <div class="graph-fact"><span>Routing</span><h3>Iris, evidence gate or Insa</h3></div>
           </div>
@@ -898,7 +1052,7 @@
             <div class="diagram-arrow">→</div>
             <div class="diagram-node agent"><span class="node-type">Zach</span><h3>Draft ticket: customer, product, impact, evidence</h3></div>
             <div class="diagram-arrow">→</div>
-            <div class="diagram-node context"><span class="node-type">SuccessGraph + triage</span><h3>Tenant, products, subscription, platform and route</h3></div>
+            <div class="diagram-node context"><span class="node-type">Customer map + triage</span><h3>Customer account, products, subscription, platform and route</h3></div>
           </div>
           <div class="diagram-branches">
             <div><div class="branch-label">Legacy · unknown · incomplete</div><div class="diagram-node human"><span class="node-type">Fail toward support</span><h3>Iris clarifies, resolves or adds missing evidence</h3></div></div>
@@ -922,8 +1076,8 @@ Approval --> Insa[Complete packet to Insa]</script>
       <div class="content split">
         <figure class="evidence-frame"><img src="public-assets/codegraph-public.png" alt="Redacted CodeGraph interface showing a highlighted dependency blast radius in a large codebase graph" /><figcaption>Code dependency blast radius; internal identifiers redacted.</figcaption></figure>
         <div class="machine-list">
-          <div class="machine-row"><code>01</code><div><h3>Resolve the lane</h3><p class="small muted">Product, repository, tenant and permissions</p></div></div>
-          <div class="machine-row"><code>02</code><div><h3>Trace the system</h3><p class="small muted">CodeGraph, UI path, service and database dependencies</p></div></div>
+          <div class="machine-row"><code>01</code><div><h3>Open the right workroom</h3><p class="small muted">Product, source code, customer system and permissions</p></div></div>
+          <div class="machine-row"><code>02</code><div><h3>Trace the system</h3><p class="small muted">Software impact map, screen, service and customer-data dependencies</p></div></div>
           <div class="machine-row"><code>03</code><div><h3>Investigate safely</h3><p class="small muted">Read-only, audited diagnostics with durable findings</p></div></div>
           <div class="machine-row"><code>04</code><div><h3>Return evidence</h3><p class="small muted">Explain, package a fix, or ask the human for more</p></div></div>
         </div>
@@ -945,8 +1099,8 @@ Approval --> Insa[Complete packet to Insa]</script>
           <h2 style="font-size:clamp(42px,5.4vw,76px)">The execution behind it is anything but.</h2>
           <div class="lane-rules" style="margin-top:24px">
             <div class="lane-rule"><code>01</code><div><h3>Resolve who + product</h3><p class="small muted">Working role, product and permitted intake mode</p></div></div>
-            <div class="lane-rule"><code>02</code><div><h3>Load the technical lane</h3><p class="small muted">Workspace, repositories, tenant path, branch and PR target</p></div></div>
-            <div class="lane-rule"><code>03</code><div><h3>Fail closed</h3><p class="small muted">Ambiguity, wrong branches or missing approval stop the workflow</p></div></div>
+            <div class="lane-rule"><code>02</code><div><h3>Load the configured workroom</h3><p class="small muted">Source code, customer-data path, safe working copy and review target</p></div></div>
+            <div class="lane-rule"><code>03</code><div><h3>Stop when uncertain</h3><p class="small muted">Ambiguity, protected code or missing approval stops the workflow</p></div></div>
           </div>
         </div>
       </div>
@@ -954,9 +1108,9 @@ Approval --> Insa[Complete packet to Insa]</script>
     </section>
 
     <section class="slide paper-grid" data-title="Insa product router map" data-notes="This is the new Insa Mermaid map. A Discord lane supplies a configured working role and product—not biometric identity. The resolver first checks channel identity and action. It then returns an explicit technical lane: repositories, workspace, tenant path, branch origin and PR target. Unknown products, channel mismatches, missing surfaces or protected targets stop. Only after resolution do CodeGraph, read-only database diagnostics, readiness checks and PR packaging run.">
-      <div class="topline"><span>Insa product router</span><span>Mermaid · conversation → technical boundary</span></div>
+      <div class="topline"><span>Insa product router</span><span>Conversation → configured workroom</span></div>
       <div class="content">
-        <span class="kicker accent">The product lane is executable context</span>
+        <span class="kicker accent">The chat already knows which product and tools are allowed</span>
         <h2 style="font-size:clamp(40px,4.7vw,66px);margin-bottom:24px">One Insa.<br>Different operating boundaries.</h2>
         <div class="diagram-shell" role="img" aria-label="Insa product router from Discord channel through channel validation and product resolution to repository, database, branch and pull request boundaries">
           <div class="router-grid">
@@ -965,17 +1119,17 @@ Approval --> Insa[Complete packet to Insa]</script>
             <div class="diagram-node agent"><span class="node-type">Insa resolver</span><h3>Match channel ID and name. Validate product, surface and action.</h3></div>
             <div class="diagram-arrow">→</div>
             <div class="router-output">
-              <div class="router-chip"><strong>Workspace + repo</strong><span>Frontend, backend and support folder</span></div>
-              <div class="router-chip"><strong>Tenant + data path</strong><span>Read-only, audited diagnostics</span></div>
-              <div class="router-chip"><strong>Branch route</strong><span>Origin, protected target and PR lane</span></div>
-              <div class="router-chip"><strong>Execution gates</strong><span>CodeGraph, readiness, build and approval</span></div>
+              <div class="router-chip"><strong>Product code</strong><span>Screens, services and support context</span></div>
+              <div class="router-chip"><strong>Customer-data path</strong><span>Read-only, audited inspection</span></div>
+              <div class="router-chip"><strong>Safe working copy</strong><span>Where the proposed change starts and is reviewed</span></div>
+              <div class="router-chip"><strong>Safety checks</strong><span>Impact map, build test and human approval</span></div>
             </div>
           </div>
           <div class="diagram-branches">
-            <div><div class="branch-label">Resolved lane</div><div class="diagram-node context"><span class="node-type">Evidence chain</span><h3>CodeGraph → read-only DB → investigation ledger → readiness</h3></div></div>
-            <div><div class="branch-label">Consequence</div><div class="diagram-node human"><span class="node-type">Human authority</span><h3>PR → Jensen review/deploy → human test → support closure</h3></div></div>
+            <div><div class="branch-label">Configured workroom</div><div class="diagram-node context"><span class="node-type">Evidence chain</span><h3>Software impact map → read-only data check → evidence log</h3></div></div>
+            <div><div class="branch-label">Human authority</div><div class="diagram-node human"><span class="node-type">Proposed change</span><h3>Insa prepares → Jensen reviews and releases → staff test</h3></div></div>
           </div>
-          <div class="diagram-caption"><span>Mismatch or ambiguity → blocked, never guessed.</span><span>The channel shapes the lane; it does not grant production authority.</span></div>
+          <div class="diagram-caption"><span>Mismatch or ambiguity → stopped, never guessed.</span><span>The chat selects the workroom; it never grants authority over the live system.</span></div>
         </div>
       </div>
       <script type="text/plain" class="mermaid-source">flowchart LR
@@ -1004,11 +1158,11 @@ PR --> Human[Jensen review, deploy and human test]</script>
           </article>
           <article class="jz-stage channel">
             <div><span class="kicker">Insa’s Discord lane</span><h3>Scoped to Jianzhi + one product</h3></div>
-            <ul><li>Starts with the correct product context</li><li>Resolves repo, branch and dependencies</li><li>Investigates and makes a small change</li></ul>
+            <ul><li>Starts with the correct product context</li><li>Finds the code and affected components</li><li>Investigates and makes a small change</li></ul>
           </article>
           <article class="jz-stage result">
             <div><span class="kicker">The result</span><h3>A reviewable web-app fix</h3></div>
-            <ul><li>Small bugs and scoped changes</li><li>PR and verification evidence</li><li>Humans retain review and release authority</li></ul>
+            <ul><li>Small bugs and scoped changes</li><li>A proposed change with verification evidence</li><li>Humans retain review and release authority</li></ul>
           </article>
         </div>
       </div>
@@ -1037,10 +1191,10 @@ PR --> Human[Jensen review, deploy and human test]</script>
         <span class="kicker" style="color:var(--mint)">How good is Insa?</span>
         <h2>8,159 audited operations.<br>Not one vanity “accuracy” score.</h2>
         <div class="metric-grid">
-          <div class="metric"><strong>2,142</strong><span>database diagnostic operations</span></div>
-          <div class="metric"><strong>1,721</strong><span>CodeGraph dependency operations</span></div>
+          <div class="metric"><strong>2,142</strong><span>read-only checks of customer data</span></div>
+          <div class="metric"><strong>1,721</strong><span>software impact-map checks</span></div>
           <div class="metric"><strong>1,165</strong><span>readiness-gate operations</span></div>
-          <div class="metric"><strong>441</strong><span>PR-package operations</span></div>
+          <div class="metric"><strong>441</strong><span>code-change packages prepared for review</span></div>
         </div>
       </div>
       <div class="footer"><span class="source">Internal Insa audit ledger. Counts measure workflow activity, not correctness, fixes, or hours saved.</span><span>07</span></div>
@@ -1054,8 +1208,8 @@ PR --> Human[Jensen review, deploy and human test]</script>
         <table class="staff-table">
           <thead><tr><th>Person</th><th>Audited operations</th><th>Primary pattern</th><th>Relative activity</th></tr></thead>
           <tbody>
-            <tr><td><strong>Jianzhi</strong><span class="role-note">BD &amp; support · nontechnical</span></td><td>2,538</td><td>Lane resolution · readiness · PR packaging</td><td><div class="bar"><i style="width:100%"></i></div></td></tr>
-            <tr><td><strong>Iris</strong><span class="role-note">Level 1 support · 8 months</span></td><td>527</td><td>DB diagnostics · investigation · support context</td><td><div class="bar"><i style="width:21%"></i></div></td></tr>
+            <tr><td><strong>Jianzhi</strong><span class="role-note">BD &amp; support · nontechnical</span></td><td>2,538</td><td>Workroom setup · safety checks · change preparation</td><td><div class="bar"><i style="width:100%"></i></div></td></tr>
+            <tr><td><strong>Iris</strong><span class="role-note">Level 1 support · 8 months</span></td><td>527</td><td>Customer-data checks · investigation · support context</td><td><div class="bar"><i style="width:21%"></i></div></td></tr>
             <tr><td><strong>Tracy</strong><span class="role-note">Engineer</span></td><td>262</td><td>Issues · product investigation</td><td><div class="bar"><i style="width:10.3%"></i></div></td></tr>
             <tr><td><strong>Jackson</strong><span class="role-note">BD lead · coding for 5 months</span></td><td>209</td><td>Multi-product delivery · investigation</td><td><div class="bar"><i style="width:8.2%"></i></div></td></tr>
             <tr><td><strong>Justin</strong><span class="role-note">Engineer</span></td><td>Not cleanly attributable</td><td>Broader adoption signal only</td><td><div class="bar"><i style="width:3%"></i></div></td></tr>
@@ -1073,11 +1227,11 @@ PR --> Human[Jensen review, deploy and human test]</script>
         <div class="profile-pair" style="margin-top:34px">
           <article class="profile" data-letter="J">
             <div><h3>Jianzhi</h3><p class="body muted">BD and support lead · no technical background</p></div>
-            <div><strong>245</strong><p class="body">distinct PR URLs recorded in Jianzhi-scoped channels</p></div>
+            <div><strong>245</strong><p class="body">proposed code changes recorded in Jianzhi’s workrooms</p></div>
           </article>
           <article class="profile" data-letter="J">
             <div><h3>Jackson</h3><p class="body muted">Business development lead · learned to code in five months</p></div>
-            <div><strong>12</strong><p class="body">distinct PR URLs associated with Jackson-scoped activity</p></div>
+            <div><strong>12</strong><p class="body">proposed code changes associated with Jackson’s workrooms</p></div>
           </article>
         </div>
       </div>
@@ -1091,8 +1245,8 @@ PR --> Human[Jensen review, deploy and human test]</script>
         <h2>The system knows when it does not know.</h2>
         <div class="gates">
           <article class="gate"><div class="number">01</div><h3>Evidence gate</h3><p class="body">Missing screen path, sample record or expected behavior returns to Iris.</p></article>
-          <article class="gate"><div class="number">02</div><h3>Authority gate</h3><p class="body">Production writes, protected changes and deployment remain human-controlled.</p></article>
-          <article class="gate"><div class="number">03</div><h3>Reality gate</h3><p class="body">A human tests production and Iris decides what the customer should hear.</p></article>
+          <article class="gate"><div class="number">02</div><h3>Authority gate</h3><p class="body">Changes to live customer systems and software releases remain human-controlled.</p></article>
+          <article class="gate"><div class="number">03</div><h3>Reality gate</h3><p class="body">A human tests the live system and Iris decides what the customer should hear.</p></article>
         </div>
       </div>
       <div class="footer"><span class="source">Verified in handoff graph tests, data-access policy and testing/closure runbooks.</span><span>10</span></div>
@@ -1110,7 +1264,7 @@ PR --> Human[Jensen review, deploy and human test]</script>
           </article>
           <article class="authority-col human">
             <h3>Iris + engineers + Jensen</h3>
-            <ul class="check-list"><li>Understand the customer’s real need</li><li>Correct and approve the record</li><li>Review code and data changes</li><li>Deploy and verify production</li><li>Own the relationship and outcome</li></ul>
+            <ul class="check-list"><li>Understand the customer’s real need</li><li>Correct and approve the record</li><li>Review code and data changes</li><li>Release and verify the live system</li><li>Own the relationship and outcome</li></ul>
           </article>
         </div>
       </div>
@@ -1155,8 +1309,8 @@ PR --> Human[Jensen review, deploy and human test]</script>
             <label>Minutes saved per intake<input id="ticketMinutes" type="number" min="0" step="1" value="6" /></label>
             <label>Investigations / month<input id="investigationCount" type="number" min="0" step="1" value="30" /></label>
             <label>Minutes saved per investigation<input id="investigationMinutes" type="number" min="0" step="1" value="45" /></label>
-            <label>Small code / PR tasks per month<input id="codeTaskCount" type="number" min="0" step="1" value="10" /></label>
-            <label>Hours saved per code / PR task<input id="codeTaskHours" type="number" min="0" step="0.5" value="2" /></label>
+            <label>Small code-change tasks per month<input id="codeTaskCount" type="number" min="0" step="1" value="10" /></label>
+            <label>Hours saved per code-change task<input id="codeTaskHours" type="number" min="0" step="0.5" value="2" /></label>
           </div>
           <p class="small muted" style="margin-top:16px">Edit the assumptions live. These are working estimates—not measured productivity claims.</p>
         </div>
@@ -1188,32 +1342,43 @@ PR --> Human[Jensen review, deploy and human test]</script>
       <div class="footer"><span class="source">Recommended next evidence: 10-ticket time study, pre/post comparison and payroll-cost reconciliation.</span><span>14</span></div>
     </section>
 
-    <section class="slide paper-grid" data-title="The B2B service promise" data-notes="This is the philosophical core. Success IT clients pay a service and support subscription for accountable people, not merely access to a response generator. In the near term, you will not replace direct human contact surfaces with AI agents. Agents stay backstage, helping staff arrive faster with more context and better escalation. Be transparent that AI is part of how the service is delivered without forcing customers to manage or supervise it.">
-      <div class="topline"><span>B2B operating philosophy</span><span>Service is a relationship, not an interface</span></div>
-      <div class="content">
-        <span class="kicker accent">What our clients are paying for</span>
-        <h2 style="font-size:clamp(44px,5.8vw,82px)">We will automate the work.<br>Not the accountability.</h2>
-        <div class="promise-grid">
-          <article class="promise customer"><div><span class="kicker">For the client</span><h3>A real person receives the request, understands the stakes and owns the escalation.</h3></div><p class="body">Direct human contact remains the service surface.</p></article>
-          <article class="promise staff"><div><span class="kicker">For our staff</span><h3>Agents recover context, investigate systems and prepare the next safe action.</h3></div><p class="body">AI increases capability behind the relationship.</p></article>
+    <section class="slide dark" data-title="Agentic Builders Collective" data-notes="Invite the audience to continue learning in community. ABC began as a WhatsApp group for Claude Code users and grew into a tool-agnostic Singapore community for agentic coding. It now has more than 1,000 active members, with daily discussion and monthly meetups. You are one of the co-organisers. Pause long enough for people to scan the QR code.">
+      <div class="topline"><span>Continue at the intersection</span><span>Agentic Builders Collective · Singapore</span></div>
+      <div class="content community-layout">
+        <div>
+          <span class="kicker" style="color:var(--mint)">Builders helping builders</span>
+          <h2 style="font-size:clamp(46px,6.2vw,88px)">Come learn agentic coding with us.</h2>
+          <p class="lede muted" style="margin-top:24px">A Singapore community for developers, designers, operators and tinkerers building software with AI.</p>
+          <div class="community-facts">
+            <div class="community-fact"><strong>1,000+</strong><span>active members</span></div>
+            <div class="community-fact"><strong>Daily</strong><span>WhatsApp discussion and troubleshooting</span></div>
+            <div class="community-fact"><strong>Monthly</strong><span>meetups, demos and workshops</span></div>
+          </div>
         </div>
+        <a class="qr-card" href="https://chat.whatsapp.com/FkPWbdgxBhz8rLPTYTFiGq" target="_blank" rel="noopener">
+          <img src="public-assets/agentic-builders-whatsapp-qr.svg" alt="QR code to join the Agentic Builders Collective WhatsApp group" />
+          <strong>Scan to join the WhatsApp group</strong>
+          <span>agenticbuilders.sg</span>
+        </a>
       </div>
-      <div class="footer"><span class="source">Success IT operating philosophy: clients retain human access; agents remain an internal capability layer.</span><span>24</span></div>
+      <div class="footer"><span class="source">agenticbuilders.sg/about · Community count as of July 2026</span><span>31</span></div>
     </section>
 
-    <section class="slide blue" data-title="The relationship remains human" data-notes="Return to the opening. The point is not invisible AI as a trick; it is role clarity. The agents remain backstage because the human relationship is the product.">
-      <div class="topline"><span>Human in the Loop</span><span>The operating principle</span></div>
-      <div class="content closing">
-        <div>
-          <span class="kicker">The customer experiences the outcome</span>
-          <h1 style="font-size:clamp(66px,9.2vw,138px)">The AI is not the relationship.</h1>
+    <section class="slide blue" data-title="Questions" data-notes="End cleanly. Restate the thesis in one sentence, invite questions and leave the LinkedIn QR code visible while the conversation continues.">
+      <div class="topline"><span>End · Questions</span><span>Human in the Loop</span></div>
+      <div class="content questions-layout">
+        <div class="questions-copy">
+          <span class="kicker">The AI is not the relationship. Our people are.</span>
+          <h1 style="font-size:clamp(82px,12vw,176px)">Questions?</h1>
+          <p class="lede">Thank you.<br>Let’s continue the conversation.</p>
         </div>
-        <aside>
-          <h3>Our people are.</h3>
-          <p class="body" style="margin-top:14px">Zach and Insa make Iris, Jianzhi and the whole Success IT team more capable.</p>
-        </aside>
+        <a class="qr-card" href="https://www.linkedin.com/in/jensenloke/" target="_blank" rel="noopener">
+          <img src="public-assets/jensen-linkedin-qr.svg" alt="QR code to connect with Jensen Loke on LinkedIn" />
+          <strong>Connect with Jensen</strong>
+          <span>linkedin.com/in/jensenloke</span>
+        </a>
       </div>
-      <div class="footer"><span class="source">Success IT · Human in the Loop · Preliminary conference narrative</span><span>15</span></div>
+      <div class="footer"><span class="source">Jensen Loke · CEO, Success IT · Co-organiser, Agentic Builders Collective</span><span>32</span></div>
     </section>
 
   </main>
