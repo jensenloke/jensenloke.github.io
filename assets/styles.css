@@ -720,6 +720,239 @@ code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
+/* ----- Section index pages (writing, talks, work, papers) ----- */
+
+.page-head {
+  padding: 52px 0 30px;
+}
+
+.page-head h1 {
+  max-width: 760px;
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+}
+
+.page-head p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+.section-main {
+  padding: 0 0 72px;
+}
+
+.section-block {
+  margin-top: 40px;
+}
+
+.section-block:first-child {
+  margin-top: 0;
+}
+
+.entry-list {
+  display: grid;
+  gap: 14px;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: end;
+  padding: 20px clamp(18px, 3vw, 26px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.entry:hover {
+  transform: translateY(-2px);
+  border-color: rgba(111, 202, 185, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.entry h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  line-height: 1.2;
+}
+
+.entry p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+.entry-meta {
+  margin: 0 0 8px;
+  color: #146d5d;
+  font-size: 0.78rem;
+  font-weight: 830;
+  text-transform: uppercase;
+}
+
+.entry.talk-entry .entry-meta {
+  color: #0170b9;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.work-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(111, 202, 185, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.work-card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
+.work-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.work-card .card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(99, 116, 132, 0.26);
+  border-radius: 999px;
+  padding: 3px 9px;
+  color: var(--slate-2);
+  background: rgba(238, 249, 245, 0.7);
+  font-size: 0.74rem;
+  font-weight: 740;
+  white-space: nowrap;
+}
+
+.chip.lang {
+  background: rgba(205, 233, 255, 0.5);
+}
+
+.compact-list {
+  display: grid;
+  gap: 8px;
+}
+
+.compact-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  border: 1px solid rgba(99, 116, 132, 0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--panel);
+}
+
+.compact-row a {
+  font-weight: 740;
+  text-decoration: none;
+}
+
+.compact-row a:hover {
+  text-decoration: underline;
+}
+
+.compact-row span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.empty-note {
+  border: 1px dashed rgba(99, 116, 132, 0.42);
+  border-radius: 8px;
+  padding: 26px;
+  color: var(--muted);
+  background: rgba(238, 249, 245, 0.35);
+}
+
+.empty-note strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+
+.explore-grid,
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.track-grid {
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+}
+
+.inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 20px;
+  font-size: 0.93rem;
+}
+
+.inline-links a {
+  font-weight: 680;
+}
+
+.hub-card {
+  display: block;
+  padding: 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.hub-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(111, 202, 185, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.hub-card h2 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.hub-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 @media (max-width: 980px) {
   .scenario,
   .definition,
@@ -732,6 +965,18 @@ code {
 
   .failure-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-grid,
+  .explore-grid,
+  .track-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-links {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px 18px;
   }
 }
 
@@ -765,6 +1010,19 @@ code {
 
   .featured-card .read-link {
     margin-top: 18px;
+  }
+
+  .entry {
+    display: block;
+  }
+
+  .entry .read-link {
+    margin-top: 14px;
+  }
+
+  .compact-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .article-wide {
