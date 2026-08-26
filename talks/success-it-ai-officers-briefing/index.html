@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <link rel="icon" href="data:," />
+  <title>How Success IT's AI Agents Work</title>
+  <style>
+    :root {
+      --paper: #f7fafc;
+      --white: #ffffff;
+      --ink: #2c384a;
+      --navy: #233044;
+      --muted: #667085;
+      --line: #ccd7df;
+      --human: #ff781c;
+      --human-soft: #fff0e6;
+      --agent: #0170b9;
+      --agent-dark: #004e82;
+      --agent-soft: #e6f3fb;
+      --system: #667085;
+      --system-soft: #edf1f4;
+      --decision: #ffc857;
+      --safe: #35865a;
+      --display: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      --body: "Karla", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { color: var(--ink); background: #dce6ed; font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    button { font: inherit; color: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { font-family: var(--display); }
+    h1 { font-size: clamp(58px, 8vw, 120px); line-height: .9; letter-spacing: -.062em; }
+    h2 { font-size: clamp(40px, 5.1vw, 74px); line-height: .96; letter-spacing: -.048em; }
+    h3 { font-size: clamp(19px, 1.8vw, 28px); line-height: 1.08; letter-spacing: -.025em; }
+    .body { font-size: clamp(16px, 1.35vw, 21px); line-height: 1.38; }
+    .small { font-size: clamp(12px, .94vw, 15px); line-height: 1.36; }
+    .muted { color: var(--muted); }
+    .dark .muted { color: rgba(255,255,255,.66); }
+
+    .deck { width: 100vw; height: 100vh; position: relative; isolation: isolate; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(12px, 2vh, 24px);
+      padding: clamp(26px, 3.7vw, 58px) clamp(32px, 5.2vw, 82px) clamp(28px, 4vw, 58px);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(2.5%);
+      background: var(--paper);
+      box-shadow: inset 0 0 0 8px #e8f0f5;
+      transition: opacity .24s ease, transform .34s cubic-bezier(.2,.8,.2,1), visibility .24s;
+    }
+    .slide.active { opacity: 1; visibility: visible; transform: none; z-index: 2; }
+    .slide.dark { color: white; background: var(--navy); box-shadow: inset 0 0 0 8px #1d2839; }
+    .slide.agent-wash { background: linear-gradient(90deg, var(--paper) 0 72%, var(--agent-soft) 72%); }
+    .slide.human-wash { background: linear-gradient(90deg, var(--human-soft) 0 28%, var(--paper) 28%); }
+
+    .topline, .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      z-index: 4;
+    }
+    .topline { padding-bottom: 10px; border-bottom: 1px solid rgba(44,56,74,.28); color: var(--agent); font: 800 clamp(10px, .9vw, 13px) var(--display); letter-spacing: .09em; text-transform: uppercase; }
+    .dark .topline { color: #cbe9fb; border-color: rgba(255,255,255,.24); }
+    .topline span:last-child { text-align: right; opacity: .72; }
+    .footer { color: var(--muted); font-size: clamp(10px, .78vw, 12px); }
+    .dark .footer { color: rgba(255,255,255,.58); }
+    .footer span:first-child { max-width: 80%; }
+    .content { min-height: 0; align-self: center; position: relative; z-index: 2; }
+    .kicker { display: block; margin-bottom: 14px; color: var(--agent); font: 850 clamp(10px, .9vw, 13px) var(--display); letter-spacing: .1em; text-transform: uppercase; }
+    .kicker.human { color: #be4c00; }
+    .dark .kicker { color: #cbe9fb; }
+
+    .hero { display: grid; grid-template-columns: 1.25fr .75fr; gap: 6vw; align-items: end; }
+    .hero h2 { margin-top: 26px; color: #cbe9fb; font-size: clamp(32px, 3.8vw, 54px); }
+    .hero-aside { padding: 4px 0 6px 26px; border-left: 8px solid var(--human); }
+    .hero-aside strong { display: block; font: 800 clamp(25px, 2.6vw, 40px)/1.04 var(--display); }
+    .hero-aside p { margin-top: 18px; }
+    .signal-line { width: 170px; height: 10px; margin-top: 30px; background: linear-gradient(90deg, var(--human) 0 32%, var(--decision) 32% 36%, var(--agent) 36% 68%, var(--system) 68%); }
+
+    .journey { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-top: 34px; border: 2px solid var(--line); background: white; }
+    .journey-step { min-height: 250px; padding: 23px 20px; position: relative; border-right: 1px solid var(--line); }
+    .journey-step:last-child { border-right: 0; }
+    .journey-step::after { content: "→"; position: absolute; right: -16px; top: 47%; z-index: 2; width: 30px; text-align: center; color: var(--agent); background: white; font: 900 24px var(--display); }
+    .journey-step:last-child::after { display: none; }
+    .journey-step b { display: block; color: var(--muted); font: 800 11px var(--mono); }
+    .journey-step h3 { margin-top: 48px; }
+    .journey-step p { margin-top: 12px; }
+    .journey-step:nth-child(2), .journey-step:nth-child(3), .journey-step:nth-child(4) { border-top: 8px solid var(--agent); }
+    .journey-step:first-child { border-top: 8px solid var(--human); }
+    .journey-step:last-child { border-top: 8px solid var(--decision); }
+
+    .role-key { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .role-key span { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; color: var(--ink); background: white; border: 1px solid var(--line); font: 800 10px var(--display); letter-spacing: .08em; text-transform: uppercase; }
+    .role-key i { width: 13px; height: 13px; display: inline-block; }
+    .key-human i { background: var(--human); border-radius: 50%; }
+    .key-agent i { background: var(--agent); clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px); }
+    .key-system i { background: var(--system-soft); border: 3px double var(--system); }
+    .key-decision i { background: var(--decision); transform: rotate(45deg); border: 1px solid var(--ink); }
+
+    .system-map { display: grid; grid-template-columns: 1.03fr 1.8fr 1fr; gap: 18px; align-items: stretch; margin-top: 25px; }
+    .map-col { display: grid; gap: 10px; }
+    .map-label { font: 850 11px var(--display); letter-spacing: .1em; text-transform: uppercase; }
+    .map-label.human { color: #bd4b00; }
+    .map-label.agent { color: var(--agent); }
+    .map-label.system { color: var(--system); }
+    .human-node, .agent-node, .system-node { min-height: 74px; padding: 13px 16px; display: flex; flex-direction: column; justify-content: center; }
+    .human-node { color: #542708; background: var(--human-soft); border: 3px solid var(--human); border-radius: 40px 10px 10px 40px; }
+    .agent-node { color: white; background: var(--agent); clip-path: polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px); }
+    .system-node { background: var(--system-soft); border: 3px double var(--system); }
+    .node-title { font: 800 clamp(17px, 1.35vw, 21px)/1.1 var(--display); }
+    .node-copy { margin-top: 5px; font-size: clamp(11px, .83vw, 13px); line-height: 1.25; }
+    .map-bridge { position: absolute; inset: 44% 28% auto; border-top: 3px dashed var(--decision); z-index: -1; }
+
+    .top-stack { display: grid; gap: 7px; margin-top: 18px; }
+    .stack-layer { display: grid; grid-template-columns: 150px 1fr; min-height: 65px; border: 1px solid var(--line); background: white; }
+    .stack-layer + .stack-layer { position: relative; }
+    .stack-layer + .stack-layer::before { content: "↓"; position: absolute; left: 66px; top: -17px; z-index: 3; width: 28px; text-align: center; color: var(--agent); background: var(--paper); font: 900 18px var(--display); }
+    .stack-name { padding: 13px 15px; display: flex; align-items: center; color: var(--muted); background: var(--system-soft); font: 850 10px/1.2 var(--display); letter-spacing: .09em; text-transform: uppercase; }
+    .stack-items { padding: 9px 13px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .stack-item { padding: 7px 11px; color: var(--ink); background: var(--system-soft); border: 2px solid var(--system); font: 750 clamp(11px,.88vw,14px)/1.15 var(--display); }
+    .stack-item.human { color: #542708; background: var(--human-soft); border-color: var(--human); border-radius: 22px 6px 6px 22px; }
+    .stack-item.agent { color: white; background: var(--agent); border: 0; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+    .stack-item.graph { color: var(--agent-dark); background: var(--agent-soft); border-color: var(--agent); }
+    .stack-item.decision { color: #5e4300; background: #fff4d6; border-color: var(--decision); }
+    .stack-item.cron { color: #294e3b; background: #e8f5ed; border-color: var(--safe); font-family: var(--mono); }
+    .slide[data-title="Top-down architecture"] .top-stack { gap: 4px; margin-top: 11px; }
+    .slide[data-title="Top-down architecture"] .stack-layer { min-height: 54px; }
+    .slide[data-title="Top-down architecture"] .stack-name { padding-top: 9px; padding-bottom: 9px; }
+    .slide[data-title="Top-down architecture"] .stack-items { padding-top: 6px; padding-bottom: 6px; }
+
+    .graph-layout { display: grid; grid-template-columns: .78fr 1.22fr; gap: 28px; align-items: stretch; margin-top: 18px; }
+    .graph-summary { display: flex; flex-direction: column; justify-content: space-between; }
+    .graph-summary h2 { font-size: clamp(37px,4.25vw,62px); }
+    .graph-note { margin-top: 18px; padding: 14px 16px; background: white; border-left: 7px solid var(--agent); }
+    .graph-note code { font: 650 clamp(10px,.75vw,12px)/1.5 var(--mono); }
+    .graph-pipeline { display: grid; align-content: center; gap: 4px; padding: 16px 18px; background: white; border: 2px solid var(--line); }
+    .graph-node { min-height: 54px; padding: 10px 14px; display: grid; grid-template-columns: 140px 1fr; gap: 15px; align-items: center; border-left: 7px solid var(--agent); background: var(--agent-soft); }
+    .graph-node.system { border-color: var(--system); background: var(--system-soft); }
+    .graph-node.human { border-color: var(--human); background: var(--human-soft); }
+    .graph-node.decision { border-color: var(--decision); background: #fff8e5; }
+    .graph-node strong { font: 820 clamp(14px,1.1vw,17px)/1.15 var(--display); }
+    .graph-node span { color: var(--muted); font-size: clamp(10px,.78vw,12px); line-height: 1.23; }
+    .graph-down { text-align: center; color: var(--agent); font: 900 16px/1 var(--display); }
+
+    .cron-grid { display: grid; grid-template-columns: 135px 1fr; gap: 0; margin-top: 20px; border: 2px solid var(--line); background: white; }
+    .cron-band { display: contents; }
+    .cron-time { padding: 16px 14px; color: white; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.2); font: 800 clamp(12px,.95vw,15px)/1.15 var(--mono); }
+    .cron-jobs { padding: 12px 15px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
+    .cron-band:last-child .cron-time, .cron-band:last-child .cron-jobs { border-bottom: 0; }
+    .cron-job { padding: 8px 10px; color: #294e3b; background: #e8f5ed; border-left: 5px solid var(--safe); font: 750 clamp(10px,.77vw,12px)/1.15 var(--display); }
+    .cron-job small { display: block; margin-top: 3px; color: #547463; font: 600 9px/1.2 var(--mono); }
+    .cron-thesis { margin-top: 13px; text-align: center; font: 780 clamp(14px,1.15vw,18px)/1.2 var(--display); }
+
+    .handoff { display: grid; grid-template-columns: 1fr 75px 1.22fr 75px .9fr; gap: 10px; align-items: center; margin-top: 26px; }
+    .handoff-col { display: grid; gap: 9px; }
+    .handoff-box { min-height: 62px; padding: 11px 13px; background: white; border: 2px solid var(--line); }
+    .handoff-box strong { display: block; font: 800 clamp(13px,1vw,16px)/1.15 var(--display); }
+    .handoff-box span { display: block; margin-top: 4px; color: var(--muted); font-size: clamp(9px,.7vw,11px); line-height: 1.2; }
+    .handoff-box.input { border-left: 7px solid var(--system); }
+    .handoff-box.graph { color: white; background: var(--agent); border-color: var(--agent); }
+    .handoff-box.graph span { color: #d7ecfa; }
+    .handoff-box.output { border-left: 7px solid var(--decision); }
+    .handoff-arrow { text-align: center; color: var(--agent); font: 900 34px var(--display); }
+    .packet { margin-top: 18px; padding: 14px 16px; background: var(--system-soft); border-left: 7px solid var(--system); font-size: clamp(11px,.86vw,14px); line-height: 1.35; }
+
+    .router-layout { display: grid; grid-template-columns: .9fr 75px 1.2fr 75px 1fr; gap: 10px; align-items: stretch; margin-top: 22px; }
+    .router-stage { padding: 18px; background: white; border: 2px solid var(--line); }
+    .router-stage.channel { border-top: 8px solid #5865f2; }
+    .router-stage.lane { border-top: 8px solid var(--agent); }
+    .router-stage.context { border-top: 8px solid var(--decision); }
+    .router-stage h3 { margin-top: 14px; }
+    .router-stage ul { margin: 14px 0 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: clamp(11px,.86vw,14px); line-height: 1.25; }
+    .router-arrow { display: grid; place-items: center; color: var(--agent); font: 900 33px var(--display); }
+    .router-stat { margin-top: 18px; display: flex; gap: 12px; }
+    .router-stat span { padding: 10px 13px; background: var(--system-soft); border-bottom: 5px solid var(--agent); font: 800 clamp(12px,.94vw,15px)/1.15 var(--display); }
+
+    .cli-columns { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; margin-top: 22px; }
+    .cli-column { min-height: 335px; padding: 19px; background: white; border-top: 8px solid var(--agent); box-shadow: 0 8px 24px rgba(44,56,74,.06); }
+    .cli-column:nth-child(2) { border-color: var(--system); }
+    .cli-column:nth-child(3) { border-color: var(--decision); }
+    .cli-column:nth-child(4) { border-color: var(--safe); }
+    .cli-column h3 { margin-top: 25px; }
+    .cli-column p { margin-top: 11px; }
+    .cli-column code { display: block; margin-top: 15px; color: var(--agent-dark); font: 650 clamp(9px,.69vw,11px)/1.45 var(--mono); }
+
+    .arch-grid { display: grid; grid-template-columns: .95fr 1.4fr; gap: 34px; align-items: stretch; margin-top: 20px; }
+    .arch-intro { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+    .arch-intro h2 { font-size: clamp(38px, 4.5vw, 65px); }
+    .arch-intro .explain { margin-top: 18px; }
+    .tools-list { margin-top: 20px; padding: 16px 18px; background: white; border-left: 7px solid var(--agent); box-shadow: 0 8px 22px rgba(44,56,74,.07); }
+    .tools-list strong { display: block; margin-bottom: 8px; color: var(--agent); font: 850 11px var(--display); letter-spacing: .08em; text-transform: uppercase; }
+    .tools-list code { font: 600 clamp(10px, .75vw, 12px)/1.55 var(--mono); color: var(--ink); overflow-wrap: anywhere; }
+    .flow { display: grid; align-content: center; gap: 9px; padding: 18px; background: white; border: 2px solid var(--line); }
+    .flow-row { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; min-height: 62px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    .flow-row:last-child { border-bottom: 0; }
+    .flow-no { display: grid; place-items: center; width: 30px; height: 30px; color: white; background: var(--agent); font: 800 11px var(--mono); }
+    .flow-row.human .flow-no { color: #542708; background: var(--human); border-radius: 50%; }
+    .flow-row.decision .flow-no { color: var(--ink); background: var(--decision); transform: rotate(45deg); }
+    .flow-row.decision .flow-no span { transform: rotate(-45deg); }
+    .flow-row.system .flow-no { color: var(--ink); background: var(--system-soft); border: 3px double var(--system); }
+    .flow-main { font: 800 clamp(15px, 1.2vw, 19px)/1.12 var(--display); }
+    .flow-sub { display: block; margin-top: 4px; color: var(--muted); font: 500 clamp(10px, .8vw, 13px)/1.25 var(--body); }
+    .flow-arrow { color: var(--agent); font: 900 22px var(--display); }
+    .flow-row.human .flow-arrow { color: var(--human); }
+    .flow-row.decision .flow-arrow { color: #ab7c17; }
+    .thumb { width: 100%; max-height: 118px; margin-top: 16px; object-fit: cover; object-position: top; background: #111827; border: 1px solid var(--line); }
+
+    .split-profile { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px; }
+    .profile { min-height: 300px; padding: 24px; background: white; border-top: 8px solid var(--agent); box-shadow: 0 10px 28px rgba(44,56,74,.07); }
+    .profile.restricted { border-color: var(--decision); }
+    .profile h3 { margin-top: 22px; font-size: clamp(24px, 2.2vw, 34px); }
+    .profile ul { margin: 18px 0 0; padding-left: 1.15em; display: grid; gap: 10px; font-size: clamp(13px, 1vw, 16px); line-height: 1.32; }
+    .profile .tool-chip { display: inline-block; margin-top: 20px; padding: 9px 12px; background: var(--system-soft); font: 700 11px var(--mono); }
+
+    .migration { display: grid; grid-template-columns: 1fr 130px 1fr; gap: 22px; align-items: center; margin-top: 30px; }
+    .runtime { min-height: 270px; padding: 25px; background: white; border-top: 8px solid var(--system); }
+    .runtime.current { border-color: var(--agent); }
+    .runtime h3 { margin-top: 30px; font-size: clamp(27px, 2.5vw, 38px); }
+    .runtime p { margin-top: 14px; }
+    .migration-arrow { text-align: center; color: var(--agent); font: 900 clamp(35px, 4vw, 56px) var(--display); }
+    .guardrail { margin-top: 18px; padding: 13px 15px; color: #542708; background: var(--human-soft); border-left: 7px solid var(--human); font: 750 clamp(13px, 1vw, 16px)/1.3 var(--display); }
+
+    .outcome-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+    .metric { min-height: 240px; padding: 23px; background: white; border-top: 8px solid var(--human); box-shadow: 0 8px 24px rgba(44,56,74,.07); }
+    .metric:nth-child(2) { border-color: var(--agent); }
+    .metric:nth-child(3) { border-color: var(--decision); }
+    .metric strong { display: block; margin-top: 30px; font: 850 clamp(45px, 5vw, 72px)/.9 var(--display); letter-spacing: -.05em; }
+    .metric span { display: block; margin-top: 14px; font-size: clamp(14px, 1.15vw, 18px); line-height: 1.28; }
+    .controls-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 18px; }
+    .control-item { min-height: 82px; padding: 12px; background: var(--system-soft); border-bottom: 5px solid var(--safe); font: 750 clamp(11px, .87vw, 14px)/1.2 var(--display); }
+
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px; }
+    .demo { min-height: 380px; padding: 23px; background: white; border: 3px solid var(--line); }
+    .demo.iris { border-color: var(--human); border-radius: 56px 14px 14px 56px; }
+    .demo.jianzhi { border-color: var(--agent); clip-path: polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px); }
+    .demo h3 { margin-top: 8px; font-size: clamp(28px, 2.7vw, 42px); }
+    .demo ol { margin: 20px 0 0; padding-left: 1.2em; display: grid; gap: 10px; font-size: clamp(14px, 1.05vw, 17px); line-height: 1.3; }
+    .demo img { width: 100%; height: 110px; margin-top: 18px; object-fit: cover; object-position: top; border: 1px solid var(--line); }
+    .fallback { margin-top: 16px; text-align: center; color: var(--muted); font-size: 12px; }
+
+    .close { display: grid; grid-template-columns: 1.1fr .9fr; gap: 6vw; align-items: center; }
+    .close h1 { font-size: clamp(54px, 7vw, 104px); }
+    .evidence-pack { padding: 26px; color: var(--ink); background: white; box-shadow: 14px 14px 0 var(--human); }
+    .evidence-pack h3 { font-size: clamp(24px, 2.2vw, 34px); }
+    .evidence-pack ul { margin: 20px 0 0; padding-left: 1.1em; display: grid; gap: 12px; font-size: clamp(14px, 1.05vw, 17px); line-height: 1.28; }
+
+    .chrome { position: fixed; right: 18px; bottom: 14px; z-index: 20; opacity: .2; transition: opacity .2s ease; }
+    .chrome:hover, .chrome:focus-within { opacity: 1; }
+    .controls { display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(255,255,255,.94); border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(44,56,74,.12); }
+    .controls button { width: 34px; height: 30px; border: 0; cursor: pointer; background: var(--system-soft); }
+    .controls button:hover, .controls button:focus-visible { color: white; background: var(--agent); outline: none; }
+    .counter { min-width: 52px; text-align: center; font: 700 11px var(--mono); }
+    .progress { position: fixed; left: 0; bottom: 0; z-index: 21; height: 5px; width: 10%; background: linear-gradient(90deg, var(--human), var(--agent)); transition: width .25s ease; }
+    .notes { position: fixed; left: 18px; bottom: 18px; z-index: 22; width: min(560px, calc(100vw - 36px)); max-height: 44vh; padding: 18px 20px; overflow: auto; color: white; background: rgba(35,48,68,.97); box-shadow: 0 12px 30px rgba(0,0,0,.25); display: none; }
+    .notes.open { display: block; }
+    .notes h3 { margin-bottom: 9px; color: #cbe9fb; font-size: 18px; }
+    .notes p { font-size: 14px; line-height: 1.45; white-space: pre-line; }
+
+    @media (max-width: 1050px), (max-height: 760px) {
+      .slide { padding-top: 24px; padding-bottom: 32px; gap: 10px; }
+      .journey-step { min-height: 200px; padding: 17px; }
+      .journey-step h3 { margin-top: 28px; }
+      .human-node, .agent-node, .system-node { min-height: 62px; padding: 10px 13px; }
+      .arch-grid { margin-top: 10px; gap: 24px; }
+      .flow-row { min-height: 52px; padding: 7px 10px; }
+      .thumb { max-height: 90px; }
+      .profile { min-height: 250px; padding: 18px; }
+      .profile ul { gap: 6px; margin-top: 12px; }
+      .runtime { min-height: 215px; padding: 20px; }
+      .outcome-grid { margin-top: 18px; }
+      .metric { min-height: 190px; padding: 18px; }
+      .metric strong { margin-top: 19px; }
+      .controls-row { margin-top: 10px; }
+      .demo { min-height: 315px; padding: 18px; }
+      .demo ol { gap: 6px; margin-top: 13px; }
+      .demo img { height: 82px; margin-top: 12px; }
+      .stack-layer { min-height: 53px; }
+      .stack-items { padding-top: 6px; padding-bottom: 6px; }
+      .graph-node { min-height: 45px; }
+      .cron-time { padding: 11px 12px; }
+      .cron-jobs { padding: 8px 12px; }
+      .handoff-box { min-height: 53px; }
+      .router-stage { padding: 14px; }
+      .cli-column { min-height: 275px; padding: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { .slide, .progress { transition: none; } }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Success IT AI officers briefing">
+
+    <section class="slide dark active" data-title="How our agents work" data-notes="Open with the operating principle: customers continue to speak to responsible people. The technical system exists backstage to give those people more context and capability. This briefing covers the current architecture, business evidence, controls and two live demonstrations.">
+      <div class="topline"><span>Success IT · Officers' briefing</span><span>Technical architecture + live demonstration</span></div>
+      <div class="content hero">
+        <div>
+          <span class="kicker">27 August 2026</span>
+          <h1>How our AI<br>agents work.</h1>
+          <div class="signal-line" aria-hidden="true"></div>
+          <h2>People remain accountable. Agents extend what they can do.</h2>
+        </div>
+        <aside class="hero-aside">
+          <strong>Zach · support</strong>
+          <strong>Insa · engineering</strong>
+          <strong>Laylah · operations</strong>
+          <strong>Peggi · finance</strong>
+          <p class="body muted">A practical operating system for a small B2B software and support team.</p>
+        </aside>
+      </div>
+      <div class="footer"><span>Jensen Loke · CEO, Success IT</span><span>01 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="The AI journey" data-notes="This journey grew out of operational needs rather than a plan to deploy chatbots. We first structured support work, then connected customer context, technical investigation and safe software-change workflows. The current phase extends the same model into business operations and finance.">
+      <div class="topline"><span>AI journey</span><span>Operational pressure → repeatable capability</span></div>
+      <div class="content">
+        <span class="kicker human">Why we built it</span>
+        <h2>Each agent began with a recurring piece of work.</h2>
+        <div class="journey">
+          <article class="journey-step"><b>01 · HUMAN WORK</b><h3>Customer conversations</h3><p class="small muted">Issues arrive in natural, incomplete language.</p></article>
+          <article class="journey-step"><b>02 · ZACH</b><h3>Structured support</h3><p class="small muted">Customer context, tickets and tracked handoffs.</p></article>
+          <article class="journey-step"><b>03 · INSA</b><h3>Technical reach</h3><p class="small muted">Product routing, investigation and proposed changes.</p></article>
+          <article class="journey-step"><b>04 · LAYLAH / PEGGI</b><h3>Operational workflows</h3><p class="small muted">PA, communication and finance-specific processes.</p></article>
+          <article class="journey-step"><b>05 · MANAGEMENT</b><h3>Improve the system</h3><p class="small muted">Fix the reusable workflow when an agent cannot help.</p></article>
+        </div>
+      </div>
+      <div class="footer"><span>Our unit of design is the workflow—not the chatbot.</span><span>02 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Four operating contracts" data-notes="Teach the visual grammar: orange rounded nodes are humans; blue angular nodes are agents; grey boxes are systems; yellow represents approval. The four agents share one OpenClaw gateway where applicable, but each has a separate workspace, memory and tool boundary. Peggi's newer finance entry point is Codex, which is shown explicitly rather than hidden.">
+      <div class="topline"><span>System architecture</span><span>Separate workspaces · tools · routes · permissions</span></div>
+      <div class="content">
+        <span class="kicker">The whole operating system</span>
+        <h2 style="font-size:clamp(38px,4.6vw,66px)">Four agents. Four bounded responsibilities.</h2>
+        <div class="system-map">
+          <div class="map-col"><div class="map-label human">Humans</div><div class="human-node"><span class="node-title">Iris</span><span class="node-copy">Customer meaning and ticket review</span></div><div class="human-node"><span class="node-title">Jianzhi</span><span class="node-copy">Product scope and business verification</span></div><div class="human-node"><span class="node-title">Jensen / team</span><span class="node-copy">Approval, release and escalation</span></div></div>
+          <div class="map-col"><div class="map-label agent">Agents</div><div class="agent-node"><span class="node-title">Zach · Support operations</span><span class="node-copy">Email/Discord → context → ticket → engineering handoff</span></div><div class="agent-node"><span class="node-title">Insa · Product engineering</span><span class="node-copy">Product lane → impact check → investigation → PR package</span></div><div class="agent-node"><span class="node-title">Laylah · Business operations</span><span class="node-copy">Privacy-aware routing → PA tools or restricted support intake</span></div><div class="agent-node"><span class="node-title">Peggi · Finance in Codex</span><span class="node-copy">Finance skill → duplicate check → draft → approval → record</span></div></div>
+          <div class="map-col"><div class="map-label system">Systems</div><div class="system-node"><span class="node-title">SuccessCatalyst + SuccessGraph</span></div><div class="system-node"><span class="node-title">CodeGraph + product software + databases</span></div><div class="system-node"><span class="node-title">Email + calendar + WhatsApp + Obsidian</span></div><div class="system-node"><span class="node-title">SuccessBooks + finance knowledge store</span></div></div>
+          <div class="map-bridge" aria-hidden="true"></div>
+        </div>
+        <div class="role-key"><span class="key-human"><i></i>Human</span><span class="key-agent"><i></i>Agent</span><span class="key-system"><i></i>System / data</span><span class="key-decision"><i></i>Approval</span></div>
+      </div>
+      <div class="footer"><span>Source: live OpenClaw configuration and Codex finance workflow audited 26 Aug 2026.</span><span>03 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Top-down architecture" data-notes="Read this diagram from top to bottom. Familiar communication channels provide the interface. OpenClaw routes each message to a separate agent workspace. Business-critical operations are exposed through registered workflow-graph tools. Those graphs orchestrate deterministic scripts and CLIs, which then access business systems. Checkpoints, audit logs and cron jobs supervise the runtime. Human approval remains a separate authority layer.">
+      <div class="topline"><span>Top-down architecture</span><span>Interface → routing → graph → CLI → systems → supervision</span></div>
+      <div class="content">
+        <span class="kicker">The technical stack at one glance</span>
+        <h2 style="font-size:clamp(36px,4.3vw,62px)">System access is routed through tools, graphs and CLIs.</h2>
+        <div class="top-stack">
+          <div class="stack-layer"><div class="stack-name">People + channels</div><div class="stack-items"><span class="stack-item human">Iris · Jianzhi · Jensen</span><span class="stack-item">Discord</span><span class="stack-item">Email</span><span class="stack-item">WhatsApp</span><span class="stack-item">Telegram</span></div></div>
+          <div class="stack-layer"><div class="stack-name">OpenClaw gateway</div><div class="stack-items"><span class="stack-item">Account binding</span><span class="stack-item">Channel / peer router</span><span class="stack-item">Session isolation</span><span class="stack-item">Model runtime</span></div></div>
+          <div class="stack-layer"><div class="stack-name">Agent workspaces</div><div class="stack-items"><span class="stack-item agent">Zach</span><span class="stack-item agent">Insa</span><span class="stack-item agent">Laylah</span><span class="stack-item agent">Peggi / Codex</span><span class="stack-item decision">Separate memory + tool allowlists</span></div></div>
+          <div class="stack-layer"><div class="stack-name">Workflow graphs</div><div class="stack-items"><span class="stack-item graph">zach-workflows</span><span class="stack-item graph">insa-workflows</span><span class="stack-item graph">Zach↔Insa handoff graph</span><span class="stack-item graph">approval checkpoints</span></div></div>
+          <div class="stack-layer"><div class="stack-name">Deterministic tools</div><div class="stack-items"><span class="stack-item">SuccessCatalyst CLI</span><span class="stack-item">SuccessGraph client</span><span class="stack-item">CodeGraph CLI</span><span class="stack-item">inspectdb-cli</span><span class="stack-item">safe SQL / Git / email scripts</span></div></div>
+          <div class="stack-layer"><div class="stack-name">Business systems</div><div class="stack-items"><span class="stack-item">Tickets + customers</span><span class="stack-item">Product repositories</span><span class="stack-item">Tenant databases</span><span class="stack-item">GitHub PRs</span><span class="stack-item">Email + Discord evidence</span></div></div>
+          <div class="stack-layer"><div class="stack-name">Control plane</div><div class="stack-items"><span class="stack-item cron">cron schedules</span><span class="stack-item cron">SQLite checkpoints</span><span class="stack-item cron">JSONL audit logs</span><span class="stack-item cron">watchdogs + EOD reconciliation</span><span class="stack-item decision">human approval</span></div></div>
+        </div>
+      </div>
+      <div class="footer"><span>Source: live gateway bindings, workflow-plugin contracts and operational state.</span><span>04 / 17</span></div>
+    </section>
+
+    <section class="slide human-wash" data-title="Zach architecture" data-notes="Iris will demonstrate this workflow. Zach accepts natural language, looks up customer and product context using SuccessGraph, and creates a structured support record in SuccessCatalyst. It can read or update tickets and route qualifying engineering issues to Insa. The customer is still speaking to Iris, and Iris checks the resulting record.">
+      <div class="topline"><span>Agent 01 · Zach</span><span>Natural conversation → structured support work</span></div>
+      <div class="content arch-grid">
+        <div class="arch-intro">
+          <div><span class="kicker human">Demo owner · Iris</span><h2>Zach is the support operations layer.</h2><p class="body muted explain">SuccessGraph is the customer map: it links companies, products, subscriptions and the correct support route.</p></div>
+          <div><div class="tools-list"><strong>Configured tool families</strong><code>reademail · createticket · readticket · updateticket · zach_group_permissions · zach_github_issue_flow · zach_engineering_delegate</code></div><img class="thumb" src="public-assets/successgraph-public.png" alt="Public-safe SuccessGraph customer map" /></div>
+        </div>
+        <div class="flow" aria-label="Zach functional flow">
+          <div class="flow-row human"><div class="flow-no">1</div><div><span class="flow-main">Iris describes the issue naturally</span><span class="flow-sub">Customer symptom, urgency and available evidence</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row system"><div class="flow-no">2</div><div><span class="flow-main">Zach resolves customer and product context</span><span class="flow-sub">Group permissions + SuccessGraph + product map</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row"><div class="flow-no">3</div><div><span class="flow-main">Ticket tools create or update the record</span><span class="flow-sub">SuccessCatalyst becomes the durable source of truth</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row decision"><div class="flow-no"><span>4</span></div><div><span class="flow-main">Iris checks meaning and completeness</span><span class="flow-sub">Missing evidence returns to the human</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row"><div class="flow-no">5</div><div><span class="flow-main">Qualifying technical work is handed to Insa</span><span class="flow-sub">Tracked owner, evidence packet, deadline and escalation</span></div><span class="flow-arrow">✓</span></div>
+        </div>
+      </div>
+      <div class="footer"><span>Client interaction remains human; Zach structures and routes the backstage work.</span><span>04 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Zach workflow graph and CLIs" data-notes="This is the deterministic execution path under Zach's conversational layer. The OpenClaw tool call enters the zach-workflows plugin. The plugin invokes the checkpointed task-chain graph. That graph selects a specific operation, runs a narrow CLI or script, then records the result to SQLite and JSONL. Draft and approval states are explicit graph outcomes rather than prompt conventions.">
+      <div class="topline"><span>Zach · execution architecture</span><span>Registered tool → graph operation → CLI → checkpoint</span></div>
+      <div class="content graph-layout">
+        <div class="graph-summary"><div><span class="kicker">Deterministic below the conversation</span><h2>Zach's tools are graph-backed commands.</h2><p class="body muted" style="margin-top:16px">The agent chooses a registered tool. The workflow graph controls what executable path can run and what evidence must be stored.</p></div><div class="graph-note"><code>zach-workflows.sqlite<br>zach-workflow-runs.jsonl<br>state.sqlite + approval queue</code></div></div>
+        <div class="graph-pipeline">
+          <div class="graph-node human"><strong>Natural request</strong><span>Iris, support email or Discord command</span></div><div class="graph-down">↓</div>
+          <div class="graph-node"><strong>OpenClaw tool contract</strong><span>ticket create/update · email send · permissions · GitHub issue · engineering delegate</span></div><div class="graph-down">↓</div>
+          <div class="graph-node"><strong>Zach task-chain graph</strong><span>draft / plan / approval / execute operation with a thread ID</span></div><div class="graph-down">↓</div>
+          <div class="graph-node system"><strong>CLI and script layer</strong><span>SuccessCatalyst CLI · SuccessGraph client · MGC email · inspectdb-cli · state_db.py · GitHub helpers</span></div><div class="graph-down">↓</div>
+          <div class="graph-node system"><strong>Business result</strong><span>ticket, comment, status, customer context, email, issue or tracked Insa packet</span></div><div class="graph-down">↓</div>
+          <div class="graph-node decision"><strong>Checkpoint + audit</strong><span>status, redacted command, approval state, timestamp and durable next action</span></div>
+        </div>
+      </div>
+      <div class="footer"><span>Source: zach-workflows plugin contract and zach_task_chains/task_chain_graph.py.</span><span>06 / 17</span></div>
+    </section>
+
+    <section class="slide" data-title="Zach automation control plane" data-notes="Zach combines event-driven work with scheduled supervision. The inbox runner polls frequently during support hours. Watchdogs verify long-running tasks, the Zach-Insa investigation queue and cron health. Reports create operational visibility. Daily and weekly jobs reconcile knowledge, workload and state. The green jobs are deterministic commands or narrowly instructed isolated agent turns.">
+      <div class="topline"><span>Zach · cron control plane</span><span>Intake · monitoring · reporting · reconciliation</span></div>
+      <div class="content">
+        <span class="kicker">Automation that keeps the workflow moving</span>
+        <h2 style="font-size:clamp(36px,4.3vw,62px)">Zach is supervised continuously—not only when someone messages him.</h2>
+        <div class="cron-grid">
+          <div class="cron-band"><div class="cron-time">Every 10–15 min</div><div class="cron-jobs"><span class="cron-job">Support inbox runner<small>15 min weekdays · 30 min weekends</small></span><span class="cron-job">Agent task watchdog<small>10 min</small></span><span class="cron-job">Zach→Insa investigation watchdog<small>15 min</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Every 2 hours</div><div class="cron-jobs"><span class="cron-job">Workflow visibility report<small>:10 · 08:00–22:00</small></span><span class="cron-job">Cron + health audit<small>07:00–23:00</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Daily</div><div class="cron-jobs"><span class="cron-job">Morning workload report<small>08:00 weekdays</small></span><span class="cron-job">Support digest<small>18:00 weekdays</small></span><span class="cron-job">End-of-day journal<small>23:00</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Weekly</div><div class="cron-jobs"><span class="cron-job">Ticket index sync<small>Monday 07:00</small></span><span class="cron-job">Meeting prep<small>Wednesday 09:00</small></span><span class="cron-job">Ticket review + knowledge patterns<small>Friday 17:00 / 18:00</small></span><span class="cron-job">State cleanup<small>Sunday 23:45</small></span></div></div>
+        </div>
+        <p class="cron-thesis">Fast loops move work. Slow loops detect drift, improve knowledge and keep state bounded.</p>
+      </div>
+      <div class="footer"><span>Source: enabled live OpenClaw cron registry audited 26 Aug 2026.</span><span>07 / 17</span></div>
+    </section>
+
+    <section class="slide" data-title="Zach and Insa handoff graph" data-notes="The handoff is its own graph because conversation memory is not reliable enough for operational ownership. The graph validates the evidence packet, reads the supporting ledgers and health signals, and emits an explicit owner, status and next action. The watchdog escalates stale investigations. This is what turns two agents into one support-to-engineering operating system.">
+      <div class="topline"><span>Cross-agent workflow</span><span>Zach↔Insa handoff graph</span></div>
+      <div class="content">
+        <span class="kicker human">Ownership survives the chat session</span>
+        <h2 style="font-size:clamp(36px,4.35vw,63px)">A separate graph decides who owns the next action.</h2>
+        <div class="handoff">
+          <div class="handoff-col"><div class="map-label system">Inputs</div><div class="handoff-box input"><strong>Support ingress</strong><span>Email cron, Discord trigger or scan</span></div><div class="handoff-box input"><strong>Evidence packet</strong><span>Ticket, product, symptom, screen and impact</span></div><div class="handoff-box input"><strong>Operational signals</strong><span>Workflow report, investigations, heartbeats and watchdogs</span></div></div>
+          <div class="handoff-arrow">→</div>
+          <div class="handoff-col"><div class="map-label agent">Graph</div><div class="handoff-box graph"><strong>Validate evidence</strong><span>Missing facts block or return to Zach</span></div><div class="handoff-box graph"><strong>Reconcile state</strong><span>Zach ledger + Insa investigation + timers</span></div><div class="handoff-box graph"><strong>Resolve owner and status</strong><span>deterministic decision + durable run ledger</span></div></div>
+          <div class="handoff-arrow">→</div>
+          <div class="handoff-col"><div class="map-label" style="color:#9b6a00">Outputs</div><div class="handoff-box output"><strong>Zach handles</strong><span>Support record or missing evidence</span></div><div class="handoff-box output"><strong>Delegate / wait for Insa</strong><span>Tracked investigation with deadline</span></div><div class="handoff-box output"><strong>Human approval / escalation</strong><span>Stale, risky or unhealthy workflow</span></div></div>
+        </div>
+        <div class="packet"><strong>Minimum handoff packet:</strong> ticket · product · tenant/customer · exact screen path · sample record · screenshot/error · expected vs actual behaviour · user impact · attempted steps</div>
+      </div>
+      <div class="footer"><span>Source: scripts/ops/zach-insa-handoff-graph.ts and tracked investigation ledgers.</span><span>08 / 17</span></div>
+    </section>
+
+    <section class="slide" data-title="Insa Discord product router" data-notes="Discord is both the user interface and a routing context. The channel registry maps 39 channels to 10 product profiles. A product profile selects specialist mode, default context files, product playbooks and read-only database-approval policy. The lane resolver then determines the correct repository, branch, PR target, database tool and endpoint. Jianzhi can therefore ask in a familiar channel without navigating a coding terminal.">
+      <div class="topline"><span>Insa · Discord architecture</span><span>Channel identity becomes product scope</span></div>
+      <div class="content">
+        <span class="kicker">Discord is the front door and the first boundary</span>
+        <h2 style="font-size:clamp(36px,4.3vw,62px)">The channel selects the product workroom before investigation begins.</h2>
+        <div class="router-layout">
+          <article class="router-stage channel"><span class="map-label" style="color:#5865f2">Discord channel</span><h3>Who and where?</h3><ul><li>#insurance-jianzhi</li><li>#workshop-jianzhi</li><li>#expat-dev…dev7</li><li>General, support or domain intake</li></ul></article>
+          <div class="router-arrow">→</div>
+          <article class="router-stage lane"><span class="map-label agent">Channel registry + lane resolver</span><h3>Which product boundary?</h3><ul><li>Product code and specialist mode</li><li>Intended user and DB approver</li><li>Repository and workspace</li><li>Branch base and PR target</li><li>Environment and endpoint</li></ul></article>
+          <div class="router-arrow">→</div>
+          <article class="router-stage context"><span class="map-label" style="color:#9b6a00">Loaded product context</span><h3>How should Insa work?</h3><ul><li>Product runbook</li><li>Workflow-quality playbook</li><li>Query patterns and schema cache</li><li>Active investigations</li><li>Product-specific safety gates</li></ul></article>
+        </div>
+        <div class="router-stat"><span>39 configured Discord channels</span><span>10 product profiles</span><span>Separate lanes for Iris, Jianzhi and other staff</span><span>Channel scope does not grant production-write authority</span></div>
+      </div>
+      <div class="footer"><span>Source: Insa channel-registry.json v2 and resolve-work-lane.mjs.</span><span>09 / 17</span></div>
+    </section>
+
+    <section class="slide agent-wash" data-title="Insa architecture" data-notes="Jianzhi will demonstrate this workflow. A Discord channel is not merely a chat room: its channel ID selects a configured product lane. That lane determines the correct repository, database, branch, PR target and approval rules. CodeGraph runs before database queries or code changes to show likely dependencies. PR means pull request: a proposed code change awaiting review, not a release.">
+      <div class="topline"><span>Agent 02 · Insa</span><span>Product-scoped investigation and proposed change</span></div>
+      <div class="content arch-grid">
+        <div class="arch-intro">
+          <div><span class="kicker">Demo owner · Jianzhi</span><h2>Insa works inside a configured product lane.</h2><p class="body muted explain"><strong>CodeGraph</strong> maps software dependencies. A <strong>DB</strong> is the product database. A <strong>PR</strong> is a proposed code change awaiting human review.</p></div>
+          <div><div class="tools-list"><strong>Configured workflow tools</strong><code>insa_product_lane · insa_codegraph · insa_db_diagnostic · insa_investigation_flow · insa_readiness_gate · insa_pr_package · insa_coding_delegate</code></div><img class="thumb" src="public-assets/codegraph-public.png" alt="Public-safe CodeGraph software impact map" /></div>
+        </div>
+        <div class="flow" aria-label="Insa functional flow">
+          <div class="flow-row human"><div class="flow-no">1</div><div><span class="flow-main">Jianzhi asks inside a product Discord channel</span><span class="flow-sub">Business behaviour, exact scope and evidence</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row system"><div class="flow-no">2</div><div><span class="flow-main">The channel router selects one product lane</span><span class="flow-sub">Repository · database · branch · endpoint · permissions</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row"><div class="flow-no">3</div><div><span class="flow-main">CodeGraph checks likely impact first</span><span class="flow-sub">Then read-only DB diagnostics, code tracing and reproduction</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row"><div class="flow-no">4</div><div><span class="flow-main">Insa prepares a diagnosis or proposed change</span><span class="flow-sub">Readiness gates, build/test evidence and PR package</span></div><span class="flow-arrow">→</span></div>
+          <div class="flow-row decision"><div class="flow-no"><span>5</span></div><div><span class="flow-main">Humans review, release and verify</span><span class="flow-sub">Jianzhi verifies behaviour; Jensen or an engineer controls release</span></div><span class="flow-arrow">✓</span></div>
+        </div>
+      </div>
+      <div class="footer"><span>Source: current Insa channel registry, tool allowlist and engineering runbooks.</span><span>05 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Insa CLI and graph toolchain" data-notes="These are the four main technical surfaces beneath Insa's workflow graph. CodeGraph answers where a change travels through the codebase. InspectDB provides tenant-resolved, audited, read-only production diagnostics. Product runbooks and readiness scripts enforce the expected workflow and evidence. Git and ACP tools package changes safely and can delegate larger coding work while Insa remains accountable for the result.">
+      <div class="topline"><span>Insa · technical toolchain</span><span>Impact · data · workflow quality · delivery</span></div>
+      <div class="content">
+        <span class="kicker">The graph selects narrow CLI operations</span>
+        <h2 style="font-size:clamp(36px,4.25vw,61px)">Each tool answers a different technical question.</h2>
+        <div class="cli-columns">
+          <article class="cli-column"><span class="map-label agent">CodeGraph CLI</span><h3>What could this change affect?</h3><p class="small muted">Maps components, services, APIs, procedures, tables and reports across products.</p><code>find · search · context<br>flow · table · blast<br>upstream · downstream<br>diff · clusters</code></article>
+          <article class="cli-column"><span class="map-label system">inspectdb-cli</span><h3>What is happening in this tenant?</h3><p class="small muted">Resolves the database from a company code and records the business reason.</p><code>tenants · tenant-info<br>schema · diagnose<br>query (read-only)<br>user lookup / unlock-plan</code></article>
+          <article class="cli-column"><span class="map-label" style="color:#9b6a00">Runbooks + gates</span><h3>What evidence is required?</h3><p class="small muted">Product playbooks constrain investigation order, SQL safety, UI tracing and release readiness.</p><code>investigate-start<br>workflow-readiness<br>quality-gate<br>fix-ready<br>record-build-artifact</code></article>
+          <article class="cli-column"><span class="map-label" style="color:var(--safe)">Git + coding delivery</span><h3>How does a proposal become reviewable?</h3><p class="small muted">Clean worktree, safe GitHub commands, verified PR evidence and optional ACP coding delegation.</p><code>ensure-clean-worktree<br>safe-gh pr create<br>done-ready<br>Codex / Claude ACP<br>Discord artifact delivery</code></article>
+        </div>
+      </div>
+      <div class="footer"><span>Source: Insa graph operations, CLI help and product engineering runbooks.</span><span>11 / 17</span></div>
+    </section>
+
+    <section class="slide" data-title="Insa automation and durable state" data-notes="Insa is primarily event-driven: a staff message in Discord starts work. The cron layer therefore focuses on liveness, stale ownership and reconciliation rather than polling for new tickets. Every ten minutes the coding monitor checks active work. The shared task watchdog checks long-running agents. Every fifteen minutes Zach's handoff watchdog checks quiet investigations. End-of-day reconciliation ensures investigations and durable actions are recorded.">
+      <div class="topline"><span>Insa · automation control plane</span><span>Event-driven work · scheduled supervision</span></div>
+      <div class="content">
+        <span class="kicker">Discord starts the work; cron checks that it survives</span>
+        <h2 style="font-size:clamp(36px,4.3vw,62px)">Insa's scheduled jobs monitor ownership, progress and evidence.</h2>
+        <div class="cron-grid">
+          <div class="cron-band"><div class="cron-time">On message</div><div class="cron-jobs"><span class="cron-job">Discord product lane<small>channel → context → investigation</small></span><span class="cron-job">Workflow-graph checkpoint<small>thread ID + operation + status</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Every 10 min</div><div class="cron-jobs"><span class="cron-job">Insa coding monitor<small>insa-heartbeat.mjs --check-only</small></span><span class="cron-job">Shared agent task watchdog<small>long-running task progress</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Every 15 min</div><div class="cron-jobs"><span class="cron-job">Zach→Insa investigation watchdog<small>quiet or overdue ownership</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">Every 2 hours</div><div class="cron-jobs"><span class="cron-job">Cross-agent workflow report<small>pending · processed · closed · approval state</small></span><span class="cron-job">Gateway / bot health reporting<small>shared runtime visibility</small></span></div></div>
+          <div class="cron-band"><div class="cron-time">23:20 daily</div><div class="cron-jobs"><span class="cron-job">Insa EOD journal<small>reconcile investigation and action ledgers</small></span></div></div>
+        </div>
+        <div class="router-stat"><span>active-investigations.json</span><span>agent-actions.json</span><span>zach-followup-queue.json</span><span>insa-workflows.sqlite</span><span>insa-workflow-runs.jsonl</span></div>
+      </div>
+      <div class="footer"><span>Source: enabled cron registry and Insa durable-state protocol.</span><span>12 / 17</span></div>
+    </section>
+
+    <section class="slide" data-title="Laylah architecture" data-notes="Laylah demonstrates why tool permissions matter. The main PA profile can coordinate email, calendar, memory and follow-up workflows, but external writes require a preview and Jensen's approval. A customer-support WhatsApp group routes to a separate restricted profile which receives only the unified support-intake tool—no shell, browser, ticket reading or general messaging access.">
+      <div class="topline"><span>Agent 03 · Laylah</span><span>Privacy-aware routing + least-privilege tools</span></div>
+      <div class="content">
+        <span class="kicker">One identity · different permission envelopes</span>
+        <h2 style="font-size:clamp(38px,4.7vw,67px)">The route decides what Laylah is allowed to do.</h2>
+        <div class="split-profile">
+          <article class="profile"><span class="map-label agent">Main PA profile</span><h3>Personal and business coordination</h3><ul><li>Email drafting and sorting</li><li>Calendar preparation and approved changes</li><li>Meeting prep, follow-up review and work capture</li><li>Obsidian search/read/write and PA memory</li><li>Can consult Zach or Insa as sibling agents</li></ul><span class="tool-chip">Preview → Jensen approval → external write</span></article>
+          <article class="profile restricted"><span class="map-label" style="color:#9b6a00">Restricted support profile</span><h3>Customer WhatsApp support intake</h3><ul><li>Activated only in explicitly mapped groups</li><li>Uses the mapped customer as source of truth</li><li>Can call only one unified intake workflow</li><li>Cannot read ticket status, browse, run shell or use general messaging</li><li>Sensitive requests escalate privately to Jensen</li></ul><span class="tool-chip">only: successit_support_intake</span></article>
+        </div>
+      </div>
+      <div class="footer"><span>Source: live bindings, Laylah tool boundary and Success IT support runbook.</span><span>06 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Peggi architecture" data-notes="Peggi is now being accessed through Codex for finance knowledge and document workflows. The previous OpenClaw Peggi configuration still exists, so describe this as a transition rather than a clean replacement. The important controls remain: source context is preserved, possible duplicates stop the workflow, accounting drafts use dry-run, and Jensen approves any write or posting.">
+      <div class="topline"><span>Agent 04 · Peggi</span><span>Finance workflow transitioning to Codex</span></div>
+      <div class="content">
+        <span class="kicker">A different runtime · the same principle</span>
+        <h2 style="font-size:clamp(38px,4.6vw,66px)">Peggi is becoming a finance capability inside Codex.</h2>
+        <div class="migration">
+          <article class="runtime"><span class="map-label system">Earlier / still configured</span><h3>OpenClaw Peggi</h3><p class="body muted">Discord-routed finance agent with SuccessBooks workflow tools, local state and accounting controls.</p><div class="tools-list"><strong>Workflow examples</strong><code>expense entry · duplicate gate · invoice flow · month-end review · billing tracker</code></div></article>
+          <div class="migration-arrow">→</div>
+          <article class="runtime current"><span class="map-label agent">Current working direction</span><h3>Codex + Peggi finance skill</h3><p class="body muted">Finance requests are classified, sourced and stored in the SICS Accounting knowledge structure; operational tooling remains available for controlled finance work.</p><div class="tools-list"><strong>Guarded path</strong><code>source → classify → duplicate check → dry run → preview → Jensen approval → record</code></div></article>
+        </div>
+        <div class="guardrail">No final accounting, tax, payroll, banking or compliance decision is made without Jensen's confirmation.</div>
+      </div>
+      <div class="footer"><span>Source: current OpenClaw Peggi configuration and Codex Peggi Finance v1.0 workflow.</span><span>07 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Outcomes and controls" data-notes="These are adoption and throughput indicators, not productivity scores. The audited-step counts show that the strongest usage comes from non-engineering staff. Iris's closed-ticket range is operational throughput. We should not claim that AI caused staffing changes or that every audited step equals a completed task. The controls below are as important as the numbers.">
+      <div class="topline"><span>Business outcomes</span><span>Evidence and controls shown together</span></div>
+      <div class="content">
+        <span class="kicker human">What we can substantiate today</span>
+        <h2 style="font-size:clamp(38px,4.7vw,67px)">The heaviest users are close to customers—not inside engineering.</h2>
+        <div class="outcome-grid">
+          <article class="metric"><span class="map-label human">Jianzhi + Insa</span><strong>2,538</strong><span>audited workflow steps in the extracted usage snapshot</span></article>
+          <article class="metric"><span class="map-label agent">Iris + Insa</span><strong>527</strong><span>audited workflow steps, alongside active Zach usage</span></article>
+          <article class="metric"><span class="map-label" style="color:#9b6a00">Iris's support throughput</span><strong>81–115</strong><span>tickets closed per month across the supplied three-month range</span></article>
+        </div>
+        <div class="controls-row"><div class="control-item">Product- and channel-scoped routing</div><div class="control-item">Separate tool allowlists</div><div class="control-item">Read-only diagnostics before writes</div><div class="control-item">Human approval and release authority</div><div class="control-item">Durable tickets, ledgers and audit evidence</div></div>
+      </div>
+      <div class="footer"><span>Audited steps indicate adoption, not completed tasks or causal productivity improvement.</span><span>08 / 10</span></div>
+    </section>
+
+    <section class="slide" data-title="Live demonstration" data-notes="Run Iris first because it begins with a familiar customer-support interaction. Then run Jianzhi to show how the structured issue crosses into a product-scoped technical workflow. Ask the officers to watch for context retrieval, visible scope, tool boundaries, durable evidence and the explicit human decision. If a live dependency is slow, use the public-safe screenshots and narrate the same checkpoints.">
+      <div class="topline"><span>Live demonstration</span><span>Iris → Zach · Jianzhi → Insa</span></div>
+      <div class="content">
+        <span class="kicker human">Observe the handoffs and controls</span>
+        <h2 style="font-size:clamp(38px,4.6vw,66px)">Two staff members. Two real workflows.</h2>
+        <div class="demo-grid">
+          <article class="demo iris"><span class="map-label human">Demo 01 · Iris</span><h3>Unstructured issue → support ticket</h3><ol><li>Describe a customer issue naturally.</li><li>Watch Zach recover customer and product context.</li><li>Review the structured ticket information.</li><li>Confirm the durable ticket and next owner.</li></ol><img src="public-assets/zach-iris-ticket-public.png" alt="Public-safe reconstruction of Iris and Zach's ticket workflow" /></article>
+          <article class="demo jianzhi"><span class="map-label agent">Demo 02 · Jianzhi</span><h3>Scoped request → technical proposal</h3><ol><li>Ask inside the configured product channel.</li><li>Watch Insa resolve the product lane.</li><li>Inspect CodeGraph/DB evidence and proposed scope.</li><li>Stop at the human review or PR checkpoint.</li></ol><img src="public-assets/insa-jianzhi-expat-public.png" alt="Public-safe reconstruction of Jianzhi and Insa's product workflow" /></article>
+        </div>
+        <p class="fallback">Fallback if a live dependency is unavailable: narrate the same checkpoints using the redacted evidence shown above.</p>
+      </div>
+      <div class="footer"><span>Do not use live customer-identifying information in the demonstration.</span><span>09 / 10</span></div>
+    </section>
+
+    <section class="slide dark" data-title="Evidence and questions" data-notes="Close by inviting questions about architecture, controls, adoption or measurement. We can provide redacted configuration extracts, workflow diagrams, sample audit evidence, usage methodology and follow-up answers. Do not promise raw customer, employee or production data. Keep this slide visible during discussion.">
+      <div class="topline"><span>Discussion + follow-up</span><span>Architecture · evidence · controls · outcomes</span></div>
+      <div class="content close">
+        <div><span class="kicker">The operating principle</span><h1>Agents move the work.<br>People own the outcome.</h1><p class="body muted" style="margin-top:28px">Questions?</p></div>
+        <aside class="evidence-pack"><h3>Available for judging follow-up</h3><ul><li>Redacted architecture and tool-boundary extracts</li><li>Product routing and approval-control explanation</li><li>Sample ticket, investigation and PR audit evidence</li><li>Usage-count definitions and evidence limitations</li><li>Additional written responses requested after the visit</li></ul></aside>
+      </div>
+      <div class="footer"><span>Success IT · Technical briefing · 27 August 2026</span><span>10 / 10</span></div>
+    </section>
+
+  </main>
+
+  <div class="chrome" aria-label="Presentation controls"><div class="controls"><button id="prev" type="button" title="Previous slide (←)">←</button><span class="counter" id="counter">1 / 10</span><button id="next" type="button" title="Next slide (→)">→</button><button id="notesBtn" type="button" title="Speaker notes (N)">N</button><button id="fullBtn" type="button" title="Fullscreen (F)">⛶</button></div></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <aside class="notes" id="notes"><h3 id="notesTitle">Speaker notes</h3><p id="notesCopy"></p></aside>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const notes = document.getElementById('notes');
+    const notesTitle = document.getElementById('notesTitle');
+    const notesCopy = document.getElementById('notesCopy');
+    let index = 0;
+
+    function indexFromHash() {
+      const raw = location.hash.replace('#', '');
+      const n = Number(raw);
+      return Number.isFinite(n) && n >= 1 && n <= slides.length ? n - 1 : 0;
+    }
+
+    function show(next, writeHash = true) {
+      index = Math.max(0, Math.min(slides.length - 1, next));
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+        const pageMarker = slide.querySelector('.footer span:last-child');
+        if (pageMarker) pageMarker.textContent = `${String(i + 1).padStart(2, '0')} / ${slides.length}`;
+      });
+      counter.textContent = `${index + 1} / ${slides.length}`;
+      progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+      notesTitle.textContent = slides[index].dataset.title || 'Speaker notes';
+      notesCopy.textContent = slides[index].dataset.notes || '';
+      document.title = `${index + 1}. ${slides[index].dataset.title} — Success IT`;
+      if (writeHash && location.hash !== `#${index + 1}`) history.replaceState(null, '', `#${index + 1}`);
+    }
+
+    document.getElementById('prev').addEventListener('click', () => show(index - 1));
+    document.getElementById('next').addEventListener('click', () => show(index + 1));
+    document.getElementById('notesBtn').addEventListener('click', () => notes.classList.toggle('open'));
+    document.getElementById('fullBtn').addEventListener('click', () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
+    window.addEventListener('hashchange', () => show(indexFromHash(), false));
+    window.addEventListener('keydown', (event) => {
+      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); show(index + 1); }
+      if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); show(index - 1); }
+      if (event.key === 'Home') show(0);
+      if (event.key === 'End') show(slides.length - 1);
+      if (event.key.toLowerCase() === 'n') notes.classList.toggle('open');
+      if (event.key.toLowerCase() === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+      if (event.key === 'Escape') notes.classList.remove('open');
+    });
+    show(indexFromHash(), false);
+  </script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <link rel="icon" href="data:," />
+  <title>Everyone Gets a Jarvis — Human in the Loop V2</title>
+  <style>
+    :root {
+      --canvas: #f8fbfd;
+      --paper: #ffffff;
+      --ink: #2c384a;
+      --ink-soft: #667085;
+      --line: #cfd8df;
+      --human: #ff781c;
+      --human-soft: #fff1e7;
+      --human-ink: #542708;
+      --agent: #0170b9;
+      --agent-dark: #004e82;
+      --agent-soft: #e8f4fb;
+      --system: #667085;
+      --system-soft: #eef1f4;
+      --decision: #ffc857;
+      --stop: #bd3f48;
+      --display: "Avenir Next", "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif;
+      --body: "Karla", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    body { background: #dfe8ee; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .deck { position: relative; width: 100vw; height: 100vh; isolation: isolate; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(14px, 2.5vh, 28px);
+      padding: clamp(28px, 4.2vw, 64px) clamp(30px, 5.4vw, 84px) clamp(28px, 4vw, 58px);
+      overflow: hidden;
+      background: var(--canvas);
+      box-shadow: inset 0 0 0 8px #e8f1f6;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(2.5%);
+      transition: opacity .28s ease, transform .4s cubic-bezier(.2,.8,.2,1), visibility .28s;
+    }
+    .slide.active { opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; }
+    .slide.exit-left { transform: translateX(-2%); }
+    .slide.dark { color: white; background: var(--ink); box-shadow: inset 0 0 0 8px #243041; }
+    .slide.agent-wash { background: linear-gradient(90deg, var(--canvas) 0 52%, var(--agent-soft) 52% 100%); }
+    .slide.human-wash { background: linear-gradient(90deg, var(--human-soft) 0 48%, var(--canvas) 48% 100%); }
+    .slide.appendix { background: #f2f5f7; }
+
+    .topline, .footer {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      font: 800 clamp(10px, .95vw, 14px) var(--display);
+      letter-spacing: .085em;
+      text-transform: uppercase;
+    }
+    .topline { padding-bottom: 11px; border-bottom: 1px solid rgba(44,56,74,.28); color: var(--agent); }
+    .dark .topline { color: #d7ecfa; border-color: rgba(255,255,255,.26); }
+    .topline span:last-child { opacity: .7; text-align: right; }
+    .footer { align-self: end; color: var(--ink-soft); font-family: var(--body); font-weight: 500; letter-spacing: 0; text-transform: none; }
+    .dark .footer { color: rgba(255,255,255,.62); }
+    .source { max-width: 78%; }
+    .content { position: relative; z-index: 2; min-height: 0; align-self: center; }
+
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { font-family: var(--display); }
+    h1 { font-size: clamp(62px, 9.5vw, 142px); line-height: .88; letter-spacing: -.064em; font-weight: 850; }
+    h2 { font-size: clamp(43px, 6.2vw, 88px); line-height: .94; letter-spacing: -.052em; font-weight: 830; }
+    h3 { font-size: clamp(21px, 2.2vw, 34px); line-height: 1.08; letter-spacing: -.026em; }
+    .lede { font-size: clamp(21px, 2.2vw, 34px); line-height: 1.25; }
+    .body { font-size: clamp(17px, 1.45vw, 23px); line-height: 1.4; }
+    .small { font-size: clamp(13px, 1vw, 16px); line-height: 1.4; }
+    .muted { color: var(--ink-soft); }
+    .dark .muted { color: rgba(255,255,255,.64); }
+    .kicker { display: block; margin-bottom: 16px; color: var(--agent); font: 800 clamp(11px, .95vw, 14px) var(--display); letter-spacing: .095em; text-transform: uppercase; }
+    .dark .kicker { color: #d7ecfa; }
+    .hot { color: var(--human) !important; }
+
+    .role-key { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .role-key span { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background: white; border: 1px solid var(--line); font: 800 11px var(--display); letter-spacing: .08em; text-transform: uppercase; }
+    .role-key i { display: inline-block; width: 14px; height: 14px; }
+    .key-human i { background: var(--human); border-radius: 50%; }
+    .key-agent i { background: var(--agent); clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px); }
+    .key-system i { background: var(--system-soft); border: 3px double var(--system); }
+    .key-decision i { background: var(--decision); border: 1px solid var(--ink); transform: rotate(45deg); }
+
+    .entity { position: relative; min-height: 190px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .entity .type { font: 900 12px var(--display); letter-spacing: .1em; text-transform: uppercase; }
+    .entity h3 { margin-top: 10px; }
+    .entity p { margin-top: 10px; }
+    .human-card { color: var(--human-ink); background: var(--human-soft); border: 3px solid var(--human); border-radius: 62px 16px 16px 62px; padding-left: 48px; }
+    .human-card .type { color: #bd4b00; }
+    .agent-card { color: white; background: var(--agent); clip-path: polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px); }
+    .agent-card .type { color: #d7ecfa; }
+    .system-card { background: var(--system-soft); border: 4px double var(--system); border-radius: 0; }
+    .system-card .type { color: var(--system); }
+
+    .hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 7vw; align-items: end; }
+    .hero-line { width: 128px; height: 12px; margin: 28px 0; background: linear-gradient(90deg,var(--human) 0 48%,var(--decision) 48% 53%,var(--agent) 53% 100%); }
+    .hero-aside { padding: 24px 0 10px 26px; border-left: 7px solid var(--human); }
+    .hero-aside strong { display: block; color: white; font: 800 clamp(28px,3vw,46px)/1 var(--display); }
+    .hero-aside p { margin-top: 10px; }
+
+    .context-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 5vw; align-items: center; }
+    .portrait-mark { aspect-ratio: 1; max-width: 360px; display: grid; place-items: center; color: white; background: var(--human); border-radius: 50% 18px 18px 50%; box-shadow: 15px 15px 0 var(--agent); }
+    .portrait-mark span { font: 900 clamp(120px,18vw,260px)/.8 var(--display); letter-spacing: -.08em; }
+    .context-facts { display: grid; grid-template-columns: 1fr 1fr; margin-top: 24px; border-top: 1px solid var(--line); }
+    .context-fact { padding: 16px 16px 16px 0; border-bottom: 1px solid var(--line); }
+    .context-fact:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--line); }
+    .context-fact span { display: block; font: 800 11px var(--mono); color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; }
+    .context-fact strong { display: block; margin-top: 8px; font: 780 clamp(19px,1.8vw,28px)/1.15 var(--display); }
+
+    .uneven-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 32px; }
+    .uneven-panel { min-height: 280px; padding: 28px; border-top: 8px solid var(--agent); background: white; box-shadow: 0 10px 30px rgba(44,56,74,.07); }
+    .uneven-panel.work { border-color: var(--human); }
+    .uneven-panel p { margin-top: 18px; }
+    .thesis-bar { margin-top: 26px; padding: 17px 22px; color: white; background: var(--ink); font: 750 clamp(18px,1.7vw,26px)/1.25 var(--display); }
+
+    .flywheel { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 30px; }
+    .fly-step { min-height: 230px; padding: 22px; position: relative; background: white; border: 2px solid var(--line); }
+    .fly-step:nth-child(1) { border-top: 8px solid var(--agent); }
+    .fly-step:nth-child(2) { color: white; background: var(--agent); border-color: var(--agent); clip-path: polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px); }
+    .fly-step:nth-child(3) { color: var(--human-ink); background: var(--human-soft); border: 3px solid var(--human); border-radius: 48px 12px 12px 48px; }
+    .fly-step:nth-child(4) { border-top: 8px solid var(--decision); }
+    .fly-step .no { display: block; font: 900 12px var(--mono); opacity: .65; }
+    .fly-step h3 { margin-top: 50px; }
+    .fly-step p { margin-top: 10px; }
+    .fly-step::after { content: "→"; position: absolute; z-index: 3; top: 50%; right: -25px; transform: translateY(-50%); color: var(--ink); font: 900 30px var(--display); }
+    .fly-step:last-child::after { content: "↺"; right: 12px; top: 20px; color: var(--agent); transform: none; }
+    .reskill-line { margin-top: 24px; text-align: center; font: 800 clamp(19px,1.7vw,26px)/1.2 var(--display); }
+
+    .cast-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 42px; margin-top: 26px; }
+    .cast-column { display: grid; gap: 14px; }
+    .cast-label { display: flex; align-items: center; gap: 12px; font: 900 13px var(--display); letter-spacing: .11em; text-transform: uppercase; }
+    .cast-label::after { content: ""; height: 1px; flex: 1; background: currentColor; opacity: .4; }
+    .cast-column.humans .cast-label { color: #bd4b00; }
+    .cast-column.agents .cast-label { color: var(--agent); }
+    .cast-card { min-height: 132px; }
+    .cast-card h3 { font-size: clamp(26px,2.5vw,38px); }
+
+    .blueprint { display: grid; gap: 0; margin-top: 20px; border: 2px solid var(--line); background: white; }
+    .lane { display: grid; grid-template-columns: 170px 1fr; min-height: 142px; }
+    .lane + .lane { border-top: 2px solid var(--line); }
+    .lane-name { padding: 20px; font: 900 12px var(--display); letter-spacing: .1em; text-transform: uppercase; }
+    .lane.front .lane-name { color: var(--human-ink); background: var(--human-soft); }
+    .lane.back .lane-name { color: white; background: var(--agent); }
+    .lane.system .lane-name { background: var(--system-soft); }
+    .lane-flow { padding: 22px 28px; display: flex; align-items: center; justify-content: center; gap: 18px; }
+    .flow-person { min-width: 154px; padding: 16px 20px; text-align: center; color: var(--human-ink); background: var(--human-soft); border: 3px solid var(--human); border-radius: 42px 10px 10px 42px; font: 800 18px var(--display); }
+    .flow-agent { min-width: 150px; padding: 16px 20px; text-align: center; color: white; background: var(--agent); clip-path: polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px); font: 800 18px var(--display); }
+    .flow-system { min-width: 145px; padding: 13px 16px; text-align: center; background: var(--system-soft); border: 3px double var(--system); font: 750 15px var(--display); }
+    .flow-arrow { display: grid; place-items: center; min-width: 80px; color: var(--human); font: 900 28px var(--display); }
+    .flow-arrow small { display: block; margin-bottom: 4px; color: var(--ink-soft); font: 700 10px var(--mono); text-transform: uppercase; }
+    .flow-arrow.agent { color: var(--agent); }
+    .flow-arrow.data { color: var(--system); }
+
+    .case-layout { display: grid; grid-template-columns: .76fr 1.24fr; gap: 28px; align-items: stretch; }
+    .case-story { display: flex; flex-direction: column; justify-content: space-between; }
+    .case-story h2 { font-size: clamp(42px,5.2vw,72px); }
+    .case-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+    .mini-entity { min-height: 125px; padding: 17px; }
+    .mini-entity h3 { font-size: clamp(20px,1.8vw,28px); }
+    .mini-entity p { font-size: 14px; }
+    .case-steps { display: grid; gap: 8px; margin-top: 18px; }
+    .case-step { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; font-size: clamp(14px,1.1vw,17px); line-height: 1.28; }
+    .case-step b { display: grid; place-items: center; width: 28px; height: 28px; color: white; background: var(--agent); font: 800 12px var(--mono); }
+    .case-step.human b { color: var(--human-ink); background: var(--human); border-radius: 50%; }
+    .case-step.decision b { color: var(--ink); background: var(--decision); transform: rotate(45deg); }
+    .case-step.decision b span { transform: rotate(-45deg); }
+    .evidence { margin: 0; height: 500px; overflow: hidden; background: #10141c; border: 1px solid var(--line); box-shadow: 0 14px 36px rgba(44,56,74,.14); }
+    .evidence img { width: 100%; height: calc(100% - 38px); display: block; object-fit: cover; }
+    .evidence figcaption { height: 38px; padding: 10px 14px; color: var(--ink-soft); background: white; font-size: 12px; }
+    .proof-callout { margin-top: 18px; padding: 14px 17px; color: var(--human-ink); background: var(--human-soft); border-left: 7px solid var(--human); font: 800 clamp(16px,1.4vw,21px)/1.22 var(--display); }
+
+    .authority-grid { display: grid; grid-template-columns: 1fr 130px 1fr; gap: 22px; align-items: center; margin-top: 30px; }
+    .authority-col { display: grid; gap: 10px; }
+    .authority-item { min-height: 58px; padding: 13px 16px; display: flex; align-items: center; font: 750 clamp(15px,1.25vw,19px)/1.2 var(--display); }
+    .authority-col.agent .authority-item { color: white; background: var(--agent); clip-path: polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px); }
+    .authority-col.human .authority-item { color: var(--human-ink); background: var(--human-soft); border: 2px solid var(--human); border-radius: 30px 8px 8px 30px; }
+    .decision-stack { display: grid; gap: 16px; justify-items: center; }
+    .decision-diamond { width: 82px; aspect-ratio: 1; display: grid; place-items: center; color: var(--ink); background: var(--decision); border: 2px solid var(--ink); transform: rotate(45deg); }
+    .decision-diamond span { transform: rotate(-45deg); text-align: center; font: 900 10px var(--display); letter-spacing: .03em; }
+
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 30px; }
+    .evidence-stat { min-height: 250px; padding: 24px; background: white; border-top: 8px solid var(--agent); box-shadow: 0 10px 30px rgba(44,56,74,.07); }
+    .evidence-stat.human { border-color: var(--human); }
+    .evidence-stat strong { display: block; margin-top: 36px; font: 850 clamp(48px,5.6vw,80px)/.9 var(--display); letter-spacing: -.05em; }
+    .evidence-stat span { display: block; margin-top: 14px; font-size: clamp(16px,1.35vw,21px); line-height: 1.28; }
+    .evidence-stat small { display: block; margin-top: 15px; color: var(--ink-soft); font-size: 12px; line-height: 1.35; }
+
+    .lessons { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-top: 30px; }
+    .lesson { min-height: 255px; padding: 19px; position: relative; background: white; border-top: 7px solid var(--agent); }
+    .lesson:nth-child(2), .lesson:nth-child(4) { border-color: var(--human); }
+    .lesson:nth-child(5) { border-color: var(--decision); }
+    .lesson b { display: block; color: var(--ink-soft); font: 800 11px var(--mono); }
+    .lesson h3 { margin-top: 42px; font-size: clamp(18px,1.65vw,25px); }
+    .lesson p { margin-top: 12px; font-size: clamp(13px,1vw,16px); line-height: 1.35; color: var(--ink-soft); }
+    .closing-line { margin-top: 24px; color: white; font: 800 clamp(20px,2vw,30px)/1.2 var(--display); }
+
+    .close-layout { display: grid; grid-template-columns: 1fr .8fr; gap: 6vw; align-items: center; }
+    .qr-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .qr-card { display: block; padding: 18px; color: var(--ink); text-decoration: none; background: white; box-shadow: 12px 12px 0 rgba(255,255,255,.14); }
+    .qr-card:first-child { box-shadow: 12px 12px 0 var(--human); }
+    .qr-card img { display: block; width: 100%; aspect-ratio: 1; }
+    .qr-card strong { display: block; margin-top: 12px; font: 800 17px var(--display); }
+    .qr-card span { display: block; margin-top: 5px; color: var(--ink-soft); font: 10px var(--mono); overflow-wrap: anywhere; }
+
+    .appendix-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 34px; align-items: center; }
+    .appendix-layout img { display: block; width: 100%; max-height: 480px; object-fit: contain; border: 1px solid var(--line); background: #10141c; }
+    .appendix-list { margin: 24px 0 0; padding-left: 1.2em; display: grid; gap: 12px; font-size: clamp(16px,1.3vw,20px); line-height: 1.3; }
+    .appendix-note { padding: 18px; background: white; border-left: 7px solid var(--system); }
+
+    .slide[data-title="AI stays backstage"] h2 { font-size: clamp(40px,4.9vw,68px) !important; }
+    .slide[data-title="AI stays backstage"] .blueprint { margin-top: 14px; }
+    .slide[data-title="AI stays backstage"] .lane { min-height: 112px; }
+    .slide[data-title="AI stays backstage"] .lane-flow { padding: 14px 24px; }
+    .slide[data-title="AI stays backstage"] .reskill-line { margin-top: 12px; }
+    .slide[data-title="Iris and Zach"] .evidence,
+    .slide[data-title="Jianzhi and Insa"] .evidence { height: 430px; }
+    .slide[data-title="Iris and Zach"] .case-story h2,
+    .slide[data-title="Jianzhi and Insa"] .case-story h2 { font-size: clamp(38px,4.4vw,61px); }
+    .slide[data-title="Iris and Zach"] .mini-entity,
+    .slide[data-title="Jianzhi and Insa"] .mini-entity { min-height: 108px; padding: 14px; }
+    .slide[data-title="Iris and Zach"] .case-pair,
+    .slide[data-title="Jianzhi and Insa"] .case-pair { margin-top: 14px; }
+    .slide[data-title="Iris and Zach"] .case-steps,
+    .slide[data-title="Jianzhi and Insa"] .case-steps { margin-top: 12px; gap: 5px; }
+    .slide[data-title="Iris and Zach"] .proof-callout,
+    .slide[data-title="Jianzhi and Insa"] .proof-callout { margin-top: 10px; padding: 11px 14px; font-size: clamp(15px,1.2vw,18px); }
+    .slide[data-title="Agents prepare, humans decide"] h2 { font-size: clamp(42px,5.5vw,76px); }
+    .slide[data-title="Agents prepare, humans decide"] .authority-grid { margin-top: 18px; }
+    .slide[data-title="Agents prepare, humans decide"] .reskill-line { margin-top: 14px; }
+    .slide[data-title="Questions"] h1 { font-size: clamp(56px,6.6vw,94px) !important; }
+
+    .chrome { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center; pointer-events: none; }
+    .controls { pointer-events: auto; display: flex; align-items: center; gap: 7px; margin-bottom: 10px; padding: 7px; color: white; background: rgba(44,56,74,.94); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; opacity: .12; transition: opacity .2s; }
+    .controls:hover, .controls:focus-within { opacity: 1; }
+    .controls button { min-width: 34px; height: 32px; padding: 0 9px; border: 0; border-radius: 999px; color: white; background: transparent; cursor: pointer; }
+    .controls button:hover, .controls button:focus-visible { background: var(--agent); outline: none; }
+    .counter { min-width: 82px; text-align: center; font: 12px var(--mono); }
+    .timer { min-width: 70px; padding: 7px 10px; text-align: center; border-radius: 999px; color: white; background: rgba(255,255,255,.12); font: 800 12px var(--mono); }
+    .timer.amber { color: var(--ink); background: var(--decision); }
+    .timer.red { background: var(--stop); }
+    .progress { position: fixed; left: 0; bottom: 0; height: 4px; z-index: 30; background: var(--human); transition: width .25s ease; }
+    .notes-panel { position: fixed; z-index: 40; right: 18px; bottom: 62px; width: min(460px,calc(100vw - 36px)); max-height: 48vh; overflow: auto; display: none; padding: 22px; color: white; background: rgba(30,39,52,.97); border-left: 7px solid var(--human); box-shadow: 0 18px 60px rgba(0,0,0,.35); }
+    .notes-panel.open { display: block; }
+    .notes-panel h3 { margin-bottom: 9px; font-size: 18px; }
+    .notes-panel p { color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.5; white-space: pre-line; }
+
+    @media (max-height: 760px) and (min-width: 901px) {
+      .slide { padding-top: 25px; padding-bottom: 28px; gap: 10px; }
+      .topline { padding-bottom: 7px; }
+      .kicker { margin-bottom: 10px; }
+      .entity { min-height: 160px; padding: 18px; }
+      .flywheel, .uneven-grid, .cast-grid, .evidence-grid, .lessons { margin-top: 18px; }
+      .fly-step { min-height: 195px; padding: 17px; }
+      .fly-step h3 { margin-top: 34px; }
+      .lane { min-height: 115px; }
+      .lane-flow { padding: 14px 20px; }
+      .evidence { height: 420px; }
+      .evidence-stat { min-height: 205px; padding: 18px; }
+      .evidence-stat strong { margin-top: 24px; }
+      .lesson { min-height: 210px; padding: 15px; }
+      .lesson h3 { margin-top: 28px; }
+      .authority-item { min-height: 48px; padding: 10px 14px; }
+      .slide[data-title="Jensen and Success IT"] .portrait-mark { max-width: 300px; }
+      .slide[data-title="Jensen and Success IT"] .context-facts { margin-top: 14px; }
+      .slide[data-title="Jensen and Success IT"] .context-fact { padding-top: 10px; padding-bottom: 10px; }
+      .slide[data-title="Jensen and Success IT"] .thesis-bar { margin-top: 14px; padding-top: 12px; padding-bottom: 12px; }
+      .slide[data-title="Iris and Zach"] .evidence,
+      .slide[data-title="Jianzhi and Insa"] .evidence { height: 370px; }
+      .slide[data-title="Iris and Zach"] .mini-entity,
+      .slide[data-title="Jianzhi and Insa"] .mini-entity { min-height: 92px; padding: 11px; }
+      .slide[data-title="Iris and Zach"] .case-step,
+      .slide[data-title="Jianzhi and Insa"] .case-step { font-size: 13px; }
+      .slide[data-title="Iris and Zach"] .proof-callout,
+      .slide[data-title="Jianzhi and Insa"] .proof-callout { font-size: 14px; }
+    }
+    @media (max-width: 900px) {
+      html, body { overflow: auto; }
+      .slide { overflow-y: auto; }
+      .hero-grid, .context-grid, .cast-grid, .case-layout, .close-layout, .appendix-layout { grid-template-columns: 1fr; }
+      .flywheel, .lessons, .evidence-grid { grid-template-columns: 1fr 1fr; }
+      .authority-grid { grid-template-columns: 1fr; }
+      .decision-stack { grid-template-columns: repeat(3,1fr); }
+      .lane { grid-template-columns: 110px 1fr; }
+      .lane-flow { flex-wrap: wrap; }
+      .footer { padding-bottom: 42px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .slide, .progress { transition: none; } }
+    @media print {
+      html, body { height: auto; overflow: visible; background: white; }
+      .deck { height: auto; }
+      .slide { position: relative; width: 13.333in; height: 7.5in; opacity: 1; visibility: visible; transform: none; page-break-after: always; }
+      .chrome, .progress, .notes-panel { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Everyone Gets a Jarvis presentation">
+
+    <section class="slide main dark active" data-title="Everyone gets a Jarvis" data-seconds="45" data-notes="Thank Nav Qirti for the invitation and acknowledge PJ Teh and Isaac Tay if appropriate. Then: I do not believe everyone in my company needs to become an AI engineer. But I do believe everyone should have access to the capability of one. At Success IT, customers continue to speak to real people. Agents recover context, investigate problems and prepare the next action behind them. This is a service-design story, not an AI architecture lesson.">
+      <div class="topline"><span>INTERSECTIONS · Service Design Conference</span><span>Human in the Loop · V2</span></div>
+      <div class="content hero-grid">
+        <div>
+          <span class="kicker hot">The proposition</span>
+          <h1>Everyone gets<br>a Jarvis.</h1>
+          <div class="hero-line" aria-hidden="true"></div>
+          <h2 style="font-size:clamp(40px,4.8vw,68px);color:#d7ecfa">Customers still get a person.</h2>
+        </div>
+        <aside class="hero-aside">
+          <strong>AI backstage.</strong>
+          <strong>People accountable out front.</strong>
+          <p class="body muted">How a small B2B team packages AI capability for non-technical colleagues.</p>
+          <p class="small muted" style="margin-top:28px">Jensen Loke · CEO, Success IT</p>
+        </aside>
+      </div>
+      <div class="footer"><span class="source">14-minute conference narrative</span><span>01</span></div>
+    </section>
+
+    <section class="slide main" data-title="Jensen and Success IT" data-seconds="60" data-notes="My career has crossed consumer and corporate digital products. The common thread is designing products, workflows and teams around better business outcomes. Success IT is not an AI lab. It has customers, subscriptions, exceptions, legacy systems and daily operational pressure. We make two promises: software should be easy to use and configure, and support should remain human and accountable.">
+      <div class="topline"><span>Context</span><span>Product · service · organisation · software</span></div>
+      <div class="content context-grid">
+        <div class="portrait-mark"><span>JL</span></div>
+        <div>
+          <span class="kicker">Jensen Loke · System builder</span>
+          <h2 style="font-size:clamp(42px,5.2vw,72px)">We design the work around the software.</h2>
+          <p class="body" style="margin-top:18px">Consumer and corporate digital products, service workflows, teams and software—with the same goal: solve real business problems.</p>
+          <div class="context-facts">
+            <div class="context-fact"><span>Earlier chapters</span><strong>DBS · Temasek · Ant Financial · Amazon</strong></div>
+            <div class="context-fact"><span>Now</span><strong>CEO, Success IT</strong></div>
+            <div class="context-fact"><span>Operating context</span><strong>20+ years of B2B software and support</strong></div>
+            <div class="context-fact"><span>Community</span><strong>Co-founder · 1,000+ Agentic Builders</strong></div>
+          </div>
+          <div class="thesis-bar">Two promises: easy, configurable software · human, accountable support.</div>
+        </div>
+      </div>
+      <div class="footer"><span class="source">linkedin.com/in/jensenloke · agenticbuilders.sg · Success IT company context</span><span>02</span></div>
+    </section>
+
+    <section class="slide main human-wash" data-title="AI adoption is uneven" data-seconds="60" data-notes="This is not about intelligence, willingness or age. AI tools change faster than most formal training programmes can spread. Some colleagues naturally become pioneers; others are serving customers, managing products or running operations. Coaching matters, but train everyone first cannot be the sole operating model.">
+      <div class="topline"><span>The organisational problem</span><span>Different starting points · different jobs</span></div>
+      <div class="content">
+        <span class="kicker hot">The uncomfortable reality</span>
+        <h2>AI adoption will never be synchronised.</h2>
+        <div class="uneven-grid">
+          <article class="uneven-panel"><h3>A few people race ahead.</h3><p class="body muted">They experiment, combine tools and invent new workflows faster than formal training can spread.</p></article>
+          <article class="uneven-panel work"><h3>Most people have a job to do.</h3><p class="body muted">They cannot continually learn new models, prompts and specialist coding interfaces.</p></article>
+        </div>
+        <div class="thesis-bar">Waiting for universal AI fluency stalls the organisation.</div>
+      </div>
+      <div class="footer"><span class="source">The distinction is job context and starting point—not ability or ambition.</span><span>03</span></div>
+    </section>
+
+    <section class="slide main agent-wash" data-title="Package the pioneers' workflows" data-seconds="75" data-notes="Work with the bright sparks already discovering useful practices. Do not leave those discoveries as private prompt collections. Turn repeatable practices into bounded agents with a role, context, permissions, review points and stop conditions. Colleagues gain leverage immediately and develop AI judgment through use. The capacity returned can create room for later learning.">
+      <div class="topline"><span>The strategy</span><span>Discovery → packaging → use → capacity</span></div>
+      <div class="content">
+        <span class="kicker">Change the sequence</span>
+        <h2 style="font-size:clamp(42px,5.5vw,78px)">Do not make AI fluency<br>the price of AI leverage.</h2>
+        <div class="flywheel">
+          <article class="fly-step"><span class="no">01 · PIONEERS</span><h3>Discover</h3><p class="small muted">A useful AI workflow inside real work.</p></article>
+          <article class="fly-step"><span class="no">02 · BUILDERS</span><h3>Package</h3><p class="small" style="color:#d7ecfa">Turn it into a bounded, repeatable agent.</p></article>
+          <article class="fly-step"><span class="no">03 · COLLEAGUES</span><h3>Use + supervise</h3><p class="small">Apply it inside familiar conversations.</p></article>
+          <article class="fly-step"><span class="no">04 · ORGANISATION</span><h3>Return capacity</h3><p class="small muted">For customers, learning and the next improvement.</p></article>
+        </div>
+        <p class="reskill-line">Using a well-designed agent can be the beginning of reskilling—not the reward for completing it.</p>
+      </div>
+      <div class="footer"><span class="source">Pioneers discover; the organisation productises; colleagues gain usable capability.</span><span>04</span></div>
+    </section>
+
+    <section class="slide main" data-title="Meet the cast" data-seconds="60" data-notes="Teach the visual language explicitly. Orange and rounded always means human. Blue and angular always means AI agent. Grey means infrastructure. Yellow means a human decision. Iris knows what the customer means. Jianzhi knows how the product should behave. Zach and Insa extend those forms of expertise; they do not replace them.">
+      <div class="topline"><span>The cast</span><span>People are the protagonists · agents are tools</span></div>
+      <div class="content">
+        <span class="kicker">Learn this visual grammar once</span>
+        <h2 style="font-size:clamp(40px,5vw,70px)">Two humans carry the expertise.<br>Two agents extend their reach.</h2>
+        <div class="cast-grid">
+          <div class="cast-column humans">
+            <div class="cast-label">Frontstage · humans</div>
+            <article class="entity human-card cast-card"><div><span class="type">Human · customer judgment</span><h3>Iris</h3><p class="small">Understands customer meaning and owns the response.</p></div></article>
+            <article class="entity human-card cast-card"><div><span class="type">Human · product judgment</span><h3>Jianzhi</h3><p class="small">Carries product history and business rules.</p></div></article>
+          </div>
+          <div class="cast-column agents">
+            <div class="cast-label">Backstage · AI agents</div>
+            <article class="entity agent-card cast-card"><div><span class="type">AI agent · support structure</span><h3>Zach</h3><p class="small">Turns conversation into reviewable support work.</p></div></article>
+            <article class="entity agent-card cast-card"><div><span class="type">AI agent · technical reach</span><h3>Insa</h3><p class="small">Investigates and prepares proposed changes.</p></div></article>
+          </div>
+        </div>
+        <div class="role-key"><span class="key-human"><i></i>Human</span><span class="key-agent"><i></i>AI agent</span><span class="key-system"><i></i>System</span><span class="key-decision"><i></i>Human decision</span></div>
+      </div>
+      <div class="footer"><span class="source">The category, geometry and colour remain consistent throughout V2.</span><span>05</span></div>
+    </section>
+
+    <section class="slide main" data-title="AI stays backstage" data-seconds="75" data-notes="Success IT does not plan to replace its direct B2B contact surfaces with agents in the near term. Customers should not need to understand prompting, supervise a bot or fight through automation to reach a responsible person. AI belongs backstage where it can make the human response faster, more informed and more capable. Human in the loop begins with the relationship itself.">
+      <div class="topline"><span>The service blueprint</span><span>Frontstage relationship · backstage capability</span></div>
+      <div class="content">
+        <span class="kicker hot">Where AI belongs in our B2B service</span>
+        <h2 style="font-size:clamp(42px,5.4vw,76px)">The AI is backstage—not between us and the customer.</h2>
+        <div class="blueprint">
+          <div class="lane front"><div class="lane-name">Frontstage<br>Human</div><div class="lane-flow"><div class="flow-person">Customer</div><div class="flow-arrow"><small>talks with</small>⇄</div><div class="flow-person">Iris / Jianzhi</div><div class="flow-arrow"><small>owns</small>→</div><div class="flow-person">Outcome</div></div></div>
+          <div class="lane back"><div class="lane-name">Backstage<br>AI agents</div><div class="lane-flow"><div class="flow-agent">Zach</div><div class="flow-arrow agent"><small>hands off</small>→</div><div class="flow-agent">Insa</div><div class="flow-arrow agent"><small>prepares</small>→</div><div class="flow-agent">Next action</div></div></div>
+          <div class="lane system"><div class="lane-name">Infrastructure<br>Systems</div><div class="lane-flow"><div class="flow-system">Customer context</div><div class="flow-arrow data"><small>retrieves</small>⋯</div><div class="flow-system">Product software</div><div class="flow-arrow data"><small>records</small>⋯</div><div class="flow-system">Audit trail</div></div></div>
+        </div>
+        <p class="reskill-line">Agents power the service. People remain the service relationship.</p>
+      </div>
+      <div class="footer"><span class="source">Customers describe symptoms; people interpret stakes; agents prepare work behind them.</span><span>06</span></div>
+    </section>
+
+    <section class="slide main human-wash" data-title="Iris and Zach" data-seconds="105" data-notes="Iris does not fill in a rigid technical form. She describes the issue naturally. Zach converts it into a structured draft and exposes missing information. It does not silently create the ticket; Iris checks it first. Insa may then inspect relevant context, but Iris continues to own the customer communication. The ticket figure is throughput context, not a causal productivity claim.">
+      <div class="topline"><span>Case study 01</span><span>Customer meaning → structured work</span></div>
+      <div class="content case-layout">
+        <div class="case-story">
+          <div>
+            <span class="kicker hot">Human expertise stays central</span>
+            <h2>Iris stays with the customer.</h2>
+            <div class="case-pair">
+              <article class="entity human-card mini-entity"><div><span class="type">Human</span><h3>Iris</h3><p>Meaning · urgency · relationship</p></div></article>
+              <article class="entity agent-card mini-entity"><div><span class="type">AI agent</span><h3>Zach</h3><p>Structure · missing facts · draft</p></div></article>
+            </div>
+            <div class="case-steps">
+              <div class="case-step human"><b>1</b><span>Iris describes the customer’s symptom naturally.</span></div>
+              <div class="case-step"><b>2</b><span>Zach prepares customer, product, urgency and evidence.</span></div>
+              <div class="case-step decision"><b><span>3</span></b><span>Iris corrects and approves before creation.</span></div>
+              <div class="case-step"><b>4</b><span>Insa can investigate backstage; Iris owns what happens next.</span></div>
+            </div>
+          </div>
+          <div class="proof-callout">81–115 tickets closed per month across the three-month range supplied by Jensen.</div>
+        </div>
+        <figure class="evidence"><img src="public-assets/zach-iris-ticket-public.png" alt="Public-safe reconstruction of Iris asking Zach to prepare a ticket, then reviewing and approving the draft" /><figcaption>Public-safe reconstruction · orange callouts are human actions; blue responses are agent work.</figcaption></figure>
+      </div>
+      <div class="footer"><span class="source">Real Success IT workflow · customer and ticket identifiers redacted</span><span>07</span></div>
+    </section>
+
+    <section class="slide main agent-wash" data-title="Jianzhi and Insa" data-seconds="105" data-notes="Jianzhi has deep experience supporting the traditional Microsoft Access product but is unfamiliar with modern web-application tooling. His dedicated Insa chat already knows which product and permissions are in scope. Insa places a proposed change on our desk for review; it has not been released. Jensen or an engineer reviews and releases it. Jianzhi verifies the actual business behaviour.">
+      <div class="topline"><span>Case study 02</span><span>Product judgment → technical reach</span></div>
+      <div class="content case-layout">
+        <div class="case-story">
+          <div>
+            <span class="kicker">Business knowledge sets the boundary</span>
+            <h2>Jianzhi says: “This report only.”</h2>
+            <div class="case-pair">
+              <article class="entity human-card mini-entity"><div><span class="type">Human</span><h3>Jianzhi</h3><p>Product history · business rule · verification</p></div></article>
+              <article class="entity agent-card mini-entity"><div><span class="type">AI agent</span><h3>Insa</h3><p>Impact check · investigation · proposed change</p></div></article>
+            </div>
+            <div class="case-steps">
+              <div class="case-step human"><b>1</b><span>Jianzhi defines the behaviour and exact scope.</span></div>
+              <div class="case-step"><b>2</b><span>Insa opens the configured product workroom and investigates.</span></div>
+              <div class="case-step decision"><b><span>3</span></b><span>Jensen or an engineer reviews and releases.</span></div>
+              <div class="case-step human"><b>4</b><span>Jianzhi tests whether the business behaviour is correct.</span></div>
+            </div>
+          </div>
+          <div class="proof-callout">Product expertise gains technical reach—without requiring Jianzhi to navigate a coding interface.</div>
+        </div>
+        <figure class="evidence"><img src="public-assets/insa-jianzhi-expat-public.png" alt="Public-safe reconstruction of Jianzhi defining a narrow report change and Insa confirming the scope" /><figcaption>Public-safe reconstruction · scope and legal identifiers redacted.</figcaption></figure>
+      </div>
+      <div class="footer"><span class="source">Real product-workroom pattern · Insa prepares; humans retain release authority</span><span>08</span></div>
+    </section>
+
+    <section class="slide main" data-title="Adoption outside engineering" data-seconds="75" data-notes="Do not turn this into a staff ranking. The numbers demonstrate adoption outside engineering. Jianzhi uses Insa for scoped changes; Iris uses it for investigation and support context. The same agent extends different kinds of business expertise. Audited steps measure workflow activity, not tasks completed or personal productivity.">
+      <div class="topline"><span>Early evidence</span><span>Adoption—not a productivity leaderboard</span></div>
+      <div class="content">
+        <span class="kicker hot">The adoption surprise</span>
+        <h2>Our heaviest agent users are not engineers.</h2>
+        <div class="evidence-grid">
+          <article class="evidence-stat human"><span class="kicker hot">Jianzhi · human</span><strong>2,538</strong><span>audited steps performed with Insa</span><small>BD + support · most active attributable user</small></article>
+          <article class="evidence-stat human"><span class="kicker hot">Iris · human</span><strong>527</strong><span>audited steps performed with Insa</span><small>Plus 81–115 tickets closed per month</small></article>
+          <article class="evidence-stat"><span class="kicker">What it means</span><strong style="font-size:clamp(40px,4.7vw,68px)">Business expertise</strong><span>can gain technical reach before every technical skill is acquired.</span><small>Engineering adoption remains useful but uneven and generally lower per person.</small></article>
+        </div>
+      </div>
+      <div class="footer"><span class="source">Audited steps are workflow activity—not completed tasks, features or personal productivity.</span><span>09</span></div>
+    </section>
+
+    <section class="slide main" data-title="Agents prepare, humans decide" data-seconds="60" data-notes="Human in the loop is a designed operating contract, not a slogan. Missing evidence returns to the staff member. Live changes and releases remain human-controlled. A person tests reality after the change. Visible uncertainty is a feature: an agent that stops safely is often more valuable than one that always produces an answer.">
+      <div class="topline"><span>The operating contract</span><span>Capability and authority are separate</span></div>
+      <div class="content">
+        <span class="kicker">Human in the loop</span>
+        <h2>Agents prepare. Humans decide.</h2>
+        <div class="authority-grid">
+          <div class="authority-col agent"><span class="cast-label" style="color:var(--agent)">AI agents · blue</span><div class="authority-item">Structure incomplete information</div><div class="authority-item">Recover customer and product context</div><div class="authority-item">Investigate safely</div><div class="authority-item">Prepare a reviewable action</div><div class="authority-item">Stop when uncertain</div></div>
+          <div class="decision-stack"><div class="decision-diamond"><span>CORRECT</span></div><div class="decision-diamond"><span>APPROVE</span></div><div class="decision-diamond"><span>RELEASE</span></div></div>
+          <div class="authority-col human"><span class="cast-label" style="color:#bd4b00">Humans · orange</span><div class="authority-item">Interpret what the customer means</div><div class="authority-item">Correct and approve the record</div><div class="authority-item">Decide whether evidence is sufficient</div><div class="authority-item">Review, release and test</div><div class="authority-item">Own the outcome and relationship</div></div>
+        </div>
+        <p class="reskill-line">The agent moves the work forward. A person owns the consequence.</p>
+      </div>
+      <div class="footer"><span class="source">Human decisions are visible checkpoints—not hidden assumptions.</span><span>10</span></div>
+    </section>
+
+    <section class="slide main dark" data-title="Five lessons" data-seconds="60" data-notes="My own role changed through agentic coding. Management can now build and maintain more of the tools and guardrails that package internal practice. Instead of personally solving every incident, ask why the agent failed to help the colleague. Fixing the reusable layer helps the next colleague and the next incident too.">
+      <div class="topline"><span>The playbook</span><span>Build with pioneers · package for everyone</span></div>
+      <div class="content">
+        <span class="kicker">What I would take back to an organisation</span>
+        <h2 style="font-size:clamp(42px,5.2vw,74px)">Design the capability—not just the AI interaction.</h2>
+        <div class="lessons">
+          <article class="lesson"><b>01</b><h3>Find the leverage</h3><p>Observe where early adopters already improve effort or judgment.</p></article>
+          <article class="lesson"><b>02</b><h3>Package the workflow</h3><p>Give the agent one role, context, permissions and stop conditions.</p></article>
+          <article class="lesson"><b>03</b><h3>Meet people at work</h3><p>Use familiar conversations—not a specialist interface.</p></article>
+          <article class="lesson"><b>04</b><h3>Keep authority visible</h3><p>Design correction, approval, testing and escalation into the flow.</p></article>
+          <article class="lesson"><b>05</b><h3>Reinvest capacity</h3><p>Return time to customers, learning and the next improvement.</p></article>
+        </div>
+        <p class="closing-line">Do not wait for everyone to catch up with AI. Build AI that can meet people where they are—and help carry them forward.</p>
+      </div>
+      <div class="footer"><span class="source">Management’s leverage: build the reusable layer, then improve it when the agent fails.</span><span>11</span></div>
+    </section>
+
+    <section class="slide main dark" data-title="Questions" data-seconds="60" data-notes="Restate the proposition once. Invite the room to challenge or adapt the model. Agentic Builders Collective is a 1,000+ member Singapore community for people learning and building with agentic coding. Leave this slide visible throughout questions.">
+      <div class="topline"><span>End · Questions</span><span>Everyone gets a Jarvis · customers get a person</span></div>
+      <div class="content close-layout">
+        <div>
+          <span class="kicker hot">The closing invitation</span>
+          <h1>Build AI people can use—before they can build it.</h1>
+          <p class="lede muted" style="margin-top:28px">Questions?</p>
+        </div>
+        <div class="qr-pair">
+          <a class="qr-card" href="https://chat.whatsapp.com/FkPWbdgxBhz8rLPTYTFiGq" target="_blank" rel="noopener"><img src="public-assets/agentic-builders-whatsapp-qr.svg" alt="QR code for the Agentic Builders Collective WhatsApp group" /><strong>Join Agentic Builders</strong><span>agenticbuilders.sg</span></a>
+          <a class="qr-card" href="https://www.linkedin.com/in/jensenloke/" target="_blank" rel="noopener"><img src="public-assets/jensen-linkedin-qr.svg" alt="QR code for Jensen Loke's LinkedIn profile" /><strong>Connect with Jensen</strong><span>linkedin.com/in/jensenloke</span></a>
+        </div>
+      </div>
+      <div class="footer"><span class="source">Jensen Loke · Success IT · Agentic Builders Collective</span><span>12</span></div>
+    </section>
+
+    <section class="slide appendix" data-title="Appendix · Technical decoder" data-notes="Optional appendix. Use only if the audience asks about terminology.">
+      <div class="topline"><span>Appendix</span><span>Plain-language technical decoder</span></div>
+      <div class="content"><span class="kicker">Five terms</span><h2 style="font-size:clamp(42px,5vw,70px)">What the machinery means in ordinary language.</h2><div class="evidence-grid"><article class="evidence-stat"><span class="kicker">SuccessGraph</span><h3>The customer map</h3><span>Which clients use which products and related companies.</span></article><article class="evidence-stat"><span class="kicker">CodeGraph</span><h3>The software impact map</h3><span>Which parts of the product a change could affect.</span></article><article class="evidence-stat"><span class="kicker">Proposed change</span><h3>A change awaiting review</h3><span>Prepared for a human; not yet released to customers.</span></article></div></div>
+      <div class="footer"><span class="source">Optional material following the 12-slide main talk.</span><span>A1</span></div>
+    </section>
+
+    <section class="slide appendix" data-title="Appendix · Customer map" data-notes="Optional appendix. SuccessGraph gives Zach context but does not replace Iris's interpretation.">
+      <div class="topline"><span>Appendix</span><span>SuccessGraph · customer context</span></div>
+      <div class="content appendix-layout"><div><span class="kicker">System · neutral grey</span><h2 style="font-size:clamp(42px,5vw,70px)">A map of the customer’s operating context.</h2><ul class="appendix-list"><li>Customer and related companies</li><li>Products and subscription state</li><li>Mapped platform and support route</li><li>Context can degrade gracefully; Iris still interprets meaning</li></ul></div><img src="public-assets/successgraph-public.png" alt="Public-safe SuccessGraph customer map" /></div>
+      <div class="footer"><span class="source">Public-safe reconstruction · identifying records redacted</span><span>A2</span></div>
+    </section>
+
+    <section class="slide appendix" data-title="Appendix · Software impact map" data-notes="Optional appendix. CodeGraph helps Insa see what else a proposed change may affect.">
+      <div class="topline"><span>Appendix</span><span>CodeGraph · software impact</span></div>
+      <div class="content appendix-layout"><div><span class="kicker">System · neutral grey</span><h2 style="font-size:clamp(42px,5vw,70px)">A map of what a change might affect.</h2><ul class="appendix-list"><li>Connects screens, services and stored procedures</li><li>Highlights downstream dependencies</li><li>Supports investigation; does not grant release authority</li><li>Humans still review and test the proposed change</li></ul></div><img src="public-assets/codegraph-public.png" alt="Public-safe CodeGraph software impact map" /></div>
+      <div class="footer"><span class="source">Public-safe reconstruction · internal identifiers redacted</span><span>A3</span></div>
+    </section>
+
+    <section class="slide appendix" data-title="Appendix · Evidence boundaries" data-notes="Optional appendix. Use this to answer questions about metrics and causation.">
+      <div class="topline"><span>Appendix</span><span>What the evidence does and does not show</span></div>
+      <div class="content"><span class="kicker">Evidence standard</span><h2>We can prove adoption.<br>We should not overclaim causation.</h2><div class="uneven-grid"><article class="appendix-note"><h3>Supported now</h3><ul class="appendix-list"><li>Substantial attributable use by Iris and Jianzhi</li><li>Different workflows for different human expertise</li><li>Visible human approvals and release controls</li></ul></article><article class="appendix-note" style="border-color:var(--human)"><h3>Measure before claiming</h3><ul class="appendix-list"><li>Exact time saved</li><li>Resolution-time or quality improvement</li><li>Causal relationship to staffing changes</li></ul></article></div></div>
+      <div class="footer"><span class="source">Audited steps are activity evidence—not productivity or quality scores.</span><span>A4</span></div>
+    </section>
+
+  </main>
+
+  <div class="chrome" aria-label="Presentation controls"><div class="controls"><button id="prev" type="button" title="Previous slide (←)">←</button><span class="counter" id="counter">1 / 16</span><button id="next" type="button" title="Next slide (→)">→</button><button id="timerBtn" type="button" title="Start/reset timer (T)">T</button><span class="timer" id="timer">00:00</span><button id="notesBtn" type="button" title="Speaker notes (N)">N</button><button id="appendixBtn" type="button" title="Jump to appendix (A)">A</button><button id="jumpBtn" type="button" title="Jump to takeaway (J)">J</button><button id="fullBtn" type="button" title="Fullscreen (F)">⛶</button></div></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <aside class="notes-panel" id="notesPanel" aria-live="polite"><h3 id="notesTitle">Speaker notes</h3><p id="notesCopy"></p></aside>
+
+  <script>
+    const mainSlides = [...document.querySelectorAll('.slide.main')];
+    const appendixSlides = [...document.querySelectorAll('.slide.appendix')];
+    const allSlides = [...mainSlides, ...appendixSlides];
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const notesPanel = document.getElementById('notesPanel');
+    const notesTitle = document.getElementById('notesTitle');
+    const notesCopy = document.getElementById('notesCopy');
+    const timerEl = document.getElementById('timer');
+    let index = Math.max(0, Math.min(allSlides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+    let timerStart = null;
+    let timerInterval = null;
+
+    function currentSlide() { return allSlides[index]; }
+    function updateTimer() {
+      const elapsed = timerStart ? Math.floor((Date.now() - timerStart) / 1000) : 0;
+      const min = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const sec = String(elapsed % 60).padStart(2, '0');
+      timerEl.textContent = `${min}:${sec}`;
+      timerEl.classList.toggle('amber', elapsed >= 690 && elapsed < 780);
+      timerEl.classList.toggle('red', elapsed >= 780);
+      timerEl.title = elapsed >= 780 ? '13:00 reached — press J for takeaway' : elapsed >= 690 ? '11:30 reached — begin closing' : 'Presentation timer';
+    }
+    function toggleTimer() {
+      if (timerStart) { timerStart = null; clearInterval(timerInterval); timerInterval = null; updateTimer(); return; }
+      timerStart = Date.now(); updateTimer(); timerInterval = setInterval(updateTimer, 1000);
+    }
+    function showSlide(nextIndex, pushHash = true) {
+      nextIndex = Math.max(0, Math.min(allSlides.length - 1, nextIndex));
+      allSlides.forEach(slide => { slide.classList.remove('active','exit-left'); slide.setAttribute('aria-hidden','true'); });
+      allSlides.forEach((slide,i) => { if (i < nextIndex) slide.classList.add('exit-left'); });
+      allSlides[nextIndex].classList.add('active'); allSlides[nextIndex].setAttribute('aria-hidden','false');
+      index = nextIndex;
+      const isAppendix = currentSlide().classList.contains('appendix');
+      counter.textContent = `${index + 1} / ${allSlides.length}`;
+      progress.style.width = `${((index + 1) / allSlides.length) * 100}%`;
+      progress.style.background = isAppendix ? 'var(--system)' : 'var(--human)';
+      notesTitle.textContent = `${isAppendix ? `Appendix ${index - mainSlides.length + 1}` : `Slide ${index + 1}`}: ${currentSlide().dataset.title}`;
+      const target = Number(currentSlide().dataset.seconds || 0);
+      notesCopy.textContent = `${target ? `Target time: ${target} seconds\n\n` : ''}${currentSlide().dataset.notes || 'No notes.'}`;
+      if (pushHash) history.replaceState(null,'',`#${index + 1}`);
+    }
+    function next() { showSlide(index + 1); }
+    function prev() { showSlide(index - 1); }
+    function jumpToAppendix() { showSlide(mainSlides.length); }
+    function jumpToTakeaway() { showSlide(10); }
+
+    document.getElementById('prev').addEventListener('click',prev);
+    document.getElementById('next').addEventListener('click',next);
+    document.getElementById('timerBtn').addEventListener('click',toggleTimer);
+    document.getElementById('notesBtn').addEventListener('click',()=>notesPanel.classList.toggle('open'));
+    document.getElementById('appendixBtn').addEventListener('click',jumpToAppendix);
+    document.getElementById('jumpBtn').addEventListener('click',jumpToTakeaway);
+    document.getElementById('fullBtn').addEventListener('click',()=>{ if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); });
+    document.addEventListener('keydown',event=>{
+      if (['ArrowRight','PageDown',' ','Enter'].includes(event.key)) { event.preventDefault(); next(); }
+      if (['ArrowLeft','PageUp','Backspace'].includes(event.key)) { event.preventDefault(); prev(); }
+      if (event.key === 'Home') showSlide(0);
+      if (event.key === 'End') showSlide(allSlides.length - 1);
+      if (event.key.toLowerCase() === 'n') notesPanel.classList.toggle('open');
+      if (event.key.toLowerCase() === 't') toggleTimer();
+      if (event.key.toLowerCase() === 'a') jumpToAppendix();
+      if (event.key.toLowerCase() === 'j') jumpToTakeaway();
+      if (event.key.toLowerCase() === 'f') document.getElementById('fullBtn').click();
+      if (event.key === 'Escape') notesPanel.classList.remove('open');
+    });
+    window.addEventListener('hashchange',()=>{ const n = Number(location.hash.slice(1)) - 1; if (Number.isFinite(n)) showSlide(n,false); });
+    let touchStart = null;
+    document.addEventListener('touchstart',e=>{ touchStart=e.changedTouches[0].clientX; },{passive:true});
+    document.addEventListener('touchend',e=>{ if(touchStart===null)return; const d=e.changedTouches[0].clientX-touchStart; if(Math.abs(d)>55)d<0?next():prev(); touchStart=null; },{passive:true});
+    showSlide(index,false); updateTimer();
+  </script>
+</body>
+</html>
