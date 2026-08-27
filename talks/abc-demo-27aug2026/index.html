@@ -430,7 +430,7 @@
     .mini-pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65cqw; }
     .mini-step { position: relative; min-height: 9.5cqh; display: flex; align-items: center; justify-content: center; padding: 1cqh .65cqw; border: 1px solid rgba(255,255,255,.14); text-align: center; color: #d9dce7; font-size: .66cqw; line-height: 1.25; }
     .mini-step:not(:last-child)::after { content: "→"; position: absolute; right: -.66cqw; color: var(--coral); font-size: .9cqw; z-index: 2; }
-    .video-shell { position: relative; height: 38cqh; border: 1px solid var(--qwen-bright); overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(42,76,255,.2), transparent 55%), #080b18; box-shadow: 0 0 2.5cqw rgba(42,76,255,.18); }
+    .video-shell { position: relative; height: 46cqh; border: 1px solid var(--qwen-bright); overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(42,76,255,.2), transparent 55%), #080b18; box-shadow: 0 0 2.5cqw rgba(42,76,255,.18); }
     .video-shell video { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; object-fit: contain; background: #050711; }
     .video-placeholder { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
     .video-placeholder strong { display: block; font-size: 1.5cqw; letter-spacing: .12em; text-transform: uppercase; }
@@ -731,9 +731,8 @@
             <div class="mini-pipeline"><div class="mini-step">Frozen brief<br>+ mock data</div><div class="mini-step">Qwen builds<br>independently</div><div class="mini-step">Playwright<br>390 × 844</div></div>
           </div>
           <div class="video-shell no-video" id="videoShell">
-            <!-- Add src="insurance-demo.mp4" to this element when the public-safe clip is available. -->
-            <video id="demoVideo" controls preload="metadata" playsinline></video>
-            <div class="video-placeholder"><div><strong>&lt;demo video&gt;</strong><span>15-second insurance product walkthrough</span></div></div>
+            <video id="demoVideo" src="assets/insurance-demo.mp4" controls preload="metadata" playsinline></video>
+            <div class="video-placeholder"><div><strong>&lt;demo video&gt;</strong><span>40-second four-model build-off walkthrough</span></div></div>
           </div>
           <div class="score-strip">
             <div class="score-card"><strong>130 / 130</strong><span>Local Qwen 3.8 27B · 100 functional + 30 build quality</span></div>
@@ -742,7 +741,7 @@
           </div>
         </div>
         <div class="footer-rule"><span>Contract compliance · UX reviewed separately</span><span>08 / 10</span></div>
-        <aside class="notes">We turned a redacted real insurance-broker request into one frozen requirements document and unchanged mock data. Every model got the same minimal prompt. The design-agnostic Playwright harness drove real journeys at a 390×844 viewport. Play the 15-second video. Both Qwen runs passed all 130 automated points. Say “satisfied this product contract,” not “production-ready.” The 90.7s and 84.0s figures are harness runtime only.</aside>
+        <aside class="notes">We turned a redacted real insurance-broker request into one frozen requirements document and unchanged mock data. Every model got the same minimal prompt. The design-agnostic Playwright harness drove real journeys at a 390×844 viewport. Play the 40-second video — four models building the same brief side by side. Both Qwen runs passed all 130 automated points. Say “satisfied this product contract,” not “production-ready.” The 90.7s and 84.0s figures are harness runtime only.</aside>
       </section>
 
       <!-- 09 — Takeaways -->
