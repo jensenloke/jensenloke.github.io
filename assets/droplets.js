@@ -60,8 +60,6 @@
   }
   function spawn(p) {
     p = p || {};
-    p.x = Math.random() * W;
-    p.y = Math.random() * H;
     p.vx = (Math.random() - 0.5) * 0.4;
     p.vy = (Math.random() - 0.5) * 0.4;
     p.size = 0.9 + Math.random() * 1.4;
@@ -74,6 +72,27 @@
     const n = targetCount();
     while (parts.length < n) parts.push(spawn());
     parts.length = n;
+    layoutHomes();
+  }
+  // Each droplet gets a "home" on a jittered grid covering the viewport.
+  // A weak spring to home is what lets the field coalesce: the void your
+  // cursor carves refills the moment the force leaves.
+  function layoutHomes() {
+    const n = parts.length;
+    if (!n) return;
+    const cols = Math.max(1, Math.round(Math.sqrt((n * W) / H)));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    for (let i = 0; i < n; i++) {
+      const p = parts[i];
+      const c = i % cols;
+      const r = (i / cols) | 0;
+      p.hx = ((c + 0.5) / cols) * W + (Math.random() - 0.5) * 40;
+      p.hy = ((r + 0.5) / rows) * H + (Math.random() - 0.5) * 40;
+      if (p.x == null) {
+        p.x = p.hx + (Math.random() - 0.5) * 60;
+        p.y = p.hy + (Math.random() - 0.5) * 60;
+      }
+    }
   }
 
   function flow(x, y, t) {
@@ -86,12 +105,15 @@
   const REPEL_R2 = REPEL_R * REPEL_R;
   const MAX_SPEED = 3.4;
   const LIFT = 0.006; // "antigravity": a slow, constant upward bias
+  const HOME_K = 0.0012; // spring strength pulling droplets back to home
 
   function step(t, dt) {
     for (const p of parts) {
       const f = flow(p.x, p.y, t);
-      p.vx += f.x * 0.014 * dt;
-      p.vy += f.y * 0.014 * dt - LIFT * dt;
+      p.vx += f.x * 0.018 * dt;
+      p.vy += f.y * 0.018 * dt - LIFT * dt;
+      p.vx += (p.hx - p.x) * HOME_K * dt;
+      p.vy += (p.hy - p.y) * HOME_K * dt;
 
       const dx = p.x - mouse.x;
       const dy = p.y - mouse.y;
@@ -113,10 +135,6 @@
       p.x += p.vx * dt;
       p.y += p.vy * dt;
 
-      if (p.x < -24) p.x = W + 24;
-      else if (p.x > W + 24) p.x = -24;
-      if (p.y < -24) p.y = H + 24;
-      else if (p.y > H + 24) p.y = -24;
     }
     mouse.vx *= 0.9;
     mouse.vy *= 0.9;
