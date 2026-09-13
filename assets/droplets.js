@@ -66,6 +66,8 @@
     p.hue = 222 + Math.random() * 16;
     p.light = 55 + Math.random() * 18;
     p.alpha = 0.35 + Math.random() * 0.55;
+    p.orbit = 45 + Math.pow(Math.random(), 0.7) * 135; // own shell radius
+    p.sw = Math.random() < 0.35 ? -1 : 1; // mostly one way, some counter-spin
     return p;
   }
   function syncCount() {
@@ -101,9 +103,15 @@
     return { x: Math.cos(a * 1.7 + b), y: Math.sin(a * 1.3 - b) };
   }
 
-  const REPEL_R = 190;
-  const REPEL_R2 = REPEL_R * REPEL_R;
-  const MAX_SPEED = 3.4;
+  // Capture well (Google-style): the cursor collects droplets into a
+  // swirling cloud. Each droplet owns an orbit radius and spin direction,
+  // so the cluster is a fuzzy swarm filling the disk - not a hard ring.
+  // Home spring is suppressed while captured; the field reforms on exit.
+  const CAPTURE_R = 260;
+  const CAPTURE_R2 = CAPTURE_R * CAPTURE_R;
+  const RING_K = 0.012; // spring toward the droplet's own orbit radius
+  const SWIRL = 0.11; // tangential acceleration -> orbiting cloud
+  const MAX_SPEED = 3.8;
   const LIFT = 0.006; // "antigravity": a slow, constant upward bias
   const HOME_K = 0.0012; // spring strength pulling droplets back to home
 
@@ -112,21 +120,39 @@
       const f = flow(p.x, p.y, t);
       p.vx += f.x * 0.018 * dt;
       p.vy += f.y * 0.018 * dt - LIFT * dt;
-      p.vx += (p.hx - p.x) * HOME_K * dt;
-      p.vy += (p.hy - p.y) * HOME_K * dt;
 
       const dx = p.x - mouse.x;
       const dy = p.y - mouse.y;
       const d2 = dx * dx + dy * dy;
-      if (d2 < REPEL_R2 && d2 > 0.01) {
-        const d = Math.sqrt(d2);
-        const fall = 1 - d / REPEL_R;
-        p.vx += (dx / d) * fall * 0.55 * dt + mouse.vx * fall * 0.05 * dt;
-        p.vy += (dy / d) * fall * 0.55 * dt + mouse.vy * fall * 0.05 * dt;
+      let cap = 0;
+      if (d2 < CAPTURE_R2) {
+        if (d2 > 0.01) {
+          const d = Math.sqrt(d2);
+          const ux = dx / d;
+          const uy = dy / d;
+          cap = 1 - d / CAPTURE_R;
+          // pull toward this droplet's own orbit -> filled, fuzzy disk
+          const ring = (d - p.orbit) * RING_K;
+          p.vx -= ux * ring * dt;
+          p.vy -= uy * ring * dt;
+          // mixed swirl directions + gentle carry with cursor movement
+          p.vx += (-uy * SWIRL * p.sw + mouse.vx * 0.03) * cap * dt;
+          p.vy += (ux * SWIRL * p.sw + mouse.vy * 0.03) * cap * dt;
+        }
+        p.cap = cap;
+      } else {
+        p.cap = 0;
       }
 
-      p.vx *= 0.955;
-      p.vy *= 0.955;
+      // home spring, relaxed while the cursor holds the particle
+      const hk = HOME_K * (1 - cap * 0.92);
+      p.vx += (p.hx - p.x) * hk * dt;
+      p.vy += (p.hy - p.y) * hk * dt;
+
+      // extra damping inside the well so droplets linger on the ring
+      const damp = 0.955 - p.cap * 0.05;
+      p.vx *= damp;
+      p.vy *= damp;
       const sp = Math.hypot(p.vx, p.vy);
       if (sp > MAX_SPEED) {
         p.vx = (p.vx / sp) * MAX_SPEED;
@@ -148,8 +174,9 @@
       const len = 1.5 + sp * 7;
       const nx = sp > 0.001 ? p.vx / sp : 0;
       const ny = sp > 0.001 ? p.vy / sp : 1;
-      ctx.strokeStyle = `hsla(${p.hue}, 88%, ${p.light}%, ${p.alpha})`;
-      ctx.lineWidth = p.size;
+      const c = p.cap || 0;
+      ctx.strokeStyle = `hsla(${p.hue}, 88%, ${p.light + c * 12}%, ${Math.min(1, p.alpha + c * 0.3)})`;
+      ctx.lineWidth = p.size * (1 + c * 0.6);
       ctx.beginPath();
       ctx.moveTo(p.x, p.y);
       ctx.lineTo(p.x - nx * len, p.y - ny * len);
