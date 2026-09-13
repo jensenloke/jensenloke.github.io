@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Success IT Engineering - Jensen Loke</title>
+    <title>Trainings - Jensen Loke</title>
     <meta
       name="description"
-      content="Engineering blog from Success IT - CodeGraph, .claude pattern linting, and how agentic engineering actually runs day to day."
+      content="Training sites built by Jensen Loke - workshops, courses, and hands-on training materials, hosted here and on GitHub."
     />
     <link rel="stylesheet" href="../assets/styles.css" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%236fcab9'%3EJ%3C/text%3E%3C/svg%3E" />
-    <meta property="og:title" content="Success IT Engineering - Jensen Loke" />
-    <meta property="og:description" content="Engineering blog from Success IT - CodeGraph, .claude pattern linting, and how agentic engineering actually runs day to day." />
+    <meta property="og:title" content="Trainings - Jensen Loke" />
+    <meta property="og:description" content="Training sites built by Jensen Loke - workshops, courses, and hands-on training materials, hosted here and on GitHub." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://jensenloke.github.io/engineering/" />
+    <meta property="og:url" content="https://jensenloke.github.io/trainings/" />
   </head>
   <body>
     <canvas id="site-field" aria-hidden="true"></canvas>
@@ -27,13 +27,13 @@
         <input type="checkbox" id="nav-toggle" class="nav-check" />
         <label for="nav-toggle" class="nav-toggle">Menu</label>
         <div class="nav-links">
-          <a href="./" aria-current="page">Engineering</a>
+          <a href="../engineering/">Engineering</a>
           <a href="../reviews/">Reviews</a>
           <a href="../second-brain/">Second Brain</a>
           <a href="../local-models/">Local Models</a>
           <a href="../qwen/">Qwen</a>
           <a href="../talks/">Talks</a>
-          <a href="../trainings/">Trainings</a>
+          <a href="./" aria-current="page">Trainings</a>
           <a href="https://github.com/jensenloke" target="_blank" rel="noopener">GitHub</a>
         </div>
       </nav>
@@ -41,45 +41,56 @@
 
     <div class="site-shell">
       <div class="page-head">
-        <p class="eyebrow">Success IT Engineering &middot; Blog</p>
-        <h1>How we build at Success IT</h1>
+        <p class="eyebrow">Trainings</p>
+        <h1>Training sites</h1>
         <p>
-          A working engineering blog: CodeGraph dependency analysis,
-          <code>.claude</code> pattern linting, agentic coding workflows, and the
-          practices that keep agents productive and safe in real repositories.
+          Workshops, courses, and training sites I have built and delivered.
+          Each entry links to the hosted training site or the repository behind
+          it, with related talks and writing where they exist.
         </p>
       </div>
 
       <main class="section-main" id="main">
         <div class="entry-list">
-          <div class="roadmap">
-            <h2>On the writing bench</h2>
-            <p>This track is being built in public. First posts, in order:</p>
-            <ul class="roadmap-list">
-              <li>
-                <span class="when">Next</span>
-                <p>A tour of CodeGraph - how cross-layer dependency analysis changes blast-radius decisions before you touch a function.</p>
-              </li>
-              <li>
-                <span class="when">Queued</span>
-                <p>Linting <code>.claude</code> patterns so agent instructions stay consistent across repositories.</p>
-              </li>
-              <li>
-                <span class="when">Queued</span>
-                <p>Agentic coding workflows that keep agents productive and safe in real repositories.</p>
-              </li>
-            </ul>
+          <a class="entry training-entry" href="https://github.com/jensenloke/palantir-learning" target="_blank" rel="noopener">
+            <div>
+              <p class="entry-meta">Team learning base &middot; started August 2026</p>
+              <h2>Palantir Learning Base</h2>
+              <p>
+                A growing knowledge base about Palantir's way of working - Foundry, the
+                Ontology, AIP, and how apps are built on top - written for people starting
+                from zero. Distilled plain-language lessons plus 205 sourced references,
+                with a training deck for the wider team in progress.
+              </p>
+            </div>
+            <span class="read-link">View repository</span>
+          </a>
+
+          <div class="entry training-entry">
+            <div>
+              <p class="entry-meta">Client programme &middot; July-October 2026</p>
+              <h2>Finance Learning Hub</h2>
+              <p>
+                A learning hub I built to run a 13-week agentic coding programme for the
+                finance team of a financial services client - guided training modules,
+                evidence-focused pull requests, automated checks, and an administrator
+                dashboard tracking issues, reviews, and approvals on GitHub.
+              </p>
+            </div>
+            <span class="tag">Private programme</span>
           </div>
 
           <!--
-            Engineering posts: add an <a class="entry"> block above this
-            comment, newest first. Files live in engineering/<slug>.html.
+            Catalogue entries: add an <a class="entry training-entry"> block
+            above this comment, newest first. Fields to fill: context or audience
+            (entry-meta), title, one-line description. Link to the hosted training
+            site or to the repository. Related content can be linked inline.
           -->
         </div>
 
         <p class="inline-links">
-          <a href="../work/">Related repositories</a>
-          <a href="../second-brain/">Knowledge systems research</a>
+          <a href="../talks/">Talks &amp; presentations</a>
+          <a href="../work/">Work &amp; repositories</a>
         </p>
       </main>
     </div>

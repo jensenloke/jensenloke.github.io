@@ -4,7 +4,7 @@ Static personal site and blog served with GitHub Pages, organized into five
 research tracks: **Success IT Engineering** (blog), **Book Reviews**,
 **Building a Second Brain** (research, with knowledge graph papers published
 underneath it), **Local Models & Harnesses**, and **Qwen** — plus cross-cutting
-catalogues for talks, work (linked to GitHub repositories), and papers.
+catalogs for talks, trainings, work (linked to GitHub repositories), and papers.
 
 ## Local Preview
 
@@ -27,6 +27,12 @@ Open `index.html` in a browser, or serve the folder with any static file server
 2. If the deck is hosted here, add a self-contained presentation under
    `talks/<talk-slug>/` and keep public-safe media inside that talk folder.
 3. Link the presentation from the catalogue entry.
+
+## Adding Trainings
+
+1. Add an entry to `trainings/index.html` (newest first).
+2. Link to the hosted training site or repository.
+3. Link to related talks or writing where they exist.
 
 ## Adding Work
 
