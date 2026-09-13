@@ -1,19 +1,23 @@
 /*
- * Droplet field - mouse-reactive particles behind the homepage hero.
- * Vanilla JS, no dependencies. Renders one static frame when the user
- * prefers reduced motion; pauses when the tab is hidden.
+ * Site-wide droplet field - mouse-reactive particles behind every page.
+ * Vanilla JS, no dependencies. Targets <canvas id="site-field">, which is
+ * CSS-fixed to the viewport at z-index -1; content columns carry a subtle
+ * translucent scrim so prose stays legible while the gutters stay alive.
  *
  * Mechanism:
  * 1. Particles hold position + velocity + size + hue + alpha.
- * 2. Each frame applies a cheap sine flow field (ambient drift) and
- *    mouse repulsion within REPEL_R, plus a sweep along cursor velocity.
+ * 2. Each frame applies a cheap sine flow field (ambient drift), a slight
+ *    upward "antigravity" bias, and mouse repulsion within REPEL_R plus a
+ *    sweep along cursor velocity.
  * 3. Particles draw as round-capped lines along their velocity, so fast
- *    ones stretch into droplet streaks. Coordinates are canvas-local.
+ *    ones stretch into droplet streaks.
+ * Respects prefers-reduced-motion (one static frame, no loop); pauses when
+ * the tab is hidden.
  */
 (() => {
   "use strict";
 
-  const canvas = document.querySelector(".hero-field");
+  const canvas = document.getElementById("site-field");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -35,34 +39,24 @@
   let lastMove = 0;
 
   addEventListener("pointermove", (e) => {
-    const r = canvas.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
     const now = performance.now();
     const dt = Math.max(now - lastMove, 1);
     if (lastMove) {
-      mouse.vx = mouse.vx * 0.7 + ((x - mouse.x) / dt) * 16 * 0.3;
-      mouse.vy = mouse.vy * 0.7 + ((y - mouse.y) / dt) * 16 * 0.3;
+      mouse.vx = mouse.vx * 0.7 + ((e.clientX - mouse.x) / dt) * 16 * 0.3;
+      mouse.vy = mouse.vy * 0.7 + ((e.clientY - mouse.y) / dt) * 16 * 0.3;
     }
-    mouse.x = x;
-    mouse.y = y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
     lastMove = now;
   });
-  addEventListener("pointerleave", park);
-  addEventListener("scroll", () => {
-    // park the pointer when the hero scrolls out of view
-    const r = canvas.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) park();
-  }, { passive: true });
-
-  function park() {
+  addEventListener("pointerleave", () => {
     mouse.x = -9999;
     mouse.y = -9999;
-  }
+  });
 
   const parts = [];
   function targetCount() {
-    return Math.max(90, Math.min(360, Math.round((W * H) / 5200)));
+    return Math.max(150, Math.min(500, Math.round((W * H) / 4300)));
   }
   function spawn(p) {
     p = p || {};
@@ -73,7 +67,7 @@
     p.size = 0.9 + Math.random() * 1.4;
     p.hue = 222 + Math.random() * 16;
     p.light = 55 + Math.random() * 18;
-    p.alpha = 0.3 + Math.random() * 0.6;
+    p.alpha = 0.35 + Math.random() * 0.55;
     return p;
   }
   function syncCount() {
@@ -91,12 +85,13 @@
   const REPEL_R = 190;
   const REPEL_R2 = REPEL_R * REPEL_R;
   const MAX_SPEED = 3.4;
+  const LIFT = 0.006; // "antigravity": a slow, constant upward bias
 
   function step(t, dt) {
     for (const p of parts) {
       const f = flow(p.x, p.y, t);
       p.vx += f.x * 0.014 * dt;
-      p.vy += f.y * 0.014 * dt;
+      p.vy += f.y * 0.014 * dt - LIFT * dt;
 
       const dx = p.x - mouse.x;
       const dy = p.y - mouse.y;
