@@ -56,7 +56,7 @@
 
   const parts = [];
   function targetCount() {
-    return Math.max(150, Math.min(500, Math.round((W * H) / 4300)));
+    return Math.max(320, Math.min(1000, Math.round((W * H) / 1800)));
   }
   function spawn(p) {
     p = p || {};
