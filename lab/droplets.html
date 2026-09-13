@@ -1,0 +1,261 @@
+<!doctype html>
+<!--
+  Droplets — mouse-reactive particle field (Google Antigravity-style hero).
+  Self-contained demo: no dependencies, no build step.
+
+  How it works:
+  1. Particles live in a plain array: position, velocity, size, hue, alpha.
+  2. Each frame, two forces act on every particle:
+     - a cheap sine-based flow field (ambient drift, no noise library)
+     - mouse repulsion inside a radius, plus a sweep from the cursor's own velocity
+  3. Particles are drawn as capsules (round-capped lines) oriented along their
+     velocity, so faster particles read as longer "droplet" streaks.
+  Respects prefers-reduced-motion (renders one static frame, no loop).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Droplets — mouse-reactive particle field</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #05060a;
+        overflow: hidden;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+
+      canvas {
+        position: fixed;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .hero-copy {
+        position: fixed;
+        top: 26%;
+        left: 6%;
+        max-width: 640px;
+        color: #f4f6fb;
+        pointer-events: none; /* let the mouse reach the canvas everywhere */
+      }
+
+      .hero-copy h1 {
+        margin: 0 0 28px;
+        font-size: clamp(2.4rem, 6vw, 4.4rem);
+        font-weight: 560;
+        line-height: 1.04;
+        letter-spacing: -0.015em;
+      }
+
+      .hero-copy .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        pointer-events: auto; /* buttons stay clickable */
+      }
+
+      .hero-copy .actions a {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 13px 24px;
+        font-size: 0.98rem;
+        font-weight: 640;
+        text-decoration: none;
+      }
+
+      .hero-copy .actions a.primary {
+        background: #fff;
+        color: #0b0d12;
+      }
+
+      .hero-copy .actions a.secondary {
+        background: rgba(255, 255, 255, 0.12);
+        color: #e8ecf5;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="field" aria-hidden="true"></canvas>
+
+    <div class="hero-copy">
+      <h1>Droplets that follow your cursor</h1>
+      <div class="actions">
+        <a class="primary" href="../">Back to site</a>
+        <a class="secondary" href="../talks/">Talks</a>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const canvas = document.getElementById("field");
+        const ctx = canvas.getContext("2d");
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        let W = 0;
+        let H = 0;
+
+        function resize() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          W = canvas.clientWidth;
+          H = canvas.clientHeight;
+          canvas.width = Math.round(W * dpr);
+          canvas.height = Math.round(H * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        addEventListener("resize", resize);
+
+        // ---- Mouse state (position + its own velocity, for the sweep force) ----
+        const mouse = { x: -9999, y: -9999, vx: 0, vy: 0 };
+        let lastMove = 0;
+
+        addEventListener("pointermove", (e) => {
+          const now = performance.now();
+          const dt = Math.max(now - lastMove, 1);
+          if (lastMove) {
+            mouse.vx = mouse.vx * 0.7 + ((e.clientX - mouse.x) / dt) * 16 * 0.3;
+            mouse.vy = mouse.vy * 0.7 + ((e.clientY - mouse.y) / dt) * 16 * 0.3;
+          }
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          lastMove = now;
+        });
+        addEventListener("pointerleave", () => {
+          mouse.x = -9999;
+          mouse.y = -9999;
+        });
+
+        // ---- Particles ----
+        const parts = [];
+        function targetCount() {
+          return Math.max(120, Math.min(420, Math.round((W * H) / 5200)));
+        }
+        function spawn(p) {
+          p = p || {};
+          p.x = Math.random() * W;
+          p.y = Math.random() * H;
+          p.vx = (Math.random() - 0.5) * 0.4;
+          p.vy = (Math.random() - 0.5) * 0.4;
+          p.size = 0.9 + Math.random() * 1.4;
+          p.hue = 222 + Math.random() * 16; // blue -> indigo
+          p.light = 55 + Math.random() * 18;
+          p.alpha = 0.3 + Math.random() * 0.6;
+          return p;
+        }
+        function syncCount() {
+          const n = targetCount();
+          while (parts.length < n) parts.push(spawn());
+          parts.length = n;
+        }
+        syncCount();
+        addEventListener("resize", syncCount);
+
+        // ---- Ambient flow field (layered sines; cheap, no noise library) ----
+        function flow(x, y, t) {
+          const a = Math.sin(x * 0.0016 + t * 0.00021) + Math.cos(y * 0.0013 - t * 0.00017);
+          const b = Math.sin((x + y) * 0.0009 + t * 0.00013);
+          return { x: Math.cos(a * 1.7 + b), y: Math.sin(a * 1.3 - b) };
+        }
+
+        const REPEL_R = 190;
+        const REPEL_R2 = REPEL_R * REPEL_R;
+        const MAX_SPEED = 3.4;
+
+        function step(t, dt) {
+          for (const p of parts) {
+            // 1. ambient drift
+            const f = flow(p.x, p.y, t);
+            p.vx += f.x * 0.014 * dt;
+            p.vy += f.y * 0.014 * dt;
+
+            // 2. mouse repulsion + sweep along cursor velocity
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < REPEL_R2 && d2 > 0.01) {
+              const d = Math.sqrt(d2);
+              const fall = 1 - d / REPEL_R;
+              p.vx += (dx / d) * fall * 0.55 * dt + mouse.vx * fall * 0.05 * dt;
+              p.vy += (dy / d) * fall * 0.55 * dt + mouse.vy * fall * 0.05 * dt;
+            }
+
+            // 3. damping, speed cap, integrate
+            p.vx *= 0.955;
+            p.vy *= 0.955;
+            const sp = Math.hypot(p.vx, p.vy);
+            if (sp > MAX_SPEED) {
+              p.vx = (p.vx / sp) * MAX_SPEED;
+              p.vy = (p.vy / sp) * MAX_SPEED;
+            }
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+
+            // 4. wrap around edges
+            if (p.x < -24) p.x = W + 24;
+            else if (p.x > W + 24) p.x = -24;
+            if (p.y < -24) p.y = H + 24;
+            else if (p.y > H + 24) p.y = -24;
+          }
+          // cursor velocity decays so a still mouse stops sweeping
+          mouse.vx *= 0.9;
+          mouse.vy *= 0.9;
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, W, H);
+          ctx.lineCap = "round";
+          for (const p of parts) {
+            const sp = Math.hypot(p.vx, p.vy);
+            const len = 1.5 + sp * 7; // streak grows with speed -> droplet look
+            const nx = sp > 0.001 ? p.vx / sp : 0;
+            const ny = sp > 0.001 ? p.vy / sp : 1;
+            ctx.strokeStyle = `hsla(${p.hue}, 88%, ${p.light}%, ${p.alpha})`;
+            ctx.lineWidth = p.size;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x - nx * len, p.y - ny * len);
+            ctx.stroke();
+          }
+        }
+
+        if (reduced) {
+          // Static frame: give each droplet a small fixed streak, draw once.
+          for (const p of parts) {
+            p.vx = (Math.random() - 0.5) * 0.8;
+            p.vy = (Math.random() - 0.5) * 0.8;
+          }
+          draw();
+          return;
+        }
+
+        let last = performance.now();
+        let running = true;
+        document.addEventListener("visibilitychange", () => {
+          running = !document.hidden;
+          if (running) {
+            last = performance.now();
+            requestAnimationFrame(loop);
+          }
+        });
+
+        function loop(now) {
+          if (!running) return;
+          const dt = Math.min((now - last) / 16.667, 3); // normalized to 60fps units
+          last = now;
+          step(now, dt);
+          draw();
+          requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+      })();
+    </script>
+  </body>
+</html>
