@@ -162,7 +162,7 @@ li {
   grid-template-columns: 1.1fr 1fr 1fr 1fr 1fr;
   height: 8px;
   overflow: hidden;
-  background: var(--slate-2);
+  background: var(--paper);
 }
 
 .palette-strip span:nth-child(1) {
@@ -178,11 +178,11 @@ li {
 }
 
 .palette-strip span:nth-child(4) {
-  background: var(--slate-1);
+  background: var(--talk);
 }
 
 .palette-strip span:nth-child(5) {
-  background: var(--slate-2);
+  background: var(--accent);
 }
 
 .home-intro {
@@ -261,8 +261,24 @@ li {
   scroll-margin-top: 32px;
 }
 
-.talk-card {
-  border-left: 6px solid var(--talk);
+.latest-grid .featured-card {
+  position: relative;
+}
+
+/* Symmetric type bars: article = indigo, talk = sky. Matches their labels. */
+.latest-grid .featured-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 8px 0 0 8px;
+  background: var(--accent);
+}
+
+.latest-grid .talk-card::before {
+  background: var(--talk);
 }
 
 .talk-card .article-meta {
@@ -1282,8 +1298,8 @@ code {
     var(--mint-1) 0 22%,
     var(--mint-2) 0 40%,
     var(--teal) 0 60%,
-    var(--slate-1) 0 80%,
-    var(--slate-2) 0 100%
+    var(--talk) 0 80%,
+    var(--accent) 0 100%
   );
 }
 
