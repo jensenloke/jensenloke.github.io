@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Software Actually Works — One-Page Map</title>
+  <meta name="description" content="The one-page map from the GPT class: eight layers from terminal to agents, printable.">
+  <style>
+    @page { size: A4; margin: 13mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body {
+      font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+      color: #101820; background: #fff;
+      font-size: 10pt; line-height: 1.42;
+      max-width: 190mm; margin: 0 auto; padding: 13mm;
+    }
+    header { border-bottom: 2.5pt solid #0e7d6a; padding-bottom: 5pt; margin-bottom: 8pt; }
+    h1 { font-size: 19pt; letter-spacing: .01em; line-height: 1.05; }
+    .sub { color: #4a5a66; font-size: 9pt; margin-top: 2.5pt; }
+    .thesis {
+      background: #eef6f3; border-left: 3pt solid #0e7d6a;
+      padding: 5.5pt 8pt; margin: 7pt 0 8pt; font-size: 9.8pt;
+    }
+    .layers { display: grid; gap: 3.5pt; }
+    .layer {
+      display: grid; grid-template-columns: 15pt 1fr; gap: 6pt;
+      border: 1pt solid #d5dde2; border-left: 3pt solid #0e7d6a;
+      padding: 3.5pt 6pt;
+    }
+    .layer .n { font-weight: 800; color: #0e7d6a; font-size: 12pt; line-height: 1.1; }
+    .layer h3 { font-size: 9.6pt; text-transform: uppercase; letter-spacing: .05em; }
+    .layer p { font-size: 8.8pt; color: #33424d; margin-top: 1pt; }
+    .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6pt; margin-top: 7pt; }
+    .box { border: 1pt solid #d5dde2; padding: 5pt 7pt; }
+    .box h3 { font-size: 9.2pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3pt; color: #0e7d6a; }
+    .box p, .box li { font-size: 8.8pt; color: #33424d; }
+    .box ul { padding-left: 11pt; }
+    .box li { margin-bottom: 1.5pt; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 8.2pt; background: #eef2f4; padding: 0 2pt; border-radius: 2pt; }
+    footer {
+      margin-top: 8pt; border-top: 1pt solid #d5dde2; padding-top: 4pt;
+      font-size: 8.2pt; color: #4a5a66;
+      display: flex; justify-content: space-between; gap: 8pt;
+    }
+    @media print {
+      body { padding: 0; max-width: none; }
+      .layer, .box, .thesis { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>How Software Actually Works</h1>
+    <p class="sub">The one-page map · GPT Class · September 2026 · Jensen Loke · jensenloke.github.io</p>
+  </header>
+
+  <div class="thesis">
+    <strong>The thesis:</strong> agents write code now. The scarce skill is <em>steering</em> — the mental map of where code lives, how it runs, and how it ships. You keep the judgment; the map keeps you in control.
+  </div>
+
+  <div class="layers">
+    <div class="layer"><div class="n">1</div><div><h3>Terminal</h3><p>The machine's honest interface — and the agent's native language. <code>pwd</code> where am I · <code>ls</code> what's here · <code>cd</code> move · <code>cat</code> read · <code>mkdir</code> make. Every file has one address: its path.</p></div></div>
+    <div class="layer"><div class="n">2</div><div><h3>Files</h3><p>A file is bytes plus a promise (the extension). Markdown and HTML are plain text with light bones — readable by you, editable by agents. Text is the lingua franca of AI.</p></div></div>
+    <div class="layer"><div class="n">3</div><div><h3>Apps</h3><p>The restaurant: <strong>frontend</strong> asks (dining room) · <strong>backend</strong> decides (kitchen) · <strong>database</strong> remembers (pantry). AuthN = who you are (passport). AuthZ = what you may do (keycard). The kitchen always decides.</p></div></div>
+    <div class="layer"><div class="n">4</div><div><h3>Browser</h3><p>Type a URL → DNS finds the address → server answers with files → browser renders. HTML = skeleton · CSS = skin · JS = muscle. Client code can display; it can never decide.</p></div></div>
+    <div class="layer"><div class="n">5</div><div><h3>Deployment</h3><p><code>localhost</code> = your machine as a server, safe to break. <strong>Vercel</strong> ships files (push → live). <strong>Supabase</strong> hosts the pantry + logins. <strong>Docker</strong> ships the whole machine, boxed.</p></div></div>
+    <div class="layer"><div class="n">6</div><div><h3>Git · GitHub · CI/CD</h3><p>A time machine for folders: <code>add</code> stage · <code>commit</code> snapshot · <code>branch</code> side road · <code>checkout</code> time travel · <code>merge</code>/<code>rebase</code> recombine. PR = propose + human review. Robots check; humans approve.</p></div></div>
+    <div class="layer"><div class="n">7</div><div><h3>Briefing the agent</h3><p><code>AGENTS.md</code> / <code>CLAUDE.md</code> = the orientation, always on. <strong>Skills</strong> = runbooks, loaded on demand. You write the map in plain text; the agent supplies speed; the files supply consistency.</p></div></div>
+    <div class="layer"><div class="n">8</div><div><h3>The human</h3><p>Direction, taste, judgment. Agents hold the wrench — you decide what's worth building. That's the human in the loop.</p></div></div>
+  </div>
+
+  <div class="cols2">
+    <div class="box">
+      <h3>The round trip, in one breath</h3>
+      <p>Click → request flies out <em>with your keycard</em> → backend checks the keycard → asks the database → the ledger answers → backend cooks → <code>200 OK</code> returns → browser renders. Whole loop: ~200 milliseconds.</p>
+    </div>
+    <div class="box">
+      <h3>The iceberg</h3>
+      <p>You built the tip: one file, structure, style, logic, a server. Real products add what's underwater — <strong>memory</strong> (databases, backups), <strong>people</strong> (accounts, auth, roles), <strong>the world</strong> (hosting, mobile, scale), <strong>trust</strong> (tests, security, rollback).</p>
+    </div>
+  </div>
+
+  <footer>
+    <span>Full interactive deck: jensenloke.github.io/talks/how-software-actually-works/</span>
+    <span>Space runs the animations · n shows speaker notes</span>
+  </footer>
+</body>
+</html>
