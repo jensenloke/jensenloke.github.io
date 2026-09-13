@@ -331,6 +331,126 @@
     .cover-map { display: grid; grid-template-columns: repeat(8, 1fr); gap: .8cqw; margin-top: 3.4cqh; }
     .cover-map .cell.a8 b { color: #ffd27d; }
 
+    /* ===== Interactive figures (step engine) ===== */
+    .fig { position: relative; height: 64cqh; border: 1px solid rgba(255,255,255,.13); background: linear-gradient(145deg, rgba(16,34,51,.55), rgba(7,16,25,.5)); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; }
+    .fig-stage { position: absolute; inset: 0 0 8cqh 0; }
+    .fig-cap { display: none; position: absolute; z-index: 8; left: 0; right: 0; bottom: 0; margin: 0; padding: 1.4cqh 1.4cqw; background: rgba(4,10,16,.92); border-top: 1px solid rgba(111,202,185,.3); color: var(--text); font-size: 1.08cqw; line-height: 1.35; font-weight: 600; }
+    .fig-cap.on { display: block; animation: enter .3s ease-out; }
+    .fig-cap .cmd { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--amber); font-weight: 700; }
+    .fig-cap .key { color: var(--mint); font-weight: 800; }
+    .fig-count { position: absolute; top: 1.1cqh; right: 1.2cqw; z-index: 9; font-size: .8cqw; font-weight: 800; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+    .fig .mv { transition: left .9s cubic-bezier(.45,.05,.25,1), top .9s cubic-bezier(.45,.05,.25,1), opacity .55s ease, background .5s ease, color .5s ease, border-color .5s ease, box-shadow .5s ease; }
+
+    /* Figure 1 — the life of a request */
+    #fig-request .node { position: absolute; top: 5cqh; width: 18cqw; height: 33cqh; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.035); }
+    #fig-request .nl { position: absolute; left: 0; right: 0; bottom: 1.2cqh; text-align: center; font-size: 1cqw; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+    #fig-request .n-brow { left: 3cqw; } #fig-request .n-back { left: 34cqw; } #fig-request .n-db { left: 66cqw; }
+    #fig-request .roadline { position: absolute; top: 21cqh; left: 21cqw; width: 45cqw; border-top: 1px dashed rgba(255,255,255,.14); }
+    #fig-request .scr { position: absolute; top: 2.4cqh; left: 2cqw; width: 14cqw; height: 15cqh; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.04); }
+    #fig-request .obtn { position: absolute; top: 19.5cqh; left: 4cqw; padding: .7cqh 1.4cqw; border: 1px solid var(--mint); color: var(--mint); font-size: .9cqw; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    #fig-request.s1 .obtn { animation: obtn-pulse 1s ease-in-out 2; }
+    @keyframes obtn-pulse { 0%,100% { box-shadow: 0 0 0 rgba(111,202,185,0); } 50% { box-shadow: 0 0 2.2cqw rgba(111,202,185,.75); background: rgba(111,202,185,.16); } }
+    #fig-request .auth { position: absolute; top: 2.6cqh; left: 2.5cqw; padding: .8cqh 1cqw; border: 1px solid rgba(255,255,255,.2); color: var(--muted); font-size: .85cqw; font-weight: 700; letter-spacing: .08em; opacity: .5; }
+    #fig-request.s3 .auth { opacity: 1; border-color: var(--amber); color: var(--amber); background: rgba(242,184,75,.12); box-shadow: 0 0 1.6cqw rgba(242,184,75,.35); }
+    #fig-request .gear { position: absolute; top: 11cqh; left: 50%; transform: translateX(-50%); font-size: 5cqw; line-height: 1; color: rgba(255,255,255,.28); }
+    #fig-request.s6 .gear { color: var(--sky); animation: gear-spin 1.6s linear infinite; }
+    @keyframes gear-spin { to { transform: translateX(-50%) rotate(360deg); } }
+    #fig-request .rowbar { position: absolute; left: 2.5cqw; width: 13cqw; height: 2.4cqh; border: 1px solid rgba(242,184,75,.5); background: rgba(242,184,75,.12); }
+    #fig-request .rb1 { top: 3.4cqh; } #fig-request .rb2 { top: 7.4cqh; } #fig-request .rb3 { top: 11.4cqh; }
+    #fig-request .pkt, #fig-request .rowspkt, #fig-request .rsppkt { position: absolute; top: 18.6cqh; padding: .8cqh .9cqw; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85cqw; font-weight: 700; white-space: nowrap; border-radius: .4cqw; opacity: 0; z-index: 5; }
+    #fig-request .pkt { left: 6cqw; background: rgba(20,134,111,.3); border: 1px solid var(--mint); color: #d7f5ea; }
+    #fig-request .pkt .lq { display: none; }
+    #fig-request.s2 .pkt { opacity: 1; left: 22cqw; }
+    #fig-request.s3 .pkt { left: 28cqw; }
+    #fig-request.s4 .pkt { left: 54cqw; }
+    #fig-request.s4 .pkt .lr { display: none; }
+    #fig-request.s4 .pkt .lq { display: inline; }
+    #fig-request.s5 .pkt { opacity: 0; }
+    #fig-request .rowspkt { left: 68cqw; background: rgba(242,184,75,.2); border: 1px solid var(--amber); color: #ffe9bd; }
+    #fig-request.s5 .rowspkt { opacity: 1; left: 45cqw; }
+    #fig-request.s6 .rowspkt { opacity: 0; }
+    #fig-request .rsppkt { left: 47cqw; background: rgba(111,183,232,.2); border: 1px solid var(--sky); color: #d9ecfa; }
+    #fig-request.s7 .rsppkt { opacity: 1; left: 21cqw; }
+    #fig-request.s8 .rsppkt { opacity: 0; }
+    #fig-request.s8 .scr { background: rgba(111,202,185,.3); border-color: var(--mint); box-shadow: 0 0 1.8cqw rgba(111,202,185,.4); }
+
+    /* Figure 2 — git time machine */
+    #fig-git .zone { position: absolute; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.03); }
+    #fig-git .z-wd { top: 3.5cqh; left: 3cqw; width: 21cqw; height: 21cqh; }
+    #fig-git .z-st { top: 3.5cqh; left: 27cqw; width: 15cqw; height: 21cqh; border-style: dashed; }
+    #fig-git .zl { position: absolute; top: .8cqh; left: 1cqw; font-size: .72cqw; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    #fig-git .fchip { position: absolute; left: 1.6cqw; padding: .6cqh 1cqw; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.05); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85cqw; color: var(--text); white-space: nowrap; }
+    #fig-git .fc1 { top: 4.6cqh; } #fig-git .fc2 { top: 9.2cqh; } #fig-git .fc3 { top: 13.8cqh; }
+    #fig-git.s1 .fc3 { border-color: var(--coral); color: var(--coral); box-shadow: 0 0 1.4cqw rgba(255,138,122,.5); }
+    #fig-git .fc-add { position: absolute; top: 9cqh; left: 1.6cqw; padding: .6cqh 1cqw; border: 1px solid var(--mint); background: rgba(20,134,111,.22); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85cqw; color: #d7f5ea; opacity: 0; white-space: nowrap; }
+    #fig-git.s2 .fc-add { opacity: 1; }
+    #fig-git.s3 .fc-add { opacity: 0; }
+    #fig-git svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #fig-git svg.wires .wire { stroke: var(--mint); stroke-width: .35; stroke-dasharray: 1.6 1.2; opacity: 0; transition: opacity .6s ease; }
+    #fig-git svg.wires .lane-feature { stroke: rgba(255,255,255,.25); stroke-width: .3; opacity: 0; transition: opacity .6s ease; }
+    #fig-git svg.wires .ll { fill: #8fa3b0; font-size: 2.4px; font-weight: 800; letter-spacing: .3px; }
+    #fig-git svg.wires .llf { opacity: 0; transition: opacity .6s ease; }
+    #fig-git.s5 .wire-branch { opacity: .9; }
+    #fig-git.s5 .lane-feature { opacity: .8; }
+    #fig-git.s5 .llf { opacity: 1; }
+    #fig-git.s8 .wire-merge { opacity: .9; }
+    #fig-git .cm { position: absolute; width: 2cqw; height: 3.5cqh; border-radius: 50%; border: 2px solid var(--mint); background: #0c1a28; transform: scale(0); transition: transform .5s cubic-bezier(.34,1.56,.64,1), top .9s cubic-bezier(.45,.05,.25,1), left .9s cubic-bezier(.45,.05,.25,1), border-color .5s ease, opacity .5s ease, box-shadow .5s ease; z-index: 4; }
+    #fig-git .cf { border-color: var(--coral); }
+    #fig-git .cm1 { top: 34.2cqh; left: 33cqw; } #fig-git .cm2 { top: 34.2cqh; left: 46cqw; } #fig-git .cm3 { top: 34.2cqh; left: 59cqw; } #fig-git .cm6 { top: 34.2cqh; left: 89cqw; }
+    #fig-git .cf1 { top: 46.2cqh; left: 69cqw; } #fig-git .cf2 { top: 46.2cqh; left: 79cqw; }
+    #fig-git.s3 .cm1 { transform: scale(1); }
+    #fig-git.s4 .cm2, #fig-git.s4 .cm3 { transform: scale(1); }
+    #fig-git.s6 .cf1, #fig-git.s6 .cf2 { transform: scale(1); }
+    #fig-git.s8 .cm6 { transform: scale(1); }
+    #fig-git .mtag { position: absolute; top: 39cqh; left: 28.6cqw; width: 10cqw; text-align: center; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .72cqw; color: var(--amber); opacity: 0; }
+    #fig-git.s3 .mtag { opacity: 1; }
+    #fig-git .head { position: absolute; z-index: 6; padding: .4cqh .7cqw; border: 1px solid var(--amber); background: rgba(242,184,75,.12); color: var(--amber); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .75cqw; font-weight: 800; letter-spacing: .08em; opacity: 0; white-space: nowrap; }
+    #fig-git .head .tri { display: block; text-align: center; line-height: .9; }
+    #fig-git.s3 .head { opacity: 1; left: 31.6cqw; top: 28.8cqh; }
+    #fig-git.s4 .head { left: 57.6cqw; }
+    #fig-git.s6 .head { left: 77.6cqw; top: 40.8cqh; }
+    #fig-git.s7 .head { left: 57.6cqw; top: 28.8cqh; }
+    #fig-git.s8 .head { left: 87.6cqw; }
+    #fig-git.s7 .fc3 { border-color: var(--mint); color: var(--mint); box-shadow: 0 0 1.4cqw rgba(111,202,185,.6); }
+    #fig-git.s9 .cm1, #fig-git.s9 .cm2, #fig-git.s9 .cm3, #fig-git.s9 .cm6 { box-shadow: 0 0 1.6cqw rgba(111,202,185,.7); }
+    #fig-git.s9 .cf { opacity: .45; }
+    #fig-git .pr-card { position: absolute; top: 40.5cqh; left: 57cqw; z-index: 7; padding: .8cqh 1cqw; border: 1px solid var(--sky); background: rgba(111,183,232,.14); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .78cqw; font-weight: 700; color: #d9ecfa; opacity: 0; white-space: nowrap; }
+    #fig-git.s10 .pr-card { opacity: 1; }
+    #fig-git.s11 .pr-card { opacity: 0; }
+    #fig-git.s11 .cf { opacity: 1; border-color: var(--mint); }
+    #fig-git.s11 .cf1 { top: 34.2cqh; left: 72cqw; }
+    #fig-git.s11 .cf2 { top: 34.2cqh; left: 84cqw; }
+    #fig-git.s11 .cm6 { transform: scale(0); }
+    #fig-git.s11 .wire-branch, #fig-git.s11 .wire-merge { opacity: 0; }
+    #fig-git.s11 .lane-feature, #fig-git.s11 .llf { opacity: 0; }
+    #fig-git.s11 .head { left: 82.6cqw; top: 28.8cqh; }
+    #fig-git.s11 .cm { box-shadow: none; }
+
+    /* Figure 3 — deploy pipeline */
+    #fig-pipe .belt { position: absolute; top: 26.5cqh; left: 6cqw; right: 6cqw; height: .8cqh; background: repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 2cqw, rgba(255,255,255,.07) 2cqw 4cqw); }
+    #fig-pipe .station { position: absolute; top: 5cqh; text-align: center; width: 16cqw; }
+    #fig-pipe .st-laptop { left: 6cqw; } #fig-pipe .st-gate { left: 44cqw; } #fig-pipe .st-globe { left: 72cqw; }
+    #fig-pipe .st-icon { font-size: 5.5cqw; line-height: 1.1; filter: grayscale(.2); }
+    #fig-pipe .st-label { margin-top: .8cqh; font-size: .85cqw; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+    #fig-pipe .gatebox { position: absolute; top: 17cqh; left: 45cqw; width: 14cqw; height: 15cqh; border: 1px dashed rgba(255,255,255,.3); }
+    #fig-pipe .gatebar { position: absolute; top: 2cqh; left: 1cqw; width: .6cqw; height: 11cqh; background: rgba(255,255,255,.14); }
+    #fig-pipe.s3 .gatebar { background: var(--amber); animation: gate-scan 1.1s ease-in-out 2; }
+    @keyframes gate-scan { 0%,100% { transform: translateX(0); } 50% { transform: translateX(11cqw); } }
+    #fig-pipe.s4 .gatebox { border: 1px solid #7ddba8; box-shadow: 0 0 1.6cqw rgba(125,219,168,.3); }
+    #fig-pipe .glight { position: absolute; top: -1.6cqh; left: 50%; transform: translateX(-50%); width: 1.4cqw; height: 2.4cqh; border-radius: 50%; background: rgba(255,255,255,.18); }
+    #fig-pipe.s3 .glight { background: var(--amber); box-shadow: 0 0 1.2cqw rgba(242,184,75,.7); }
+    #fig-pipe.s4 .glight { background: #7ddba8; box-shadow: 0 0 1.2cqw rgba(125,219,168,.8); }
+    #fig-pipe .pbox { position: absolute; top: 20.5cqh; left: 8cqw; z-index: 5; padding: .9cqh 1cqw; border: 1px solid var(--mint); background: rgba(20,134,111,.3); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85cqw; font-weight: 700; color: #d7f5ea; white-space: nowrap; opacity: 0; }
+    #fig-pipe.s1 .pbox { opacity: 1; }
+    #fig-pipe.s2 .pbox { left: 38cqw; }
+    #fig-pipe.s3 .pbox { left: 47cqw; }
+    #fig-pipe.s5 .pbox { left: 74cqw; }
+    #fig-pipe.s6 .pbox { opacity: 0; }
+    #fig-pipe.s6 .st-globe .st-icon { filter: none; text-shadow: 0 0 2.5cqw rgba(111,202,185,.9); }
+    #fig-pipe .liveflag { position: absolute; top: 34cqh; left: 72cqw; width: 15cqw; text-align: center; font-size: 1cqw; font-weight: 800; letter-spacing: .3em; color: var(--mint); opacity: 0; }
+    #fig-pipe.s6 .liveflag { opacity: 1; animation: live-blink 1s ease-in-out 3; }
+    @keyframes live-blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
     @media print {
       @page { size: 16in 9in; margin: 0; }
       html, body { width: 16in; height: auto; overflow: visible; }
@@ -673,32 +793,42 @@ Run `preview` before the call.
       <!-- 15 — Request/response -->
       <section class="slide" data-title="Request and response">
         <div class="topline"><span class="act">Act 3 · Architecture</span><span class="no">17 / 54</span></div>
-        <h2>The conversation: request → response</h2>
-        <div class="cols c2">
-          <div class="term">
-            <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">what actually travels</span></div>
-            <div class="term-body"><span class="c">your phone → the server:</span>
-<span class="o">GET /menu?day=tuesday</span>
-
-<span class="c">the server → your phone:</span>
-<span class="ok">{ "special": "nasi lemak",
-  "price": 4.50,
-  "sold_out": false }</span></div>
-          </div>
-          <div>
-            <div class="panel pad" style="height:100%">
-              <h3>API — the waiter's notepad</h3>
-              <p class="muted" style="margin-top:.8cqh">An <span class="strong" style="color:var(--text)">API</span> is the agreed menu of requests an app can make: "get the menu", "place an order", "cancel booking".</p>
-              <p class="muted" style="margin-top:.8cqh">Two rules make it work:</p>
-              <ul class="check-list" style="margin-top:.6cqh">
-                <li>The request says <span class="mint strong">what</span> is wanted.</li>
-                <li>The backend decides <span class="sky strong">whether</span> and <span class="sky strong">how</span> — never the client.</li>
-              </ul>
+        <h2>Watch a request make the round trip</h2>
+        <figure class="fig" id="fig-request" data-steps="8" data-cur="0">
+          <div class="fig-count">PRESS SPACE TO RUN</div>
+          <div class="fig-stage">
+            <div class="roadline"></div>
+            <div class="node n-brow">
+              <div class="scr mv"></div>
+              <div class="obtn mv">Order</div>
+              <div class="nl">Browser · frontend</div>
             </div>
+            <div class="node n-back">
+              <div class="auth mv">🎫 KEYCARD</div>
+              <div class="gear">⚙</div>
+              <div class="nl">Backend · kitchen</div>
+            </div>
+            <div class="node n-db">
+              <div class="rowbar rb1"></div>
+              <div class="rowbar rb2"></div>
+              <div class="rowbar rb3"></div>
+              <div class="nl">Database · pantry</div>
+            </div>
+            <div class="pkt mv"><span class="lr">POST /orders · 🎫</span><span class="lq">GET customer 42 · 🎫</span></div>
+            <div class="rowspkt mv">rows ⇢</div>
+            <div class="rsppkt mv">⇠ 200 OK + data</div>
           </div>
-        </div>
+          <p class="fig-cap">Someone taps <span class="key">Order</span> in the browser. Every click starts a conversation.</p>
+          <p class="fig-cap">A <span class="key">request</span> flies to the backend — carrying the order <em>and</em> your keycard token.</p>
+          <p class="fig-cap">The kitchen checks the keycard first — <span class="key">AuthZ</span>: who is asking, and may they ask?</p>
+          <p class="fig-cap">The backend asks the <span class="key">database</span> — the pantry — for what it needs.</p>
+          <p class="fig-cap">The ledger answers with rows. The database <span class="key">remembers</span> — it never decides.</p>
+          <p class="fig-cap">The backend <span class="key">cooks</span>: business logic runs here, never in your browser.</p>
+          <p class="fig-cap">The response returns — <span class="cmd">200 OK</span> plus the data (HTML, or JSON).</p>
+          <p class="fig-cap">The browser renders it. Whole round trip: ~200 milliseconds. That's the <span class="key">API</span> — the agreed menu of asks and answers.</p>
+        </figure>
         <div class="footer-rule"><span>Never trust the dining room with the kitchen's decisions</span><span>17 / 54</span></div>
-        <aside class="notes">The JSON on the left gets a reaction — this is really what flies through the air (well, as light and radio). Emphasize the second rule; it becomes important in the auth slide and later when agents act on systems: authority lives in the backend. If the group is technical enough, mention HTTP status codes as footnotes (404 = not on the menu).</aside>
+        <aside class="notes">Run the figure with space — one beat per step, narrating each. Beats 3 and 6 are the security lesson (authority lives in the backend); beat 5 sets up the database slide next. The old JSON example survives verbally if the room is technical: GET /menu?day=tuesday comes back as { "special": "nasi lemak", ... }. Watch for eyes on the keycard — it returns on slide 19 (auth).</aside>
       </section>
 
       <!-- 16 — Database -->
@@ -989,30 +1119,49 @@ Run `preview` before the call.
       <section class="slide" data-title="Git is a time machine">
         <div class="topline"><span class="act">Act 6 · Git</span><span class="no">34 / 54</span></div>
         <h2>Git — a time machine for folders</h2>
-        <div class="cols c2">
-          <div class="term">
-            <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">terminal</span></div>
-            <div class="term-body"><span class="p">$</span> git add -A
-<span class="p">$</span> git commit -m <span class="o">"Add pricing page"</span>
-<span class="c">[main 3f9c21a] Add pricing page</span>
-<span class="p">$</span> git log --oneline
-<span class="ok">3f9c21a Add pricing page</span>
-<span class="ok">b7d04e2 Fix checkout bug</span>
-<span class="ok">1a2f9c0 First version</span></div>
-          </div>
-          <div>
-            <ul class="check-list">
-              <li>A <span class="mint strong">commit</span> = a saved snapshot of the whole folder, with a message.</li>
-              <li>Any snapshot can be revisited or restored — nothing is truly lost.</li>
-              <li>A <span class="mint strong">branch</span> = a parallel universe to try things in, then merge back.</li>
-            </ul>
-            <div class="panel amber-edge pad" style="margin-top:1.2cqh">
-              <p class="tiny"><span class="amber strong">Why it matters with AI:</span> agents write code fast. Git is the safety net — every change visible, reversible, reviewable.</p>
+        <figure class="fig" id="fig-git" data-steps="11" data-cur="0">
+          <div class="fig-count">PRESS SPACE TO RUN</div>
+          <div class="fig-stage">
+            <div class="zone z-wd"><div class="zl">Working folder</div>
+              <div class="fchip fc1">index.html</div>
+              <div class="fchip fc2">style.css</div>
+              <div class="fchip fc3 mv">app.js</div>
             </div>
+            <div class="zone z-st"><div class="zl">Staging shelf</div>
+              <div class="fc-add mv">app.js · staged</div>
+            </div>
+            <svg class="wires" viewBox="0 0 100 56" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="3" y1="36" x2="97" y2="36" stroke="rgba(255,255,255,.25)" stroke-width=".3"></line>
+              <text class="ll" x="3.5" y="34.6">main</text>
+              <line class="lane-feature" x1="55" y1="48" x2="97" y2="48"></line>
+              <text class="ll llf" x="55.5" y="46.6">feature</text>
+              <line class="wire wire-branch" x1="60" y1="36" x2="70" y2="48"></line>
+              <line class="wire wire-merge" x1="80" y1="48" x2="90" y2="36"></line>
+            </svg>
+            <div class="cm cm1"></div>
+            <div class="cm cm2"></div>
+            <div class="cm cm3"></div>
+            <div class="cm cf cf1"></div>
+            <div class="cm cf cf2"></div>
+            <div class="cm cm6"></div>
+            <div class="mtag">"Add pricing page"</div>
+            <div class="head mv">HEAD<span class="tri">▼</span></div>
+            <div class="pr-card">PR #12 · feature → main · reviewed ✓</div>
           </div>
-        </div>
+          <p class="fig-cap">You edited <span class="cmd">app.js</span>. The working folder holds your change — and only that moment.</p>
+          <p class="fig-cap"><span class="cmd">git add app.js</span> — choose what goes into the next snapshot. The staging shelf holds it.</p>
+          <p class="fig-cap"><span class="cmd">git commit -m "Add pricing page"</span> — the snapshot is saved to history, with a message. <span class="key">HEAD</span> points at now.</p>
+          <p class="fig-cap">Keep committing: history grows. Every saved moment stays reachable.</p>
+          <p class="fig-cap"><span class="cmd">git branch feature</span> — a parallel universe forks off. Free. Main doesn't notice.</p>
+          <p class="fig-cap"><span class="cmd">git checkout feature</span> — HEAD moves; new commits land on the fork. Main stays untouched.</p>
+          <p class="fig-cap"><span class="cmd">git checkout main</span> — <span class="key">the time machine</span>: your folder snaps back to main's state, including app.js.</p>
+          <p class="fig-cap"><span class="cmd">git merge</span> — the universes recombine. Nothing was ever lost.</p>
+          <p class="fig-cap"><span class="key">main</span> is the agreed trunk — the version everyone trusts. A <span class="key">branch</span> is a side road: work happens there without touching the trunk.</p>
+          <p class="fig-cap"><span class="key">Pull request</span> — you propose your branch back to main. Humans review the diff and approve. That's the checkpoint before merge.</p>
+          <p class="fig-cap"><span class="key">Rebase</span> — instead of merging, lift your branch onto main's latest commit: a straighter history. Same safety net, different shape.</p>
+        </figure>
         <div class="footer-rule"><span>Snapshot · Message · Undo</span><span>34 / 54</span></div>
-        <aside class="notes">Time machine is the metaphor; commit = save point is the mechanic. The AI angle is what makes this urgent for this audience: when an agent changes 30 files in a minute, git is how you see what happened and walk it back. If someone asks about git vs GitHub, promise the next slide.</aside>
+        <aside class="notes">Run it with space; step 7 is the gasp — narrate the snap-back slowly, it's the time-machine proof. Steps 9–11 are the vocabulary: main vs branch (side road), PR (propose + human review before merge), rebase (straighten the history — mention it exists, don't go deep). The AI-era stakes: when an agent changes 30 files in a minute, this history is how you see what happened and walk it back. If asked git vs GitHub: next slide. Stage fright fallback: the captions alone tell the whole story.</aside>
       </section>
 
       <!-- 30 — GitHub -->
@@ -1044,21 +1193,26 @@ Run `preview` before the call.
       <section class="slide" data-title="CI/CD">
         <div class="topline"><span class="act">Act 6 · CI/CD</span><span class="no">36 / 54</span></div>
         <h2>CI/CD — the robots that check and ship</h2>
-        <div class="cols c2">
-          <div class="panel sky-edge pad">
-            <h3 class="sky">CI — Continuous Integration</h3>
-            <p class="muted" style="margin:.8cqh 0">On every proposed change, robots automatically run the checks: does it build? do the tests pass? No human has to remember.</p>
+        <figure class="fig" id="fig-pipe" data-steps="6" data-cur="0">
+          <div class="fig-count">PRESS SPACE TO RUN</div>
+          <div class="fig-stage">
+            <div class="belt"></div>
+            <div class="station st-laptop"><div class="st-icon">💻</div><div class="st-label">git push</div></div>
+            <div class="station st-gate"><div class="st-icon">🤖</div><div class="st-label">Checks · CI</div></div>
+            <div class="station st-globe"><div class="st-icon">🌍</div><div class="st-label">Deploy · CD</div></div>
+            <div class="gatebox"><div class="glight mv"></div><div class="gatebar"></div></div>
+            <div class="pbox mv">commit 3f9c21a</div>
+            <div class="liveflag">● LIVE</div>
           </div>
-          <div class="panel mint-edge pad">
-            <h3 class="mint">CD — Continuous Delivery</h3>
-            <p class="muted" style="margin:.8cqh 0">When checks pass and a human approves, robots deploy it — no manual copying, no "deploy Fridays".</p>
-          </div>
-        </div>
-        <div class="panel pad" style="margin-top:1.6cqh">
-          <p><span class="amber strong">You've seen this already:</span> Vercel building and publishing your site the moment you push <span class="strong" style="color:var(--text)">is</span> CI/CD. So is GitHub running checks on a pull request before anyone can merge it.</p>
-        </div>
+          <p class="fig-cap"><span class="cmd">git push</span> — you hand the robots your change. That's the whole job description.</p>
+          <p class="fig-cap"><span class="key">CI</span> picks it up automatically: does it build? do the tests pass?</p>
+          <p class="fig-cap">The robots run the checks — no human has to remember to check.</p>
+          <p class="fig-cap">Checks pass — and a human approves. Robots check; <span class="key">humans decide</span>.</p>
+          <p class="fig-cap"><span class="key">CD</span> ships it — no manual copying, no "deploy Fridays".</p>
+          <p class="fig-cap"><span class="key">Live.</span> Vercel building and publishing your site the moment you push <em>is</em> this machine.</p>
+        </figure>
         <div class="footer-rule"><span>Check automatically · Ship deliberately</span><span>36 / 54</span></div>
-        <aside class="notes">The payoff line is the bottom panel: CI/CD is not a new machine — it's what Vercel was doing all along. The human-approval note is deliberate: robots check, humans decide. This is the class's recurring thesis applied to shipping.</aside>
+        <aside class="notes">Run it with space; six quick beats. The payoff line is the last caption: CI/CD is not a new machine — it's what Vercel was doing all along (slide 29). Keep the human-approval beat deliberate: robots check, humans decide — the class's thesis applied to shipping.</aside>
       </section>
 
       <!-- 32 — Checkpoint 5 -->
@@ -1500,6 +1654,7 @@ todos survive the refresh</span></div>
         counter.textContent = `${index + 1} / ${slides.length}`;
         progress.style.width = `${((index + 1) / slides.length) * 100}%`;
         document.title = `${slides[index].dataset.title} — Jensen`;
+        slides[index].querySelectorAll('.fig').forEach(fig => figApply(fig, 0));
         if (updateHash) history.replaceState(null, '', `#slide-${index + 1}`);
       }
 
@@ -1511,13 +1666,13 @@ todos survive the refresh</span></div>
       });
 
       document.addEventListener('keydown', event => {
-        if (['ArrowRight', 'PageDown', 'Enter'].includes(event.key) || (event.key === ' ' && !event.shiftKey)) { event.preventDefault(); const unrevealed = document.querySelectorAll('.slide.active .qa:not(.revealed)'); if (unrevealed.length && !document.body.classList.contains('reveal-all')) { unrevealed[0].classList.add('revealed'); } else { show(index + 1); } }
+        if (['ArrowRight', 'PageDown', 'Enter'].includes(event.key) || (event.key === ' ' && !event.shiftKey)) { event.preventDefault(); const fig = document.querySelector('.slide.active .fig:not(.done)'); if (fig) { figAdvance(fig); return; } const unrevealed = document.querySelectorAll('.slide.active .qa:not(.revealed)'); if (unrevealed.length && !document.body.classList.contains('reveal-all')) { unrevealed[0].classList.add('revealed'); } else { show(index + 1); } }
         if (['ArrowLeft', 'PageUp', 'Backspace'].includes(event.key) || (event.key === ' ' && event.shiftKey)) { event.preventDefault(); show(index - 1); }
         if (event.key === 'Home') show(0);
         if (event.key === 'End') show(slides.length - 1);
         if (event.key.toLowerCase() === 'f') document.getElementById('fullscreen').click();
         if (event.key.toLowerCase() === 'n') document.body.classList.toggle('show-notes');
-        if (event.key.toLowerCase() === 'r') document.body.classList.toggle('reveal-all');
+        if (event.key.toLowerCase() === 'r') { const fig = document.querySelector('.slide.active .fig:not(.done)'); if (fig) { figApply(fig, parseInt(fig.dataset.steps, 10)); } else { document.body.classList.toggle('reveal-all'); } }
       });
 
       let touchStart = null;
@@ -1530,6 +1685,22 @@ todos survive the refresh</span></div>
       }, { passive: true });
 
       document.querySelectorAll('.qa').forEach(qa => qa.addEventListener('click', () => qa.classList.toggle('revealed')));
+
+      function figApply(fig, n) {
+        const steps = parseInt(fig.dataset.steps, 10);
+        n = Math.max(0, Math.min(steps, n));
+        fig.dataset.cur = n;
+        for (let i = 1; i <= steps; i++) fig.classList.toggle('s' + i, i <= n);
+        fig.querySelectorAll('.fig-cap').forEach((c, i) => c.classList.toggle('on', i === n - 1));
+        const count = fig.querySelector('.fig-count');
+        if (count) count.textContent = n === 0 ? 'PRESS SPACE TO RUN' : (n >= steps ? 'DONE · SPACE FOR NEXT' : `STEP ${n} / ${steps}`);
+        fig.classList.toggle('done', n >= steps);
+      }
+      function figAdvance(fig) { figApply(fig, (parseInt(fig.dataset.cur, 10) || 0) + 1); }
+      document.querySelectorAll('.fig').forEach(fig => {
+        figApply(fig, 0);
+        fig.addEventListener('click', () => { if (!fig.classList.contains('done')) figAdvance(fig); });
+      });
 
       show(index, false);
     })();
