@@ -4,6 +4,7 @@
   --mint-0: #0d1420;
   --mint-1: #16203a;
   --mint-2: #2c3f6e;
+  --ramp-0: #1b2a4a;
   --teal: #5b7cfa;
   --slate-1: #8b98ad;
   --slate-2: #e8ecf5;
@@ -166,7 +167,7 @@ li {
 }
 
 .palette-strip span:nth-child(1) {
-  background: var(--mint-1);
+  background: var(--ramp-0);
 }
 
 .palette-strip span:nth-child(2) {
@@ -178,11 +179,11 @@ li {
 }
 
 .palette-strip span:nth-child(4) {
-  background: var(--talk);
+  background: var(--accent);
 }
 
 .palette-strip span:nth-child(5) {
-  background: var(--accent);
+  background: var(--talk);
 }
 
 .home-intro {
@@ -1295,11 +1296,11 @@ code {
   height: 4px;
   background: linear-gradient(
     90deg,
-    var(--mint-1) 0 22%,
+    var(--ramp-0) 0 20%,
     var(--mint-2) 0 40%,
     var(--teal) 0 60%,
-    var(--talk) 0 80%,
-    var(--accent) 0 100%
+    var(--accent) 0 80%,
+    var(--talk) 0 100%
   );
 }
 
