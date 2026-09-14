@@ -17,8 +17,8 @@ Jensen Loke's personal site and blog, organized into **five research tracks** pl
 | Qwen | `qwen/` | Dedicated Qwen section. Jensen is a **Qwen event ambassador for Singapore** — ambassador content lives here |
 
 Cross-cutting pages (not tracks):
-- `talks/index.html` — master catalogue of every presentation, including talks whose materials live only on GitHub. Hosted decks live in `talks/<talk-slug>/` as fully self-contained folders (custom vanilla-JS slide deck — absolute-positioned `.slide` elements toggled via `.active`; not reveal.js or any library) with their own media.
-- `trainings/index.html` — catalogue of training sites Jensen has built and delivered; entries link to the hosted training site or repository.
+- `talks/index.html` — master catalogue of presentations given at events (conferences, meetups, briefings). Hosted decks live in `talks/<talk-slug>/` as fully self-contained folders (custom vanilla-JS slide deck — absolute-positioned `.slide` elements toggled via `.active`; not reveal.js or any library) with their own media. Training materials do NOT live here — they belong under `trainings/`.
+- `trainings/index.html` — catalogue of training materials: classes, workshops, courses, and training sites Jensen has built and delivered. Deck-based classes are hosted under `trainings/<slug>/` (self-contained, same deck pattern as talks); site-based trainings link to the hosted site or repository.
 - `work/index.html` — open catalogue of work across fields; cards/rows link to GitHub repos and related site content.
 - `papers/` — paper storage + template. Papers are flat files `papers/<slug>.html` (abstract + numbered sections + references + related); start from `papers/template.html`. KG papers are listed both in `papers/index.html` and under `second-brain/index.html`.
 - `writing/index.html` — archive of all articles across tracks.
@@ -40,7 +40,7 @@ Cross-cutting pages (not tracks):
 - **New article:** create `<track>/<slug>.html`, add an entry to that track's `index.html` (newest first), add it to `writing/index.html`, and update the homepage featured card if it is the latest.
 - **New paper:** copy `papers/template.html` → `papers/<slug>.html`; add entries to `papers/index.html` and, for KG research, to `second-brain/index.html`.
 - **New talk:** add an entry to `talks/index.html`; if the deck is hosted here, add the self-contained folder `talks/<slug>/` too.
-- **New training:** add an entry to `trainings/index.html` (newest first); link the hosted training site or repository and related talks/writing.
+- **New training:** add an entry to `trainings/index.html` (newest first). Deck-based class: host the self-contained deck under `trainings/<slug>/` and link the deck plus any handout. Training site: link the hosted site or repository and related talks/writing.
 - **New work/repo:** add a card or compact row to `work/index.html`.
 
 ## Gotchas
