@@ -16,17 +16,17 @@ Jensen Loke's personal site and blog, organized into **five research tracks** pl
 | Local Models & Harnesses | `local-models/` | Local model reviews, agent harness reviews |
 | Qwen | `qwen/` | Dedicated Qwen section. Jensen is a **Qwen event ambassador for Singapore** — ambassador content lives here |
 
-Cross-cutting pages (not tracks):
-- `talks/index.html` — master catalogue of presentations given at events (conferences, meetups, briefings). Hosted decks live in `talks/<talk-slug>/` as fully self-contained folders (custom vanilla-JS slide deck — absolute-positioned `.slide` elements toggled via `.active`; not reveal.js or any library) with their own media. Training materials do NOT live here — they belong under `trainings/`.
-- `trainings/index.html` — catalogue of training materials: classes, workshops, courses, and training sites Jensen has built and delivered. Deck-based classes are hosted under `trainings/<slug>/` (self-contained, same deck pattern as talks); site-based trainings link to the hosted site or repository.
+Cross-cutting pages (not tracks). The nav groups everything as **Writing · Talks & Trainings · Qwen · GitHub**: the four tracks above sit under the Writing hub (Qwen keeps its own nav item as ambassador content); talks and trainings share one merged catalogue page.
+- `writing/index.html` — the Writing hub: sectioned index of published articles across the four tracks (Engineering / Reviews / Second Brain / Local Models), each section linking to its track index. Track pages remain the home of roadmaps and per-track context.
+- `talks/index.html` — "Talks & Trainings": one merged catalogue — Conference talks / Meetups & briefings / Classes & training sites (`#trainings`) / Archives & materials on GitHub. Event-presentation decks live in `talks/<talk-slug>/` as fully self-contained folders (custom vanilla-JS slide deck — absolute-positioned `.slide` elements toggled via `.active`; not reveal.js or any library) with their own media.
+- `trainings/index.html` — redirect stub to `talks/#trainings`. Deck-based classes are still hosted under `trainings/<slug>/` (self-contained, same deck pattern as talks); only the catalogue page moved.
 - `work/index.html` — open catalogue of work across fields; cards/rows link to GitHub repos and related site content.
 - `papers/` — paper storage + template. Papers are flat files `papers/<slug>.html` (abstract + numbered sections + references + related); start from `papers/template.html`. KG papers are listed both in `papers/index.html` and under `second-brain/index.html`.
-- `writing/index.html` — archive of all articles across tracks.
 
 ## Conventions
 
 - **Every article belongs to exactly one track** and lives inside that track's directory: `engineering/<slug>.html`, `reviews/<slug>.html`, `second-brain/<slug>.html`, `local-models/<slug>.html`, `qwen/<slug>.html`. Papers stay flat in `papers/`.
-- Nav on all non-deck pages: Engineering · Reviews · Second Brain · Local Models · Qwen · Talks · Trainings · GitHub (external).
+- Nav on all non-deck pages: Writing · Talks & Trainings · Qwen · GitHub (external). "Writing" is `aria-current` on the writing hub, all four track indexes, and article pages; "Talks & Trainings" on `talks/`; "Qwen" on `qwen/`.
 - **Cross-linking is the architecture:** every article/talk/paper links to its sibling content and repos ("Related" section at the end); track pages carry `inline-links` to related tracks; the article kicker states its track.
 - Track index pages carry an HTML comment marking where new entries go (newest first). Empty tracks show an `.empty-note` describing what is planned.
 - Talk media lives in `talks/<talk-slug>/public-assets/` and must be **safe to publish publicly**. Confidential screenshots (e.g. internal product UI) are deliberately excluded — don't pull media in from outside the repo.
