@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Two Brains, One Operator - Jensen Loke</title>
+    <meta
+      name="description"
+      content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+    <meta property="og:title" content="Two Brains, One Operator - Jensen Loke" />
+    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen planned the architecture and audited 1,837 pages of company knowledge." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jensenloke.github.io/essays/two-brains-one-operator.html" />
+    <style>
+      /* Paper-scoped figure system */
+      .paper-fig svg { width: 100%; height: auto; display: block; }
+      .paper-fig { margin-top: 26px; margin-bottom: 8px; }
+      .figcap strong { color: var(--accent); font-weight: 600; }
+      .grid-2, .grid-3, .grid-4 { display: grid; gap: 12px; }
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .grid-2 .card, .grid-3 .card, .grid-4 .card { padding: 16px; }
+      .grid-2 p, .grid-3 p, .grid-4 p { margin-bottom: 0; color: var(--muted); font-size: 0.92rem; }
+      @media (max-width: 980px) {
+        .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="site-field" aria-hidden="true"></canvas>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="palette-strip" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <header class="site-header">
+      <div class="article-header">
+        <nav class="article-nav" aria-label="Main navigation">
+          <a href="../">Jensen Loke</a>
+          <input type="checkbox" id="nav-toggle" class="nav-check" />
+        <label for="nav-toggle" class="nav-toggle">Menu</label>
+        <div class="nav-links">
+            <a href="../essays/" aria-current="page">Essays</a>
+            <a href="../talks/">Talks &amp; Trainings</a>
+            <a href="../work/">Projects</a>
+          </div>
+        </nav>
+        <p class="article-kicker">Building a Second Brain &middot; Qwen</p>
+        <h1 class="article-title">Two Brains, One Operator</h1>
+        <p class="article-subtitle">
+          Why personal and corporate agent memory must split, how each half is
+          governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks
+          planned the architecture and audited 1,837 pages of company knowledge.
+        </p>
+        <p class="article-byline">Jensen Loke &middot; September 2026 &middot; ~15 min read</p>
+      </div>
+    </header>
+
+    <main class="article" id="main">
+      <section>
+        <p class="note">
+          Public note: this paper describes a real production system but uses
+          generalized names and omits live values, page identifiers, customer
+          identities, hostnames, and credentials. Finding classes and counts are
+          real; the specifics are deliberately not.
+        </p>
+      </section>
+
+      <section aria-labelledby="abstract-title">
+        <div class="section-head">
+          <h2 id="abstract-title">Abstract</h2>
+        </div>
+        <div class="callout">
+          <p>
+            When AI agents become coworkers, memory becomes infrastructure. One
+            operator running two agent platforms - a personal platform (Hermes)
+            and a company platform (OpenClaw) - faces a design fork: share one
+            knowledge brain, or split. This paper argues the split is not
+            organizational tidiness but a security and governance requirement:
+            the two brains have different writer populations, different subjects,
+            and different costs of being wrong.
+          </p>
+          <p>
+            I describe both halves. The company brain enforces an integrity
+            boundary in the server itself - agents write only to an unreviewed
+            tier; humans promote through git - and was audited by a local-model
+            verifier loop that swept 1,837 pages and surfaced real credential
+            leaks. The personal brain plays a different role: a universal harness
+            adapter that serves skills, harness configuration, and a device
+            framework to any agent harness on any device. Both halves were built
+            with Qwen: Qwen 3.8 Max for architecture and policy design, and
+            Qwen 3.8 Flash Next served from two NVIDIA DGX Sparks for the
+            high-volume audit.
+          </p>
+        </div>
+      </section>
+
+      <section id="platforms" aria-labelledby="s1-title">
+        <div class="section-head">
+          <h2 id="s1-title">1. One Operator, Two Platforms</h2>
+          <p>
+            The unit of analysis is not one agent with memory. It is one person who
+            runs two agent platforms, each with its own fleet, and owes each fleet
+            a durable memory.
+          </p>
+        </div>
+
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: the personal Hermes fleet and the company OpenClaw fleet, separated by a wall, each connecting to its own brain.">
+          <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <defs>
+              <marker id="aT" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
+              </marker>
+              <marker id="aG" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--good)" />
+              </marker>
+            </defs>
+
+            <!-- Personal lane -->
+            <rect x="20" y="16" width="420" height="250" rx="14" fill="var(--mint-fill)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="44" y="50" font-size="16" font-weight="700" fill="var(--teal)">Personal lane &middot; Hermes</text>
+            <text x="44" y="72" font-size="12" fill="var(--muted)">hub-and-spoke &middot; private local channels</text>
+            <rect x="160" y="92" width="150" height="46" rx="10" fill="var(--panel)" stroke="var(--border-teal)" stroke-width="1.5" />
+            <text x="235" y="120" font-size="13" text-anchor="middle" fill="var(--ink)">Chief of staff</text>
+            <rect x="52" y="180" width="104" height="42" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="104" y="206" font-size="12" text-anchor="middle" fill="var(--muted)">Calendar</text>
+            <rect x="172" y="180" width="104" height="42" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="224" y="206" font-size="12" text-anchor="middle" fill="var(--muted)">Tasks</text>
+            <rect x="292" y="180" width="104" height="42" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="344" y="206" font-size="12" text-anchor="middle" fill="var(--muted)">Contacts</text>
+            <line x1="200" y1="138" x2="110" y2="180" stroke="var(--border-teal)" stroke-width="1.5" />
+            <line x1="235" y1="138" x2="224" y2="180" stroke="var(--border-teal)" stroke-width="1.5" />
+            <line x1="270" y1="138" x2="340" y2="180" stroke="var(--border-teal)" stroke-width="1.5" />
+            <text x="235" y="248" font-size="11.5" text-anchor="middle" fill="var(--muted)">+ per-client specialists &middot; one owner</text>
+
+            <!-- Wall -->
+            <line x1="500" y1="8" x2="500" y2="392" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" opacity="0.7" />
+            <text x="500" y="300" font-size="11.5" text-anchor="middle" fill="var(--danger)">separate servers</text>
+            <text x="500" y="318" font-size="11.5" text-anchor="middle" fill="var(--danger)">separate credentials</text>
+            <text x="500" y="336" font-size="11.5" text-anchor="middle" fill="var(--danger)">never a fallback</text>
+
+            <!-- Company lane -->
+            <rect x="560" y="16" width="420" height="250" rx="14" fill="rgba(78, 203, 154, 0.07)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="584" y="50" font-size="16" font-weight="700" fill="var(--good)">Company lane &middot; OpenClaw</text>
+            <text x="584" y="72" font-size="12" fill="var(--muted)">enrolled agents &middot; shared company work</text>
+            <rect x="592" y="92" width="118" height="46" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="651" y="120" font-size="12.5" text-anchor="middle" fill="var(--ink)">Support</text>
+            <rect x="722" y="92" width="118" height="46" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="781" y="120" font-size="12.5" text-anchor="middle" fill="var(--ink)">Coding</text>
+            <rect x="592" y="152" width="118" height="46" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="651" y="180" font-size="12.5" text-anchor="middle" fill="var(--ink)">Synthesis</text>
+            <rect x="722" y="152" width="118" height="46" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="781" y="180" font-size="12.5" text-anchor="middle" fill="var(--ink)">Verifier</text>
+            <rect x="856" y="122" width="104" height="46" rx="10" fill="var(--panel)" stroke="var(--warning)" stroke-width="1.5" />
+            <text x="908" y="150" font-size="12.5" text-anchor="middle" fill="var(--warn-ink)">Humans</text>
+            <text x="770" y="248" font-size="11.5" text-anchor="middle" fill="var(--muted)">customers &middot; products &middot; credentials</text>
+
+            <!-- Brains -->
+            <rect x="130" y="330" width="210" height="56" rx="12" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="235" y="355" font-size="14" font-weight="700" text-anchor="middle" fill="var(--teal)">Personal brain</text>
+            <text x="235" y="374" font-size="11" text-anchor="middle" fill="var(--muted)">permissive &middot; self-promoting</text>
+            <rect x="665" y="330" width="210" height="56" rx="12" fill="var(--panel)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="770" y="355" font-size="14" font-weight="700" text-anchor="middle" fill="var(--good)">Company brain</text>
+            <text x="770" y="374" font-size="11" text-anchor="middle" fill="var(--muted)">enforced integrity boundary</text>
+            <line x1="235" y1="266" x2="235" y2="326" stroke="var(--teal)" stroke-width="2" marker-end="url(#aT)" />
+            <line x1="770" y1="266" x2="770" y2="326" stroke="var(--good)" stroke-width="2" marker-end="url(#aG)" />
+          </svg>
+          <p class="figcap"><strong>Figure 1.</strong> Two fleets, two trust domains. Each platform connects to its own brain over MCP; the wall is physical, not procedural.</p>
+        </div>
+
+        <div class="grid-2 article-wide">
+          <div class="card">
+            <strong>Hermes - the personal platform</strong>
+            <p>
+              A chief-of-staff agent coordinates specialist agents - calendar,
+              tasks, contacts, investments, per-client scopes - as private peers
+              on loopback. Subject matter is one person. Memory must be
+              permissive: a personal assistant that needs an approval queue for
+              every note is useless.
+            </p>
+          </div>
+          <div class="card">
+            <strong>OpenClaw - the company platform</strong>
+            <p>
+              Several enrolled agents - support, engineering, synthesis,
+              verification - plus humans, all writing about customers, tickets,
+              products, and credentials. A wrong or leaked page can harm people
+              outside the building. Memory must be governed: nothing an agent
+              writes becomes company truth without a human signature.
+            </p>
+          </div>
+        </div>
+        <p>
+          Both fleets need the same mechanical thing - a knowledge base behind MCP
+          that agents can search, read, and write - but they need it to behave in
+          opposite ways. That tension is the entire paper.
+        </p>
+      </section>
+
+      <section id="split" aria-labelledby="s2-title">
+        <div class="section-head">
+          <h2 id="s2-title">2. Why One Brain Fails</h2>
+          <p>
+            The naive design is one brain with folders and good intentions. It fails
+            because personal memory and company memory have different trust physics.
+          </p>
+        </div>
+        <div class="scorecard article-wide">
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Personal brain</th>
+                <th>Company brain</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Property">Writer population</td>
+                <td data-label="Personal">One owner plus personal agents under the owner's direct control.</td>
+                <td data-label="Company">Multiple enrolled agents with their own credentials, plus humans.</td>
+              </tr>
+              <tr>
+                <td data-label="Property">Subject matter</td>
+                <td data-label="Personal">The owner's own life. No third parties.</td>
+                <td data-label="Company">Customers, staff, products, credentials - other people's data.</td>
+              </tr>
+              <tr>
+                <td data-label="Property">Cost of being wrong</td>
+                <td data-label="Personal">The owner misremembers something. Recoverable.</td>
+                <td data-label="Company">A customer is misinformed or a credential leaks. External harm.</td>
+              </tr>
+              <tr>
+                <td data-label="Property">Promotion model</td>
+                <td data-label="Personal">Self-promoting. Write it, it is true for you.</td>
+                <td data-label="Company">Human-gated. An agent's write is a claim, never truth.</td>
+              </tr>
+              <tr>
+                <td data-label="Property">Failure containment</td>
+                <td data-label="Personal">Git-backed, single-owner, trivially reversible.</td>
+                <td data-label="Company">Needs enforced boundaries, audit trails, and scrubbing.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Three consequences follow.</p>
+        <div class="grid-3 article-wide">
+          <div class="card">
+            <strong>1 &middot; Governance asymmetry</strong>
+            <p>
+              One shared brain must pick a governance level. Pick the company's and
+              personal memory drowns in gates it never needed. Pick the personal
+              one and company knowledge inherits self-promotion - the exact
+              property that lets an agent launder a hallucination into truth.
+            </p>
+          </div>
+          <div class="card">
+            <strong>2 &middot; Credential isolation</strong>
+            <p>
+              Company knowledge requires company credentials. If the fleets share a
+              brain, some personal agent ends up holding company keys. The split
+              makes isolation physical: separate servers, separate credentials,
+              neither side ever a fallback. Even inside the personal fleet,
+              company-brain access is confined to a single named specialist - the
+              boundary is enforced at every scale it can be.
+            </p>
+          </div>
+          <div class="card">
+            <strong>3 &middot; Blast radius</strong>
+            <p>
+              A company brain accumulates imports: old manuals, handover documents,
+              ticket archives. Some of that material contains secrets nobody
+              remembers copying. If the corpora share one store, one bad import
+              contaminates everything the owner personally trusts as well.
+            </p>
+          </div>
+        </div>
+        <p>
+          The split is therefore the architecture: two GBrain servers, one per
+          trust domain, each reached over MCP with its own credential. The rest of
+          the paper describes what each half must be true for the split to work.
+        </p>
+      </section>
+
+      <section id="company" aria-labelledby="s3-title">
+        <div class="section-head">
+          <h2 id="s3-title">3. The Company Brain: Integrity by Construction</h2>
+          <p>
+            The company half must solve one problem above all others: many writers,
+            most of them models, none of them allowed to decide what is true.
+          </p>
+        </div>
+
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: agent writes flow into the unreviewed captures tier through an intake scrub, a nightly verifier produces recommend-only digests, and only a human git PR can promote knowledge into the reviewed tier; a barrier blocks agents from writing to reviewed directly.">
+          <svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <defs>
+              <marker id="aM" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
+              </marker>
+              <marker id="aW" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--warning)" />
+              </marker>
+              <marker id="aG2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--good)" />
+              </marker>
+            </defs>
+
+            <!-- Main flow row -->
+            <rect x="20" y="70" width="128" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="84" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Agent writes</text>
+            <text x="84" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">MCP put_page</text>
+
+            <rect x="188" y="70" width="170" height="60" rx="10" fill="var(--mint-fill)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="273" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Captures tier</text>
+            <text x="273" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">unreviewed &middot; ~1,900 pages</text>
+
+            <rect x="398" y="70" width="128" height="60" rx="10" fill="var(--warn-bg)" stroke="var(--warning)" stroke-width="1.5" />
+            <text x="462" y="96" font-size="12.5" text-anchor="middle" fill="var(--warn-ink)">Intake scrub</text>
+            <text x="462" y="114" font-size="10.5" text-anchor="middle" fill="var(--warn-ink)">secrets redacted</text>
+
+            <rect x="566" y="70" width="140" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="636" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Nightly verifier</text>
+            <text x="636" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">local model &middot; checks</text>
+
+            <rect x="746" y="70" width="150" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="821" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Digest</text>
+            <text x="821" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">recommend-only</text>
+
+            <line x1="148" y1="100" x2="184" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
+            <line x1="358" y1="100" x2="394" y2="100" stroke="var(--warning)" stroke-width="2" marker-end="url(#aW)" />
+            <line x1="526" y1="100" x2="562" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
+            <line x1="706" y1="100" x2="742" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
+
+            <!-- Promotion row -->
+            <rect x="566" y="230" width="140" height="60" rx="10" fill="var(--panel)" stroke="var(--accent)" stroke-width="1.5" />
+            <text x="636" y="256" font-size="12.5" text-anchor="middle" fill="var(--ink)">Human PR</text>
+            <text x="636" y="274" font-size="10.5" text-anchor="middle" fill="var(--muted)">git &middot; diffable &middot; revertible</text>
+
+            <rect x="746" y="230" width="150" height="60" rx="10" fill="rgba(78, 203, 154, 0.1)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="821" y="256" font-size="12.5" text-anchor="middle" fill="var(--good)">Reviewed tier</text>
+            <text x="821" y="274" font-size="10.5" text-anchor="middle" fill="var(--muted)">company truth &middot; 19 pages</text>
+
+            <line x1="821" y1="130" x2="821" y2="168" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" />
+            <line x1="821" y1="168" x2="636" y2="168" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" />
+            <line x1="636" y1="168" x2="636" y2="226" stroke="var(--accent)" stroke-width="2" marker-end="url(#aM)" />
+            <line x1="706" y1="260" x2="742" y2="260" stroke="var(--good)" stroke-width="2" marker-end="url(#aG2)" />
+
+            <!-- Barrier -->
+            <line x1="273" y1="150" x2="273" y2="290" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" opacity="0.75" />
+            <line x1="273" y1="290" x2="742" y2="290" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" opacity="0.75" />
+            <text x="290" y="200" font-size="11.5" fill="var(--danger)">server-enforced barrier:</text>
+            <text x="290" y="218" font-size="11.5" fill="var(--danger)">agent write to reviewed</text>
+            <text x="290" y="236" font-size="11.5" fill="var(--danger)">&rarr; permission denied</text>
+
+            <!-- Git authority note -->
+            <text x="20" y="322" font-size="11.5" fill="var(--muted)">Durable authority: git-backed Markdown. Database and vector index are projections - diffable, revertible, replaceable.</text>
+          </svg>
+          <p class="figcap"><strong>Figure 2.</strong> The company knowledge pipeline. Agents can only enter at captures; the only path to the reviewed tier runs through a human and a git PR.</p>
+        </div>
+
+        <div class="grid-4 article-wide">
+          <div class="card">
+            <strong>Two sources, one engine</strong>
+            <p>A reviewed tier (company truth, 19 curated pages) and an unreviewed captures tier (~1,900 pages of imports and agent writes), served by one engine.</p>
+          </div>
+          <div class="card">
+            <strong>Enforced boundary</strong>
+            <p>Agent tokens can write only to captures. A write to the reviewed tier returns permission-denied - verified live, not assumed from policy prose.</p>
+          </div>
+          <div class="card">
+            <strong>Git is authority</strong>
+            <p>Durable knowledge is git-backed Markdown. The database and the vector index are projections - diffable, revertible, replaceable.</p>
+          </div>
+          <div class="card">
+            <strong>Labelled retrieval</strong>
+            <p>Search serves both tiers but every unreviewed result carries its tier. An answer built on an agent note says so.</p>
+          </div>
+        </div>
+        <p>
+          The promotion path is where most designs quietly give up and let the model
+          self-promote. This one does not, and the interesting part is how it avoids
+          the opposite failure - a human review queue so large that nothing ever
+          gets reviewed.
+        </p>
+        <div class="timeline article-wide" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+          <article class="card step">
+            <span>01</span>
+            <h3>Capture</h3>
+            <p>
+              Every agent write lands in the unreviewed tier, scrubbed for
+              credential-shaped strings at intake before it ever reaches a commit.
+            </p>
+          </article>
+          <article class="card step">
+            <span>02</span>
+            <h3>Classify</h3>
+            <p>
+              Pages are separated by what they are: imported reference evidence,
+              agent assertions, and explicit promotion proposals. Evidence is
+              tagged observed - searchable, but never a review item.
+            </p>
+          </article>
+          <article class="card step">
+            <span>03</span>
+            <h3>Verify</h3>
+            <p>
+              A nightly local-model verifier rotates through pages, runs
+              deterministic checks plus a model-assisted comparison, and writes a
+              recommend-only digest. It cannot edit anything.
+            </p>
+          </article>
+          <article class="card step">
+            <span>04</span>
+            <h3>Promote</h3>
+            <p>
+              Only a human, through a git PR, moves knowledge into the reviewed
+              tier. Small mechanical changes may auto-merge once a classifier can
+              prove them small; anything touching a business fact or the rules
+              themselves stays human-gated.
+            </p>
+          </article>
+        </div>
+        <p>
+          The classification step matters more than it looks. Before it existed, the
+          brain reported ~1,890 unverified pages - which read as 1,890 things
+          waiting for a human. Composition analysis showed the truth: most were
+          imported reference material that never needed a verdict. After retagging,
+          the real review queue was a few hundred agent assertions plus the small
+          set of explicit promotion proposals. The governance burden dropped by an
+          order of magnitude without weakening a single gate.
+        </p>
+      </section>
+
+      <section id="audit" aria-labelledby="s4-title">
+        <div class="section-head">
+          <h2 id="s4-title">4. The Audit: 1,837 Pages Under a Local Skeptic</h2>
+          <p>
+            Governance rules are prose until something tests them. The test, in this
+            case, was a full-corpus verification sweep run by local models over
+            several nights.
+          </p>
+        </div>
+        <div class="blueprint article-wide">
+          <div class="callout">
+            <h3>Loop design</h3>
+            <p>
+              Each cycle: select a batch of pages, run deterministic checks
+              (frontmatter contract, empty sections, broken citations,
+              secret-shaped strings, orphan and duplicate detection), then hand a
+              bounded sample to a tools-disabled model for compare-and-describe
+              only. Findings are ranked by severity and confidence into a digest.
+              The loop is recommend-only by construction - the writing path is
+              confined to its own digest pages. One brain page carries the cursor
+              and the ledger, so any fresh agent can resume the sweep with no
+              other memory.
+            </p>
+          </div>
+          <div class="blueprint-list">
+            <div class="blueprint-row">
+              <strong>Corpus</strong>
+              <p>1,837 pages at sweep time; 1,805 deep-inspected, the rest skip-logged oversize imports or declared exclusions.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>Execution</strong>
+              <p>36 cycles across chained runner agents over three nights, roughly 80 pages per runner-hour, every cycle checkpointed and independently verified.</p>
+            </div>
+            <div class="blueprint-row">
+              <strong>Model placement</strong>
+              <p>Reasoning stayed in-network on local hardware. Company content - including the secrets being hunted - never crossed to an external API for the sweep.</p>
+            </div>
+          </div>
+        </div>
+        <p>What the skeptic found, in finding classes:</p>
+        <div class="failure-grid article-wide">
+          <article class="card failure">
+            <span class="num">1</span>
+            <h3>Credential leaks</h3>
+            <p>
+              Years-old imported documents carried live-shaped secrets: hundreds of
+              staff phone-number cells, password tables, SQL literals including
+              production-tier logins, and a customer UAT database login. The design
+              had been catching lies - nothing untrusted could become trusted - but
+              not secrets: everything untrusted was readable by every agent.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">2</span>
+            <h3>Standard vs engine drift</h3>
+            <p>
+              The canonical standards document mandated a page type that the live
+              schema pack did not define - a contradiction between the two sources
+              of truth that no human had noticed because nothing ever compared them.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">3</span>
+            <h3>Duplicate corpora</h3>
+            <p>
+              An entire imported manual set existed as near-duplicate pages -
+              one file per import shard - invisible to keyword search, obvious to
+              a sweep that compares.
+            </p>
+          </article>
+          <article class="card failure">
+            <span class="num">4</span>
+            <h3>Graph islands</h3>
+            <p>
+              Reviewed pages cross-referenced each other with relative file links
+              the link graph never indexed - every curated page was an island,
+              which silently degraded retrieval ranking.
+            </p>
+          </article>
+        </div>
+        <p>
+          The leaks drove the immediate response: redaction on the live pages,
+          a rewrite of git history, and a purge of the database version store -
+          which held the same secrets in page snapshots that any read-scoped agent
+          could have fetched. Scrubbing then moved upstream to intake, so secrets
+          are redacted before they ever reach a commit.
+        </p>
+        <p>
+          But the sweep's deeper value was not the incident. It was three lessons
+          that changed the architecture:
+        </p>
+        <div class="grid-3 article-wide">
+          <div class="card">
+            <strong>Protect secrets, not just lies</strong>
+            <p>An integrity boundary stops false claims from becoming truth. It does nothing for true claims that should never have been stored. Confidentiality needs its own gate, at the door.</p>
+          </div>
+          <div class="card">
+            <strong>Unverified is not awaiting-you</strong>
+            <p>A status vocabulary that conflates imported evidence with agent assertions manufactures a review queue nobody can finish. Classification, not more reviewing, was the fix.</p>
+          </div>
+          <div class="card">
+            <strong>Audit the auditor</strong>
+            <p>Twice, the verification tooling itself was wrong - a history scanner broken on the real vault topology, a self-test fixture that never reproduced it. A recommend-only loop survives its own false greens; a self-promoting one would not have.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="personal" aria-labelledby="s5-title">
+        <div class="section-head">
+          <h2 id="s5-title">5. The Personal Brain: A Universal Harness Adapter</h2>
+          <p>
+            Freed from multi-writer governance, the personal brain can play a more
+            ambitious role: the adaptation layer between one operator and every
+            harness on every device.
+          </p>
+        </div>
+
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: four layers - devices on top, then harnesses, then the two brains, then one master skill registry at the bottom - connected by MCP.">
+          <svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <defs>
+              <marker id="aM2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
+              </marker>
+            </defs>
+
+            <!-- L1 devices -->
+            <text x="20" y="42" font-size="13" font-weight="700" fill="var(--accent)">L1 &middot; DEVICES</text>
+            <rect x="130" y="18" width="128" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="194" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">MacBook Pro</text>
+            <rect x="270" y="18" width="118" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="329" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">Mac mini</text>
+            <rect x="400" y="18" width="118" height="44" rx="10" fill="var(--surface)" stroke="var(--border-teal)" />
+            <text x="459" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">DGX Spark</text>
+            <rect x="530" y="18" width="118" height="44" rx="10" fill="var(--surface)" stroke="var(--border-teal)" />
+            <text x="589" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">DGX Spark</text>
+            <rect x="660" y="18" width="118" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="719" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">Office VM</text>
+            <rect x="790" y="18" width="118" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="849" y="45" font-size="12" text-anchor="middle" fill="var(--ink)">iPhone</text>
+            <text x="459" y="80" font-size="11" text-anchor="middle" fill="var(--muted)">Sparks are deliberately dumb compute &middot; phone reaches the mini over a private mesh</text>
+
+            <!-- L2 harnesses -->
+            <text x="20" y="140" font-size="13" font-weight="700" fill="var(--accent)">L2 &middot; HARNESSES</text>
+            <rect x="130" y="116" width="180" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="220" y="143" font-size="12" text-anchor="middle" fill="var(--ink)">Terminal agents</text>
+            <rect x="322" y="116" width="180" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="412" y="143" font-size="12" text-anchor="middle" fill="var(--ink)">Coding harnesses</text>
+            <rect x="514" y="116" width="180" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="604" y="143" font-size="12" text-anchor="middle" fill="var(--ink)">Browser-UI harness</text>
+            <rect x="706" y="116" width="180" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="796" y="143" font-size="12" text-anchor="middle" fill="var(--ink)">Chat harnesses</text>
+            <text x="459" y="178" font-size="11" text-anchor="middle" fill="var(--muted)">different set per device &middot; variety accepted, not normalized</text>
+
+            <!-- L3 brains -->
+            <text x="20" y="240" font-size="13" font-weight="700" fill="var(--accent)">L3 &middot; BRAINS</text>
+            <rect x="130" y="214" width="330" height="56" rx="12" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="295" y="240" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--teal)">Personal brain</text>
+            <text x="295" y="259" font-size="11" text-anchor="middle" fill="var(--muted)">skills &middot; memory verbs &middot; device framework</text>
+            <rect x="540" y="214" width="330" height="56" rx="12" fill="var(--panel)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="705" y="240" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--good)">Company brain</text>
+            <text x="705" y="259" font-size="11" text-anchor="middle" fill="var(--muted)">separate server &middot; separate credential</text>
+
+            <!-- MCP arrows -->
+            <line x1="295" y1="62" x2="295" y2="112" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#aM2)" opacity="0.6" />
+            <line x1="620" y1="62" x2="620" y2="112" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#aM2)" opacity="0.6" />
+            <line x1="295" y1="160" x2="295" y2="210" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#aM2)" opacity="0.6" />
+            <line x1="705" y1="160" x2="705" y2="210" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#aM2)" opacity="0.6" />
+            <text x="310" y="192" font-size="11" fill="var(--muted)">MCP</text>
+            <text x="720" y="192" font-size="11" fill="var(--muted)">MCP</text>
+
+            <!-- L4 registry -->
+            <text x="20" y="340" font-size="13" font-weight="700" fill="var(--accent)">L4 &middot; ONE SKILL REGISTRY</text>
+            <rect x="130" y="314" width="778" height="64" rx="12" fill="var(--mint-fill-2)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="519" y="342" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--ink)">Master skill catalogue - served by the personal brain over MCP</text>
+            <text x="519" y="362" font-size="11" text-anchor="middle" fill="var(--muted)">personal skills supersede &middot; company adapters are rows inside it, not a second registry</text>
+            <line x1="295" y1="270" x2="295" y2="310" stroke="var(--teal)" stroke-width="2" marker-end="url(#aM2)" />
+            <line x1="705" y1="270" x2="705" y2="310" stroke="var(--good)" stroke-width="2" marker-end="url(#aM2)" />
+
+            <text x="500" y="420" font-size="12" text-anchor="middle" fill="var(--muted)">Any harness on any device discovers the same skills the same way - connect-and-go.</text>
+            <text x="500" y="442" font-size="11" text-anchor="middle" fill="var(--muted)">routing policy travels inside the MCP connection itself</text>
+          </svg>
+          <p class="figcap"><strong>Figure 3.</strong> The four-layer adapter stack. Skills, harness conventions, and device knowledge live in the brain, not in each harness's private configuration.</p>
+        </div>
+
+        <div class="scenario article-wide">
+          <article class="panel ticket">
+            <div class="ticket-top">
+              <span class="tag">Layer 1 &middot; Devices</span>
+            </div>
+            <p>
+              Workstation, home server, two personal-AI compute modules, an office
+              VM, and a phone. The phone reaches the home server directly over a
+              private mesh; the compute modules are deliberately dumb - they serve
+              models and run sweeps, they do not own knowledge.
+            </p>
+          </article>
+          <article class="panel ticket">
+            <div class="ticket-top">
+              <span class="tag">Layer 2 &middot; Harnesses</span>
+            </div>
+            <p>
+              Each device runs its own set of agent harnesses - terminal agents,
+              coding harnesses, a browser-UI harness on the phone. Harnesses differ
+              per device; that variety is accepted, not normalized away.
+            </p>
+          </article>
+          <article class="panel ticket">
+            <div class="ticket-top">
+              <span class="tag">Layer 3 &middot; Brains</span>
+            </div>
+            <p>
+              Every harness connects to a brain over MCP. Personal and company
+              brains are separate servers with separate credentials; neither is
+              ever a fallback for the other.
+            </p>
+          </article>
+          <article class="panel ticket">
+            <div class="ticket-top">
+              <span class="tag">Layer 4 &middot; One skill registry</span>
+            </div>
+            <p>
+              A single master catalogue of skills, served by the personal brain
+              itself. Personal skills supersede; company adapters are rows inside
+              the registry, not a second registry. Any harness on any device
+              discovers the same skills the same way.
+            </p>
+          </article>
+        </div>
+        <p>
+          The load-bearing idea is that skills, harness conventions, and device
+          knowledge live <em>in the brain</em>, not in each harness's private
+          configuration. The brain publishes its own skills over MCP; a harness
+          connects, discovers what the operator knows how to do, and inherits the
+          operator's working patterns - routing rules, memory verbs, ingestion
+          discipline - without per-harness setup. Adding a new device or a new
+          harness becomes connect-and-go: the routing policy travels inside the
+          MCP connection itself.
+        </p>
+        <p>
+          The clearest example of the adapter pattern is how memory itself is
+          routed. The brain serves its own memory verbs as skills -
+          <code>/remember</code>, <code>/recall</code>, <code>/forget</code> - and
+          any harness that connects inherits them. <code>/remember</code> is an
+          ingestion router: it takes a write, classifies ownership, and routes it
+          to the correct store - personal notes to the personal brain, company
+          knowledge to the company brain. An explicit destination wins; when
+          ownership is genuinely ambiguous the skill asks rather than guesses, and
+          it never dual-writes. <code>/recall</code> is the retrieval mirror: it
+          selects one brain and searches only that one. The routing policy - what
+          counts as personal, what counts as company, what to do when unsure -
+          lives in the brain, not in any harness.
+        </p>
+
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: any harness loads the memory-verb skill from the brain over MCP; the skill routes writes and reads to either the personal brain or the company brain based on ownership, never both.">
+          <svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <defs>
+              <marker id="aR1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
+              </marker>
+              <marker id="aR2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
+              </marker>
+              <marker id="aR3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--good)" />
+              </marker>
+            </defs>
+
+            <!-- Any harness -->
+            <rect x="30" y="118" width="180" height="76" rx="12" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="120" y="150" font-size="14" font-weight="700" text-anchor="middle" fill="var(--ink)">Any harness</text>
+            <text x="120" y="172" font-size="11" text-anchor="middle" fill="var(--muted)">terminal &middot; coding &middot; chat &middot; phone</text>
+
+            <!-- Skill box -->
+            <rect x="300" y="118" width="250" height="76" rx="12" fill="var(--mint-fill-2)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="425" y="146" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--teal)">Memory-verb skill</text>
+            <text x="425" y="168" font-size="12" text-anchor="middle" fill="var(--ink)">/remember &middot; /recall &middot; /forget</text>
+            <text x="425" y="186" font-size="10.5" text-anchor="middle" fill="var(--muted)">served by the brain over MCP</text>
+
+            <line x1="210" y1="156" x2="296" y2="156" stroke="var(--muted)" stroke-width="2" marker-end="url(#aR1)" />
+            <text x="253" y="146" font-size="10.5" text-anchor="middle" fill="var(--muted)">loads skill</text>
+
+            <!-- Personal brain -->
+            <rect x="640" y="42" width="330" height="72" rx="12" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="805" y="72" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--teal)">Personal brain</text>
+            <text x="805" y="92" font-size="11" text-anchor="middle" fill="var(--muted)">notes &middot; plans &middot; people &middot; ideas</text>
+
+            <!-- Company brain -->
+            <rect x="640" y="198" width="330" height="72" rx="12" fill="var(--panel)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="805" y="228" font-size="13.5" font-weight="700" text-anchor="middle" fill="var(--good)">Company brain</text>
+            <text x="805" y="248" font-size="11" text-anchor="middle" fill="var(--muted)">products &middot; tickets &middot; runbooks</text>
+
+            <line x1="550" y1="140" x2="636" y2="82" stroke="var(--teal)" stroke-width="2" marker-end="url(#aR2)" />
+            <line x1="550" y1="172" x2="636" y2="230" stroke="var(--good)" stroke-width="2" marker-end="url(#aR3)" />
+
+            <!-- Routing rules -->
+            <rect x="30" y="262" width="940" height="52" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
+            <text x="500" y="284" font-size="12" text-anchor="middle" fill="var(--ink)">Routing rules live in the skill: explicit destination wins &middot; ambiguous &rarr; ask, never guess &middot; never dual-write &middot; search one brain only</text>
+            <text x="500" y="302" font-size="11" text-anchor="middle" fill="var(--muted)">change the rules once in the brain - every harness on every device updates</text>
+          </svg>
+          <p class="figcap"><strong>Figure 4.</strong> Memory routing as a served skill. The split is enforced at the routing layer, so no harness can accidentally cross it.</p>
+        </div>
+
+        <p>
+          This is what makes the split operable. Two brains are only safe if every
+          writer routes correctly - and the router is not a convention each harness
+          must reimplement; it is a skill served by the brain itself. A new
+          knowledge source becomes a new row in the routing table, not a new
+          integration in every harness. The same mechanism is why the personal
+          brain earns the title <em>universal harness adapter</em>: it does not
+          merely store knowledge, it exports the operator's entire way of working -
+          skills, routing, memory discipline - to whatever harness shows up next.
+        </p>
+        <p>
+          This is why the personal brain can stay permissive where the company
+          brain must be strict. Single owner, no third-party subjects, git-backed
+          and reversible: the cost of a bad write is a bad note, and the remedy is
+          a revert. The same properties would be negligence in the company brain -
+          which is precisely why section 2's split is load-bearing rather than
+          cosmetic.
+        </p>
+      </section>
+
+      <section id="qwen" aria-labelledby="s6-title">
+        <div class="section-head">
+          <h2 id="s6-title">6. Qwen's Division of Labor</h2>
+          <p>
+            Both halves of this system were built with Qwen, and the build itself
+            demonstrates the pattern: a frontier-class model for judgment,
+            high-throughput local serving for volume.
+          </p>
+        </div>
+
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: Qwen 3.8 Max feeds planning outputs - architecture, policy RFC, scrub and runner design; Qwen 3.8 Flash Next on two DGX Sparks feeds the 1,837-page sweep and its 36 digests; a footer notes reasoning stayed in-network.">
+          <svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+            <defs>
+              <marker id="aT2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
+              </marker>
+              <marker id="aG3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--good)" />
+              </marker>
+            </defs>
+
+            <!-- Max column -->
+            <rect x="30" y="40" width="220" height="76" rx="12" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="140" y="72" font-size="15" font-weight="700" text-anchor="middle" fill="var(--teal)">Qwen 3.8 Max</text>
+            <text x="140" y="94" font-size="11.5" text-anchor="middle" fill="var(--muted)">frontier-class reasoning</text>
+
+            <rect x="330" y="16" width="300" height="44" rx="10" fill="var(--surface)" stroke="var(--border-teal)" />
+            <text x="480" y="43" font-size="12.5" text-anchor="middle" fill="var(--ink)">Architecture &amp; two-source model</text>
+            <rect x="330" y="68" width="300" height="44" rx="10" fill="var(--surface)" stroke="var(--border-teal)" />
+            <text x="480" y="95" font-size="12.5" text-anchor="middle" fill="var(--ink)">Promotion policy RFC + classifier</text>
+            <rect x="330" y="120" width="300" height="44" rx="10" fill="var(--surface)" stroke="var(--border-teal)" />
+            <text x="480" y="147" font-size="12.5" text-anchor="middle" fill="var(--ink)">Scrub engine + verifier runner gates</text>
+
+            <line x1="250" y1="66" x2="326" y2="38" stroke="var(--teal)" stroke-width="1.5" marker-end="url(#aT2)" />
+            <line x1="250" y1="78" x2="326" y2="90" stroke="var(--teal)" stroke-width="1.5" marker-end="url(#aT2)" />
+            <line x1="250" y1="92" x2="326" y2="142" stroke="var(--teal)" stroke-width="1.5" marker-end="url(#aT2)" />
+
+            <!-- Flash Next column -->
+            <rect x="30" y="196" width="220" height="76" rx="12" fill="var(--panel)" stroke="var(--good)" stroke-width="1.5" />
+            <text x="140" y="226" font-size="15" font-weight="700" text-anchor="middle" fill="var(--good)">Qwen 3.8 Flash Next</text>
+            <text x="140" y="248" font-size="11.5" text-anchor="middle" fill="var(--muted)">&times;2 DGX Sparks &middot; LiteLLM</text>
+
+            <rect x="330" y="200" width="220" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="440" y="227" font-size="12.5" text-anchor="middle" fill="var(--ink)">1,837-page sweep</text>
+            <rect x="590" y="200" width="220" height="44" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="700" y="227" font-size="12.5" text-anchor="middle" fill="var(--ink)">36 digests &middot; risk register</text>
+            <line x1="250" y1="234" x2="326" y2="222" stroke="var(--good)" stroke-width="1.5" marker-end="url(#aG3)" />
+            <line x1="550" y1="222" x2="586" y2="222" stroke="var(--good)" stroke-width="1.5" marker-end="url(#aG3)" />
+            <text x="440" y="266" font-size="11" text-anchor="middle" fill="var(--muted)">~80 pages / runner-hour &middot; 36 cycles &middot; 3 nights</text>
+
+            <!-- Footer bar -->
+            <rect x="30" y="290" width="940" height="34" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
+            <text x="500" y="312" font-size="12" text-anchor="middle" fill="var(--muted)">Reasoning in-network - company content never left the LAN during the sweep.</text>
+          </svg>
+          <p class="figcap"><strong>Figure 5.</strong> Judgment gets the strongest model; volume gets cheap local throughput. Neither role alone would have worked.</p>
+        </div>
+
+        <div class="grid-2 article-wide">
+          <div class="card">
+            <strong>Qwen 3.8 Max - planning</strong>
+            <p>
+              Designed the company brain's two-source model, the enforced write
+              boundary, and the promotion policy; drafted the two-lane promotion
+              RFC and the big-vs-small change classifier; designed the leak-scrub
+              engine, intake-time redaction, and the verifier runner's safety
+              gates; held multi-day state across sessions via brain pages.
+            </p>
+          </div>
+          <div class="card">
+            <strong>Qwen 3.8 Flash Next - volume</strong>
+            <p>
+              Served locally through a LiteLLM front, addressing the compute
+              modules as one model endpoint; combed through 1,837 pages -
+              mechanical checks plus bounded compare-and-describe - at roughly 80
+              pages per hour; runs the nightly verification cycle that keeps the
+              brain's risk register current.
+            </p>
+          </div>
+        </div>
+        <p>
+          The pairing is the point. Planning work is low-volume and
+          high-consequence - a wrong promotion policy is a design flaw that lives
+          for years - so it gets the strongest available reasoning. Verification
+          is high-volume and mechanically bounded - each page either passes the
+          checks or it does not - so it gets cheap, fast, local throughput on
+          hardware the operator owns.
+        </p>
+      </section>
+
+      <section id="discussion" aria-labelledby="s7-title">
+        <div class="section-head">
+          <h2 id="s7-title">7. Discussion</h2>
+          <p>When this design applies, and where it breaks.</p>
+        </div>
+        <div class="blueprint-list article-wide">
+          <div class="blueprint-row">
+            <strong>When to split</strong>
+            <p>Split whenever writer population, subject ownership, or failure cost differs between your agents' worlds. One brain is fine for a single writer with no regulated subjects; it fails the moment other people's data or other agents' credentials enter.</p>
+          </div>
+          <div class="blueprint-row">
+            <strong>Failure mode: surface drift</strong>
+            <p>Git, the brain's page store, and the runner's checkpoint are three surfaces that can disagree. The fix is naming one durable authority and reconciling the others against it - and checking, not assuming, that reconciliation happened.</p>
+          </div>
+          <div class="blueprint-row">
+            <strong>Failure mode: over-gating</strong>
+            <p>Requiring human approval for everything looks safe and produces a queue nobody finishes - which means nothing actually gets reviewed. Governance must classify change size, not just enforce gates.</p>
+          </div>
+          <div class="blueprint-row">
+            <strong>Failure mode: under-gating</strong>
+            <p>The integrity boundary caught every lie and every leak survived it. Confidentiality is a separate property and needs its own gate at intake, plus history and version-store hygiene when something slips through.</p>
+          </div>
+          <div class="blueprint-row">
+            <strong>What I would change</strong>
+            <p>Scrub at intake from day one. Distinguish evidence from assertion in the status vocabulary from day one. Test audit tooling against the real storage topology, not a fixture shaped like the happy path.</p>
+          </div>
+        </div>
+        <p>
+          The release posture follows directly. Reading the company brain is safe
+          today - retrieval labels unreviewed material as unreviewed. Writing
+          knowledge the organization trusts is still gated on growing the reviewed
+          tier, which is 19 pages against ~1,900 of captures. That ratio, not any
+          missing mechanism, is the remaining work.
+        </p>
+      </section>
+
+      <section aria-labelledby="refs-title">
+        <div class="section-head">
+          <h2 id="refs-title">References</h2>
+          <p>Systems and models referenced in this paper.</p>
+        </div>
+        <div class="sources article-wide">
+          <div class="card">
+            <h3>Models and hardware</h3>
+            <ul>
+              <li>
+                <a href="https://github.com/QwenLM" target="_blank" rel="noreferrer">Qwen</a> - Qwen 3.8 Max (planning) and Qwen 3.8 Flash Next (sweep).
+              </li>
+              <li>
+                <a href="https://www.nvidia.com/en-us/products/workstations/dgx-spark/" target="_blank" rel="noreferrer">NVIDIA DGX Spark</a> - two units serving the sweep models locally.
+              </li>
+              <li>
+                <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noreferrer">LiteLLM</a> - the model-serving front used by the agent harnesses.
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Protocols</h3>
+            <ul>
+              <li>
+                <a href="https://modelcontextprotocol.io/" target="_blank" rel="noreferrer">Model Context Protocol</a> - the connection layer between every harness and both brains.
+              </li>
+              <li>Git-backed Markdown as durable authority; database and vector index as projections.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="related-title">
+        <div class="section-head">
+          <h2 id="related-title">Related</h2>
+          <p>
+            This paper continues the research programme from
+            <em>Why a Knowledge Management Layer Still Matters</em>, which argues
+            the retrieval-side case for a structured KM layer.
+          </p>
+        </div>
+        <div class="explore-grid">
+          <a class="hub-card featured-card" href="../second-brain/knowledge-management-layer-success-it.html">
+            <h2>Why a Knowledge Management Layer Still Matters</h2>
+            <p>Where no KM fails, where search helps, and where a structured KM layer changes agent behavior.</p>
+          </a>
+          <a class="hub-card featured-card" href="../second-brain/">
+            <h2>Building a Second Brain</h2>
+            <p>The research track this paper belongs to, including knowledge graph research published on this site.</p>
+          </a>
+          <a class="hub-card featured-card" href="../talks/human-in-the-loop-v2/">
+            <h2>Everyone Gets a Jarvis</h2>
+            <p>Bounded agents package colleagues' expertise while people retain authority - the governance stance this paper operationalizes.</p>
+          </a>
+          <a class="hub-card featured-card" href="../essays/">
+            <h2>Essays</h2>
+            <p>Every article across the tracks, searchable by title, excerpt, and date.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+        <footer class="site-footer">
+      <div class="footer-grid">
+        <div>
+          <h2>Jensen Loke</h2>
+          <p>Writing about useful systems - agentic coding, AI agents, and knowledge that works.</p>
+        </div>
+        <div>
+          <h2>Site</h2>
+          <ul>
+            <li><a href="../essays/">Essays</a></li>
+            <li><a href="../talks/">Talks &amp; Trainings</a></li>
+            <li><a href="../work/">Projects</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Elsewhere</h2>
+          <ul>
+            <li><a href="https://github.com/jensenloke" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/Success-IT" target="_blank" rel="noopener">Success IT</a></li>
+            <li><a href="https://www.linkedin.com/in/jensenloke/" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="https://x.com/jensenloke" target="_blank" rel="noopener">X</a></li>
+            <li><a href="https://www.youtube.com/@jensenloke" target="_blank" rel="noopener">YouTube</a></li>
+            <li><a href="https://huggingface.co/jensenloke" target="_blank" rel="noopener">Hugging Face</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-base">
+        <p>Copyright 2026 Jensen Loke.</p>
+      </div>
+    </footer>
+      <script src="../assets/droplets.js" defer></script>
+  </body>
+</html>

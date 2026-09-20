@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Essays - Jensen Loke</title>
+    <meta
+      name="description"
+      content="All articles by Jensen Loke - engineering practice, second-brain research, book reviews, local models, and Qwen coverage - in one searchable archive."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+    <meta property="og:title" content="Essays - Jensen Loke" />
+    <meta property="og:description" content="All articles by Jensen Loke in one searchable archive - engineering, second brains, reviews, local models, and Qwen." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jensenloke.github.io/essays/" />
+    <style>
+      .search-row { display: flex; align-items: center; gap: 14px; margin: 22px 0 18px; flex-wrap: wrap; }
+      .search-row input {
+        flex: 1;
+        min-width: 220px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-soft);
+        background: var(--surface);
+        color: var(--ink);
+        font: inherit;
+        font-size: 0.95rem;
+      }
+      .search-row input:focus { outline: none; border-color: var(--border-teal); }
+      .search-row input::placeholder { color: var(--muted); }
+      .search-count { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+      .entry-list .entry .entry-tag {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border-soft);
+        background: var(--wash);
+        color: var(--tag-ink);
+        font-size: 0.72rem;
+        letter-spacing: 0.02em;
+      }
+      .no-results { display: none; padding: 26px 0; color: var(--muted); }
+      .no-results.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <canvas id="site-field" aria-hidden="true"></canvas>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="palette-strip" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <header class="home-header">
+      <nav class="home-nav" aria-label="Main navigation">
+        <a class="brand" href="../">Jensen Loke</a>
+        <input type="checkbox" id="nav-toggle" class="nav-check" />
+        <label for="nav-toggle" class="nav-toggle">Menu</label>
+        <div class="nav-links">
+          <a href="./" aria-current="page">Essays</a>
+          <a href="../talks/">Talks &amp; Trainings</a>
+          <a href="../work/">Projects</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="site-shell">
+      <div class="page-head">
+        <p class="eyebrow">Essays</p>
+        <h1>Essays</h1>
+        <p>
+          Everything I have published, newest first - engineering practice,
+          second-brain research, book reviews, and local models.
+          Search by title, topic, or track.
+        </p>
+      </div>
+
+      <main class="section-main" id="main">
+        <section class="section-block" aria-labelledby="articles-title">
+          <p class="section-label" id="articles-title">All articles</p>
+
+          <div class="search-row">
+            <input type="search" id="article-search" placeholder="Search articles - try &quot;brain&quot;, &quot;Qwen&quot;, &quot;dependency&quot;&hellip;" aria-label="Search articles" />
+            <span class="search-count" id="search-count" aria-live="polite"></span>
+          </div>
+
+          <div class="entry-list" id="article-list">
+            <a class="entry" href="./two-brains-one-operator.html">
+              <div>
+                <p class="entry-meta">September 2026<span class="entry-tag">Paper</span><span class="entry-tag">Second Brain</span><span class="entry-tag">Qwen</span></p>
+                <h2>Two Brains, One Operator</h2>
+                <p>
+                  Why personal and corporate agent memory must split, how each half
+                  is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two
+                  DGX Sparks planned the architecture and audited 1,837 pages of
+                  company knowledge.
+                </p>
+              </div>
+              <span class="read-link">Read paper</span>
+            </a>
+
+            <a class="entry" href="../engineering/codegraph-tour.html">
+              <div>
+                <p class="entry-meta">September 2026<span class="entry-tag">Engineering</span></p>
+                <h2>Know What Breaks Before You Change It</h2>
+                <p>
+                  A tour of CodeGraph - cross-layer dependency analysis across
+                  Angular, C#, SQL, reports, and legacy VBA, and why agents need
+                  blast radius even more than we do.
+                </p>
+              </div>
+              <span class="read-link">Read article</span>
+            </a>
+
+            <a class="entry" href="../second-brain/knowledge-management-layer-success-it.html">
+              <div>
+                <p class="entry-meta">May 2026<span class="entry-tag">Second Brain</span></p>
+                <h2>Why a Knowledge Management Layer Still Matters</h2>
+                <p>
+                  A practical look at where no KM fails, where connectors and search
+                  help, and where a structured KM layer materially improves
+                  consistency, reasoning quality, traceability, and permissioning.
+                </p>
+              </div>
+              <span class="read-link">Read article</span>
+            </a>
+
+            <!-- New articles: add an <a class="entry"> block above this comment, newest first. -->
+          </div>
+
+          <p class="no-results" id="no-results">
+            Nothing matches that search. Try a broader term, or clear the search
+            to see the full list.
+          </p>
+        </section>
+
+        <section class="section-block" aria-labelledby="pipeline-title">
+          <p class="section-label" id="pipeline-title">In the pipeline</p>
+          <div class="roadmap">
+            <ul class="roadmap-list">
+              <li>
+                <span class="when">Reviews</span>
+                <p>Book reviews - Victor Dibia, knowledge graph books, AI and systems titles. Roadmap on the <a href="../reviews/">Reviews track page</a>.</p>
+              </li>
+              <li>
+                <span class="when">Local Models</span>
+                <p>Local model and agent harness reviews, including Qwen-on-local-hardware evaluations. Roadmap on the <a href="../local-models/">Local Models track page</a>.</p>
+              </li>
+              <li>
+                <span class="when">Papers</span>
+                <p>Knowledge graph research - what a graph adds over plain retrieval. Listed under <a href="../second-brain/">Second Brain</a> and in this archive once published.</p>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <p class="inline-links">
+          <a href="../second-brain/">Second Brain research</a>
+          <a href="../engineering/">Engineering track</a>
+          <a href="../work/">Projects</a>
+        </p>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div>
+          <h2>Jensen Loke</h2>
+          <p>Writing about useful systems - agentic coding, AI agents, and knowledge that works.</p>
+        </div>
+        <div>
+          <h2>Site</h2>
+          <ul>
+            <li><a href="./">Essays</a></li>
+            <li><a href="../talks/">Talks &amp; Trainings</a></li>
+            <li><a href="../work/">Projects</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Elsewhere</h2>
+          <ul>
+            <li><a href="https://github.com/jensenloke" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/Success-IT" target="_blank" rel="noopener">Success IT</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-base">
+        <p>Copyright 2026 Jensen Loke.</p>
+      </div>
+    </footer>
+    <script src="../assets/droplets.js" defer></script>
+    <script>
+      (function () {
+        var input = document.getElementById('article-search');
+        var list = document.getElementById('article-list');
+        var count = document.getElementById('search-count');
+        var empty = document.getElementById('no-results');
+        var entries = Array.prototype.slice.call(list.querySelectorAll('.entry'));
+        var total = entries.length;
+
+        function apply() {
+          var q = input.value.trim().toLowerCase();
+          var shown = 0;
+          entries.forEach(function (el) {
+            var hit = !q || el.textContent.toLowerCase().indexOf(q) !== -1;
+            el.style.display = hit ? '' : 'none';
+            if (hit) shown++;
+          });
+          count.textContent = q ? shown + ' of ' + total + ' articles' : total + ' articles';
+          empty.classList.toggle('show', shown === 0);
+        }
+
+        input.addEventListener('input', apply);
+        apply();
+      })();
+    </script>
+  </body>
+</html>

@@ -230,6 +230,16 @@ li {
   text-transform: uppercase;
 }
 
+.hero-social {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 14px 0 0;
+  font-size: 0.86rem;
+  font-weight: 680;
+}
+
 .eyebrow,
 .article-meta,
 .section-label {
@@ -1113,6 +1123,57 @@ code {
   align-items: stretch;
 }
 
+/* About: bio prose + roles panel */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.about-bio {
+  padding: 4px 8px 4px 0;
+}
+
+.about-bio p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.about-bio a {
+  color: var(--link);
+  text-decoration: none;
+  font-weight: 680;
+}
+
+.about-bio a:hover {
+  text-decoration: underline;
+}
+
+.about-note {
+  color: var(--slate-1);
+  font-size: 0.9rem;
+}
+
+.about-roles {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 20px;
+}
+
+.about-roles h2 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.about-roles .strip-list {
+  gap: 14px;
+}
+
 .strip-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1506,6 +1567,7 @@ code {
   }
 
   .latest-grid,
+  .about-grid,
   .strip-grid {
     grid-template-columns: 1fr;
   }
