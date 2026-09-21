@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Know What Breaks Before You Change It - Jensen Loke</title>
+  <title>From Company Knowledge to Verified Changes - Jensen Loke</title>
   <meta
     name="description"
-    content="A tour of CodeGraph: cross-layer dependency analysis across Angular, C#, SQL, reports, and legacy VBA - and why agents need blast radius more than we do."
+    content="How Success Brain, shared abstractions, pattern linting, CodeGraph, and built-in verifiers work together to guide agentic engineering."
   />
   <link rel="stylesheet" href="../assets/styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
-  <meta property="og:title" content="Know What Breaks Before You Change It - Jensen Loke" />
-  <meta property="og:description" content="A tour of CodeGraph: cross-layer dependency analysis across Angular, C#, SQL, reports, and legacy VBA - and why agents need blast radius more than we do." />
+  <meta property="og:title" content="From Company Knowledge to Verified Changes - Jensen Loke" />
+  <meta property="og:description" content="How Success Brain, shared abstractions, pattern linting, CodeGraph, and built-in verifiers work together to guide agentic engineering." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://jensenloke.github.io/engineering/codegraph-tour.html" />
     <link rel="stylesheet" href="/assets/cues.css">
@@ -31,257 +31,323 @@
     <div class="article-header">
 
       <p class="article-kicker">Success IT Engineering &middot; Dependency analysis &middot; Agentic engineering</p>
-      <h1 class="article-title">Know What Breaks Before You Change It</h1>
+      <h1 class="article-title">From Company Knowledge to Verified Changes</h1>
       <p class="article-subtitle">
-        A tour of CodeGraph - the cross-layer dependency graph we query before touching
-        a stored procedure, a table, an endpoint, or a shared component - and why coding
-        agents need blast radius even more than we do.
+        Success Brain supplies context. Shared abstractions encode rules. Pattern
+        lints, CodeGraph, and built-in verifiers help us check the changes agents make.
       </p>
-      <p class="article-byline">Jensen Loke &middot; September 2026 &middot; ~7 min read</p>
+      <p class="article-byline">Jensen Loke &middot; Updated <time datetime="2026-09-21">21 September 2026</time> &middot; ~9 min read</p>
     </div>
   </header>
 
   <main class="article" id="main">
-    <section>
-      <p class="note">
-        Public note: this article describes our tooling and operating practice in
-        general terms. Product and customer names are generalized, and command
-        examples are simplified. The pattern is the point, not the internals.
+    <section aria-labelledby="problem-title">
+      <div class="section-head">
+        <h2 id="problem-title">A small change can cross the whole system</h2>
+      </div>
+      <p>
+        A shared component needs a simpler layout on one screen. A stored procedure
+        needs an extra result field. A report needs to display that field. Each
+        request sounds local until you ask what else depends on the same code.
+      </p>
+      <p>
+        At Success IT, those dependencies cross Angular frontends, C# services,
+        SQL Server databases, Jasper reports, and legacy Access and VBA workflows.
+        Reading the file you intend to change is only the beginning. You also need
+        to find the callers that expect its current behavior.
+      </p>
+      <p>
+        CodeGraph helps us trace those dependencies, but it is one part of the
+        system. The larger problem is giving an agent the business context, shared
+        implementation patterns, and verification tools it needs to make a sound change.
       </p>
     </section>
 
-    <section aria-labelledby="problem-title">
+    <section aria-labelledby="layers-title">
       <div class="section-head">
-        <h2 id="problem-title">The blast-radius problem</h2>
-        <p>
-          Change one stored procedure and something breaks - the question is whether
-          you find out in review or in production.
-        </p>
+        <h2 id="layers-title">The layers around a code change</h2>
       </div>
       <p>
-        Our stack is sixteen products wide and five layers deep: Angular frontends,
-        C# backends, SQL Server databases, Jasper reports, and - still running real
-        workflows - legacy VBA forms from codebases that predate most of the team.
-        A single business concept lives in all of them at once: a policy table is
-        read by stored procedures, called by endpoints, rendered by components,
-        printed by reports, and mirrored in a twenty-year-old Access form.
+        Success Brain is the knowledge layer at the top: durable company meaning,
+        business rules, decisions, and cross-product standards. The product
+        repository owns the implementation and its verification. CodeGraph is a
+        queryable projection of structural relationships in that implementation.
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Layer</th><th>Question it helps answer</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Layer">Success Brain</td><td data-label="Question it helps answer">What does this rule mean, and why does it exist?</td></tr>
+            <tr><td data-label="Layer">Abstractions and pattern recipes</td><td data-label="Question it helps answer">What recurring rule is this, where does it appear, and which shared implementation or contract governs it?</td></tr>
+            <tr><td data-label="Layer">Pattern linting</td><td data-label="Question it helps answer">Is new code repeating a known mistake or bypassing the shared implementation?</td></tr>
+            <tr><td data-label="Layer">CodeGraph</td><td data-label="Question it helps answer">Which indexed callers and data paths could this change affect?</td></tr>
+            <tr><td data-label="Layer">Built-in verifiers</td><td data-label="Question it helps answer">Does the implementation satisfy the behaviors and invariants we have specified?</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        These layers meet in the engineering workflow. The agent retrieves relevant
+        decisions, inspects the code and its dependencies, then combines acceptance
+        criteria with affected callers to form a verification matrix. That matrix
+        states what must change and what must remain compatible.
       </p>
       <p>
-        In a stack like that, "obvious" changes have non-obvious consequences.
-        Renaming a column is never just a rename. Dropping an endpoint that looks
-        unused can break a legacy form nobody remembers shipping. And the
-        consequences are cross-layer: the thing that breaks is rarely in the layer
-        you edited.
+        This is a division of responsibilities, rather than a single automatic
+        pipeline. A saved decision does not prove the current code follows it.
+        A graph query does not generate the tests. The agent and reviewer have to
+        connect the evidence and resolve disagreements between it.
+      </p>
+    </section>
+
+    <section aria-labelledby="abstractions-title">
+      <div class="section-head">
+        <h2 id="abstractions-title">Encode the rule once, then guard its use</h2>
+      </div>
+      <p>
+        Abstractions include both shared implementations and named pattern recipes.
+        The product’s pattern catalogue describes recurring rules with a falsifiable
+        contract, a signature for recognizing instances, and references to actual
+        code. An executable recipe points to its checks: a frontend verifier, a
+        database contract, a static lint, or a backend test.
       </p>
       <p>
-        Coding agents make this sharper, not softer. They change code faster than a
-        human can trace the fallout - thirty files in a minute is a normal session.
-        Speed is the whole point of using them, so the safety question becomes:
-        <em>how do you know the blast radius before the change lands?</em>
+        The catalogue gives the codebase a vocabulary beyond functions and files.
+        Its YAML records where checks live; the existing harnesses execute them.
+        Some recipes remain documented guidance with an explicit reason, so naming
+        a pattern does not mean it is automatically enforced. The catalogue inspected
+        here is product-local, not proof of a company-wide executable pattern library.
+      </p>
+      <p>
+        Shared implementations give recurring behavior a common home. Consider a small but
+        persistent integration problem: the same line-number field arrives with
+        different capitalization. A shared reader handles the accepted variants
+        instead of making each screen rediscover them.
+      </p>
+      <p>
+        The current repository contains all three parts of the safeguard. A shared
+        calculator implements the reader. A verification unit calls the actual
+        implementation with the supported field-name variants and an unknown-name
+        edge case. A pattern lint flags new component-local copies and directs
+        them back to the shared implementation.
+      </p>
+      <p>
+        Each check has a different job. The verifier checks whether the abstraction
+        works for its specified cases. The lint checks for a known way of bypassing
+        it. CodeGraph helps identify callers when the shared code changes. Success
+        Brain is where the durable context and decisions behind such rules belong.
+      </p>
+      <p>
+        This is also an incremental migration. Some older copies are explicitly
+        allowlisted. Signature lints detect the patterns they are written to find;
+        they cannot recognize every equivalent mistake. The lint registry separates
+        gating checks from advisory checks, so their consequences are explicit.
+      </p>
+    </section>
+
+    <section aria-labelledby="verifiers-title">
+      <div class="section-head">
+        <h2 id="verifiers-title">Make behavior inspectable inside the application</h2>
+      </div>
+      <p>
+        The frontend includes a verification runner that exercises real code with
+        fixtures and invariants. Its development-only bridge exposes
+        <code>window.__verify</code>, making logic checks available in the running
+        development application. That bridge is loaded outside production.
+      </p>
+      <p>
+        Results distinguish <code>PASS</code>, <code>FAIL</code>,
+        <code>BLOCKED</code>, and <code>SKIP</code>. An unavailable check is not a
+        successful check. The verification matrix requires an edge-case probe for
+        each unit; where a unit declares mutations, it also checks that those
+        deliberate changes cause the target invariant to fail.
+      </p>
+      <p>
+        That tests something about the checks themselves: can they detect the
+        mistake they claim to guard against? Coverage still has limits. Some units
+        explicitly record known defects, and a successful suite does not establish
+        that the entire product is defect-free. Browser-visible changes still need
+        the rendered feature exercised; reports still need their output checked.
       </p>
     </section>
 
     <section aria-labelledby="graph-title">
       <div class="section-head">
-        <h2 id="graph-title">One graph, every layer</h2>
-        <p>
-          CodeGraph is a local dependency database with a CLI. Indexers walk each
-          layer and emit one graph: nodes for everything that can be depended on,
-          edges for every dependency.
-        </p>
-      </div>
-      <div class="definition article-wide">
-        <div class="card">
-          <strong>Angular</strong>
-          <p>Components, services, routes - including which inputs each call site actually passes.</p>
-        </div>
-        <div class="card">
-          <strong>C#</strong>
-          <p>Functions, API endpoints, services, classes across the backend projects.</p>
-        </div>
-        <div class="card">
-          <strong>SQL</strong>
-          <p>Stored procedures, tables, views, functions - from the system catalogs.</p>
-        </div>
-        <div class="card">
-          <strong>Reports</strong>
-          <p>Jasper templates, so a data change shows up in what gets printed.</p>
-        </div>
-        <div class="card">
-          <strong>Legacy VBA</strong>
-          <p>Forms, reports, queries, modules extracted from the old Access frontends.</p>
-        </div>
+        <h2 id="graph-title">Connect the layers, preserve the evidence</h2>
       </div>
       <p>
-        The current index holds <strong>41,440 nodes and 179,234 edges</strong>
-        across the sixteen products. The part that matters most is the bridging:
-        five legacy customer codebases and the modern stack resolve onto shared
-        nodes, so one table can show you its legacy VBA forms <em>and</em> its
-        modern C# endpoints in a single view. That cross-layer visibility is the
-        whole product - a per-repository tool would miss exactly the edges we care
-        about.
+        CodeGraph uses indexers to turn code and database metadata into a shared
+        graph backed by SQLite. Nodes represent objects such as components,
+        endpoints, procedures, and tables. Edges describe relationships the
+        indexers identify between them.
+      </p>
+      <p>
+        The implementation includes Angular, C#, SQL Server, Jasper, and legacy
+        VBA indexing, as well as a React and TypeScript Azure Functions path.
+        The important work happens at the joins: connecting a frontend request
+        to an endpoint, or a backend database call to the SQL object it uses.
+        Database-qualified identities help distinguish tables with the same name
+        in different databases.
+      </p>
+      <p>
+        There is still a CLI, but the current service also exposes authenticated
+        REST access and a read-only MCP interface. REST and MCP answers share an
+        evidence envelope: the result travels with source references, freshness
+        information, supported capabilities, and warnings about ambiguity or
+        truncated output.
+      </p>
+      <p>
+        This is what makes the graph useful as an agent tool. The agent can inspect
+        both the dependency result and the reasons to trust or qualify it.
       </p>
     </section>
 
     <section aria-labelledby="loop-title">
       <div class="section-head">
-        <h2 id="loop-title">The core loop: blast before you edit</h2>
-        <p>Four steps, run before and after any risky change.</p>
-      </div>
-      <div class="timeline article-wide">
-        <article class="card step">
-          <span>01</span>
-          <h3>Identify</h3>
-          <p>Find the node you are about to touch - by name, layer, product, or keyword search.</p>
-        </article>
-        <article class="card step">
-          <span>02</span>
-          <h3>Query</h3>
-          <p>Run the narrowest useful command: blast for full impact, upstream for what breaks, downstream for what it depends on, flow for the execution path.</p>
-        </article>
-        <article class="card step">
-          <span>03</span>
-          <h3>Summarize</h3>
-          <p>Write down the affected upstream and downstream code and the cross-layer risks - before editing anything.</p>
-        </article>
-        <article class="card step">
-          <span>04</span>
-          <h3>Re-verify</h3>
-          <p>After the edit, rerun a focused query to confirm the dependencies you expected still resolve.</p>
-        </article>
+        <h2 id="loop-title">Check the answer before using it</h2>
       </div>
       <p>
-        A typical pre-change check reads like this: <code>blast</code> the stored
-        procedure you are about to modify; read the upstream list (every caller, in
-        every layer); skim the execution <code>flow</code> from the entry point to
-        the procedure. Ten seconds of querying replaces an hour of grep-and-hope -
-        and grep cannot see across layers anyway.
+        Our repository instructions make CodeGraph an early step in engineering
+        work. They also require checking the product, revision, freshness,
+        capabilities, ambiguity, and truncation of the returned evidence. Running
+        the query alone is not the whole procedure.
+      </p>
+      <ol>
+        <li><strong>Establish the scope.</strong> Resolve the object in the intended
+          product and check that the indexed revision is relevant to the checkout.</li>
+        <li><strong>Ask a focused question.</strong> Find callers, shared-component
+          consumers, table dependencies, or the structural path through the graph.</li>
+        <li><strong>Read the qualifications.</strong> Check freshness and coverage.
+          Investigate ambiguous matches and partial results before drawing conclusions.</li>
+        <li><strong>Plan the change and the checks.</strong> Name the callers whose
+          behavior should change and the callers whose behavior must stay the same.</li>
+        <li><strong>Verify against code and behavior.</strong> After editing, use an
+          index that matches the code being reviewed, inspect the changed dependencies,
+          and run focused checks on the affected and protected paths. Refreshing or
+          publishing a shared index follows its own controlled workflow.</li>
+      </ol>
+      <p>
+        A stale or incomplete answer should narrow what we claim. It should not
+        turn into a clean bill of health because the query returned successfully.
+        In the service contract, <code>PASS</code> means the question is answerable
+        against current evidence; it does not mean the change is safe.
+        <code>DEGRADED</code> keeps qualifications such as staleness visible, while
+        <code>AMBIGUOUS</code> flags matches that cannot be safely resolved to one
+        product. Source inspection, text search, and tests remain part of the workflow.
       </p>
     </section>
 
     <section aria-labelledby="questions-title">
       <div class="section-head">
-        <h2 id="questions-title">The questions it answers</h2>
-        <p>Each command is a question you would otherwise answer by reading code you have never seen.</p>
+        <h2 id="questions-title">The questions we ask</h2>
+        <p>These are simplified CLI forms; the result must be read within its indexed scope.</p>
       </div>
       <div class="scorecard article-wide">
         <table>
-          <thead>
-            <tr>
-              <th>Question</th>
-              <th>Command</th>
-              <th>What you get</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Question</th><th>Command</th><th>How to use the answer</th></tr></thead>
           <tbody>
-            <tr>
-              <td data-label="Question">What breaks if I change this?</td>
-              <td data-label="Command"><code>blast &lt;node&gt;</code></td>
-              <td data-label="What you get">Full upstream and downstream impact, every layer.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">Who calls this?</td>
-              <td data-label="Command"><code>upstream &lt;node&gt;</code></td>
-              <td data-label="What you get">Every dependent - including the legacy ones.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">What touches this table?</td>
-              <td data-label="Command"><code>table &lt;name&gt;</code></td>
-              <td data-label="What you get">All code and SQL that reads or writes it.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">Is this shared component safe to edit?</td>
-              <td data-label="Command"><code>consumers &lt;Component&gt;</code></td>
-              <td data-label="What you get">Every renderer, and which inputs each call site actually passes.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">What did my changes just touch?</td>
-              <td data-label="Command"><code>diff [git-ref]</code></td>
-              <td data-label="What you get">Changed files mapped to graph nodes and their blast radius.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">What would a rename break?</td>
-              <td data-label="Command"><code>rename &lt;old&gt; &lt;new&gt;</code></td>
-              <td data-label="What you get">Every reference that needs updating, before you start.</td>
-            </tr>
-            <tr>
-              <td data-label="Question">Is this endpoint really unused?</td>
-              <td data-label="Command"><code>unused</code></td>
-              <td data-label="What you get">Dead endpoints - with the confidence that nothing, in any layer, calls them.</td>
-            </tr>
+            <tr><td data-label="Question">What depends on this?</td><td data-label="Command"><code>blast &lt;node&gt;</code></td><td data-label="How to use the answer">Identify indexed dependencies to inspect before changing it.</td></tr>
+            <tr><td data-label="Question">Who calls this?</td><td data-label="Command"><code>upstream &lt;node&gt;</code></td><td data-label="How to use the answer">Find callers whose assumptions may need checking.</td></tr>
+            <tr><td data-label="Question">What uses this table?</td><td data-label="Command"><code>table &lt;name&gt;</code></td><td data-label="How to use the answer">Trace indexed readers and writers across layers.</td></tr>
+            <tr><td data-label="Question">Which screens use this component?</td><td data-label="Command"><code>consumers &lt;Component&gt; --product &lt;product&gt; --show-inputs</code></td><td data-label="How to use the answer">Inspect callers and supplied inputs before changing shared behavior.</td></tr>
+            <tr><td data-label="Question">What did this branch touch?</td><td data-label="Command"><code>diff [git-ref]</code></td><td data-label="How to use the answer">Map changed files to graph nodes and their dependencies.</td></tr>
+            <tr><td data-label="Question">How are these pieces connected?</td><td data-label="Command"><code>flow &lt;node&gt;</code></td><td data-label="How to use the answer">Inspect a structural path; this is not a runtime execution trace.</td></tr>
           </tbody>
         </table>
       </div>
       <p>
-        The <code>consumers</code> command deserves special mention. Shared Angular
-        components fail in a specific, nasty way: you guard a behavior change
-        behind an <code>@Input</code> that most call sites never pass.
-        <code>consumers</code> lists every component that renders the target and
-        which inputs each one actually supplies - it catches "I guarded my change
-        on an input that thirteen of fifteen screens never pass" before review does.
+        Other commands help investigate renames and apparently unused endpoints.
+        CLI commands do not all carry the REST and MCP service’s safeguards.
+        They produce candidates for review. An endpoint with no indexed callers
+        may still have a caller outside the indexed sources.
       </p>
     </section>
 
-    <section aria-labelledby="agents-title">
+    <section aria-labelledby="component-title">
       <div class="section-head">
-        <h2 id="agents-title">Why agents need it more than we do</h2>
-        <p>
-          A human edits one file and holds the blast radius in their head. An agent
-          edits thirty and holds nothing - unless you give it a tool that answers
-          the question.
-        </p>
+        <h2 id="component-title">Protect the callers that did not ask for a change</h2>
       </div>
       <p>
-        In our operating model, the rule is explicit: <em>CodeGraph comes first</em>
-        - before database queries, before code changes, before any cross-layer work.
-        The graph is what makes that rule executable instead of aspirational. The
-        agent runs <code>blast</code>, reads the result, and only then proposes the
-        change; the blast radius becomes part of the plan, not part of the post-mortem.
+        Shared UI components make the value of this workflow concrete. Suppose
+        one invoice screen needs a more compact totals panel. A component-level
+        change can also alter quotation or purchasing screens that use the same panel.
       </p>
       <p>
-        Two commands matter most in agentic sessions. <code>diff</code> maps the
-        agent's own changes back onto the graph - "you touched these nodes; here is
-        what depends on them" - which turns a thirty-file diff into a reviewable
-        impact statement. And <code>blast</code> before a change is the difference
-        between an agent that asks permission with evidence and one that asks
-        forgiveness from production.
+        The frontend instructions pair <code>consumers --show-inputs</code> with
+        a selector search in the source. The aim is to identify both sets of
+        callers: the ones that need the new presentation and the ones that need
+        the existing presentation preserved.
       </p>
       <p>
-        This is the same thesis as the
-        <a href="../second-brain/knowledge-management-layer-success-it.html">knowledge
-        management layer</a>: retrieval tells an agent what the codebase contains;
-        a dependency graph tells it what the codebase <em>owes</em> to each piece.
-        Agents that know what they might break are the ones you can trust with
-        write access.
+        The current code contains this pattern: optional presentation inputs retain
+        existing behavior by default, and verification fixtures mount the real
+        shared totals component for different caller cases. Those checks assert
+        which labels, headings, and dropdowns should be present, and which should
+        be absent.
+      </p>
+      <p>
+        The graph helps find the callers. The fixtures check their behavior.
+        Together, they turn “this component is shared” into a specific review
+        question: did the intended screen change while the protected callers
+        kept the behavior they rely on?
       </p>
     </section>
 
-    <section aria-labelledby="practice-title">
+    <section aria-labelledby="reports-title">
       <div class="section-head">
-        <h2 id="practice-title">What it changes in practice</h2>
-        <p>Three decisions that go differently once the graph answers first.</p>
-      </div>
-      <div class="blueprint article-wide">
-        <div class="blueprint-list">
-          <div class="blueprint-row">
-            <strong>The rename that didn't happen</strong>
-            <p>A table rename looked safe in the modern code. The graph showed legacy VBA queries referencing it by the old name in three products. Decision: alias, don't rename.</p>
-          </div>
-          <div class="blueprint-row">
-            <strong>The "unused" endpoint that wasn't</strong>
-            <p>An endpoint with no modern callers was queued for deletion. Upstream analysis found a legacy form calling it directly. Decision: keep it, document it.</p>
-          </div>
-          <div class="blueprint-row">
-            <strong>The shared component that got a new input</strong>
-            <p>A behavior change to a widely-rendered component would have silently altered screens that never opted in. The consumers list made the opt-in explicit. Decision: new input, default to old behavior.</p>
-          </div>
-        </div>
+        <h2 id="reports-title">Some dependencies live in configuration</h2>
       </div>
       <p>
-        None of these were exotic. They are the ordinary, daily near-misses of a
-        multi-layer codebase - the kind that used to surface as support tickets a
-        week after a release. The graph moves them to before the edit, where they
-        cost ten seconds instead of a week.
+        Reports reveal a different challenge. A Jasper template can consume JSON
+        while the backend selects a stored procedure using a value supplied at
+        runtime. Reading the backend source alone may not reveal which procedure
+        belongs to which report.
+      </p>
+      <p>
+        The report indexer includes explicit template-to-procedure bindings for
+        this gap. It checks authoritative mappings first, then supports a labelled
+        convention-based fallback. That fallback only links to a procedure that
+        already exists in the graph; it does not invent one from a plausible name.
+      </p>
+      <p>
+        There is a useful boundary here. A declared report field can establish a
+        JSON key the template expects. It does not, on its own, prove which SQL
+        column supplied that value. Keeping those claims separate makes the graph
+        more useful than presenting every inferred relationship as equally certain.
+      </p>
+    </section>
+
+    <section aria-labelledby="limits-title">
+      <div class="section-head">
+        <h2 id="limits-title">A dependency answer is not a safety guarantee</h2>
+      </div>
+      <p>
+        A graph can be stale. Its indexers can miss a relationship. A dynamic call
+        can be unresolved. A query can stop at an output limit. These are properties
+        of the evidence that need to stay visible when an agent summarizes it.
+      </p>
+      <p>
+        Even a correctly indexed relationship says little about whether behavior
+        remains compatible. A report can still call the same procedure and fail
+        because its result shape changed. A screen can still render the same
+        component and show the wrong total.
+      </p>
+      <p>
+        The layers work together by answering different questions. Success Brain
+        preserves meaning and decisions. Abstractions concentrate implementation.
+        Pattern lints discourage known regressions. CodeGraph makes structural
+        consequences visible. Verifiers provide executable evidence for the cases
+        we have defined.
+      </p>
+      <p>
+        After a change, durable business lessons belong in Success Brain; tests,
+        code-specific quirks, and implementation instructions stay with the product
+        repository. That keeps both the next agent and the next reviewer better
+        informed without asking any one layer to stand in for all the others.
+      </p>
+      <p class="note">
+        Implementation reviewed on 21 September 2026. Examples are generalized from
+        repository instructions, source, and verification fixtures. They describe
+        implemented capabilities, not a live deployment audit or a new test run.
       </p>
     </section>
 
