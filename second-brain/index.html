@@ -14,25 +14,19 @@
     <meta property="og:description" content="Research on building second brains for personal and corporate use - knowledge management layers, ontologies, and knowledge graph research published on this site." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://jensenloke.github.io/second-brain/" />
-  </head>
+      <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
   <body>
-    <canvas id="site-field" aria-hidden="true"></canvas>
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="palette-strip" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <header class="home-header">
-      <nav class="home-nav" aria-label="Main navigation">
-        <a class="brand" href="../">Jensen Loke</a>
-        <input type="checkbox" id="nav-toggle" class="nav-check" />
-        <label for="nav-toggle" class="nav-toggle">Menu</label>
-        <div class="nav-links">
-          <a href="../essays/" aria-current="page">Essays</a>
-          <a href="../talks/">Talks &amp; Trainings</a>
-          <a href="../work/">Projects</a>
-        </div>
-      </nav>
-    </header>
+    <header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header>
 
     <div class="site-shell">
       <div class="page-head">
@@ -51,6 +45,7 @@
           <p class="section-label" id="writing-title">Writing</p>
           <div class="entry-list">
             <a class="entry" href="./knowledge-management-layer-success-it.html">
+              <span class="number">01</span>
               <div>
                 <p class="entry-meta">Knowledge systems - Agent platforms</p>
                 <h2>Why a Knowledge Management Layer Still Matters</h2>
@@ -72,6 +67,7 @@
           <p class="section-label" id="research-title">Published research</p>
           <div class="entry-list">
             <a class="entry" href="../essays/two-brains-one-operator.html">
+              <span class="number">02</span>
               <div>
                 <p class="entry-meta">Agent memory &middot; Governance &middot; Qwen</p>
                 <h2>Two Brains, One Operator</h2>
@@ -96,7 +92,8 @@
             </div>
 
             <!--
-              Published KG research: add an <a class="entry"> block above
+              Published KG research: add an <a class="entry">
+              <span class="number">03</span> block above
               this comment, newest first. Papers live in essays/<slug>.html (start from
               papers/template.html) and are listed both here and in essays/index.html.
             -->
@@ -110,36 +107,17 @@
       </main>
     </div>
 
-        <footer class="site-footer">
-      <div class="footer-grid">
-        <div>
-          <h2>Jensen Loke</h2>
-          <p>Writing about useful systems - agentic coding, AI agents, and knowledge that works.</p>
-        </div>
-        <div>
-          <h2>Site</h2>
-          <ul>
-            <li><a href="../essays/">Essays</a></li>
-            <li><a href="../talks/">Talks &amp; Trainings</a></li>
-            <li><a href="../work/">Projects</a></li>
-          </ul>
-        </div>
-        <div>
-          <h2>Elsewhere</h2>
-          <ul>
-            <li><a href="https://github.com/jensenloke" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a href="https://github.com/Success-IT" target="_blank" rel="noopener">Success IT</a></li>
-            <li><a href="https://www.linkedin.com/in/jensenloke/" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li><a href="https://x.com/jensenloke" target="_blank" rel="noopener">X</a></li>
-            <li><a href="https://www.youtube.com/@jensenloke" target="_blank" rel="noopener">YouTube</a></li>
-            <li><a href="https://huggingface.co/jensenloke" target="_blank" rel="noopener">Hugging Face</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-base">
-        <p>Copyright 2026 Jensen Loke.</p>
-      </div>
-    </footer>
-      <script src="../assets/droplets.js" defer></script>
+        <footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer>
   </body>
 </html>

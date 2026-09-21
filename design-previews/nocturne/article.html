@@ -1,55 +1,16 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Two Brains, One Operator - Jensen Loke</title>
-    <meta
-      name="description"
-      content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge."
-    />
-    <link rel="stylesheet" href="../assets/styles.css" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
-    <meta property="og:title" content="Two Brains, One Operator - Jensen Loke" />
-    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen planned the architecture and audited 1,837 pages of company knowledge." />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://jensenloke.github.io/essays/two-brains-one-operator.html" />
-    <style>
-      /* Paper-scoped figure system */
-      .paper-fig svg { width: 100%; height: auto; display: block; }
-      .paper-fig { margin-top: 26px; margin-bottom: 8px; }
-      .figcap strong { color: var(--accent); font-weight: 600; }
-      .grid-2, .grid-3, .grid-4 { display: grid; gap: 12px; }
-      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .grid-2 .card, .grid-3 .card, .grid-4 .card { padding: 16px; }
-      .grid-2 p, .grid-3 p, .grid-4 p { margin-bottom: 0; color: var(--muted); font-size: 0.92rem; }
-      @media (max-width: 980px) {
-        .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      }
-      @media (max-width: 640px) {
-        .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      }
-    </style>
-      <link rel="stylesheet" href="/assets/cues.css">
-    <script src="/assets/cues.js" defer></script>
-</head>
-<body><a class="skip-link" href="#main">Skip to content</a><header class="site-nav">
-  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
-  <nav aria-label="Main navigation">
-    <a href="/essays/" aria-current="page">Essays</a>
-    <a href="/talks/">Talks &amp; Trainings</a>
-    <a href="/work/">Projects</a>
-  </nav>
-</header><div class="article-hero"><p class="article-kicker">Building a Second Brain &middot; Qwen</p>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Two Brains, One Operator · Nocturne preview</title><link rel="stylesheet" href="styles.css"></head><body>
+<a class="skip-link" href="#main">Skip to content</a>
+<aside class="preview" aria-label="Design preview"><span>Design C / Nocturne</span><div class="preview-links"><a href="/design-previews/">Compare</a><a href="/design-previews/editorial/">A</a><a href="/design-previews/atelier/">B</a><a href="/design-previews/nocturne/" aria-current="page">C</a></div></aside>
+<header class="site-header"><nav aria-label="Main navigation"><a class="brand" href="index.html">Jensen Loke<span class="brand-dot" aria-hidden="true">.</span></a><div class="nav-links"><a href="essays.html" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></div></nav></header>
+<header class="reading-head"><a class="back" href="essays.html">← All essays</a><p class="article-kicker">Building a Second Brain &middot; Qwen</p>
         <h1 class="article-title">Two Brains, One Operator</h1>
         <p class="article-subtitle">
           Why personal and corporate agent memory must split, how each half is
           governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks
           planned the architecture and audited 1,837 pages of company knowledge.
         </p>
-        <p class="article-byline">Jensen Loke &middot; September 2026 &middot; ~15 min read</p></div><main class="article" id="main">
+        <p class="article-byline">Jensen Loke &middot; September 2026 &middot; ~15 min read</p></header><main class="article" id="main">
       <section>
         <p class="note">
           Public note: this paper describes a real production system but uses
@@ -98,8 +59,8 @@
           </p>
         </div>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: the personal Hermes fleet and the company OpenClaw fleet, separated by a wall, each connecting to its own brain.">
-          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+        <div class="paper-fig article-wide" role="group" aria-label="Diagram: the personal Hermes fleet and the company OpenClaw fleet, separated by a wall, each connecting to its own brain." tabindex="0">
+          <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aT" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
@@ -157,7 +118,7 @@
             <text x="770" y="374" font-size="11" text-anchor="middle" fill="var(--muted)">enforced integrity boundary</text>
             <line x1="235" y1="266" x2="235" y2="326" stroke="var(--teal)" stroke-width="2" marker-end="url(#aT)" />
             <line x1="770" y1="266" x2="770" y2="326" stroke="var(--good)" stroke-width="2" marker-end="url(#aG)" />
-          </svg></div>
+          </svg>
           <p class="figcap"><strong>Figure 1.</strong> Two fleets, two trust domains. Each platform connects to its own brain over MCP; the wall is physical, not procedural.</p>
         </div>
 
@@ -284,8 +245,8 @@
           </p>
         </div>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: agent writes flow into the unreviewed captures tier through an intake scrub, a nightly verifier produces recommend-only digests, and only a human git PR can promote knowledge into the reviewed tier; a barrier blocks agents from writing to reviewed directly.">
-          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+        <div class="paper-fig article-wide" role="group" aria-label="Diagram: agent writes flow into the unreviewed captures tier through an intake scrub, a nightly verifier produces recommend-only digests, and only a human git PR can promote knowledge into the reviewed tier; a barrier blocks agents from writing to reviewed directly." tabindex="0">
+          <svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aM" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
@@ -347,7 +308,7 @@
 
             <!-- Git authority note -->
             <text x="20" y="322" font-size="11.5" fill="var(--muted)">Durable authority: git-backed Markdown. Database and vector index are projections - diffable, revertible, replaceable.</text>
-          </svg></div>
+          </svg>
           <p class="figcap"><strong>Figure 2.</strong> The company knowledge pipeline. Agents can only enter at captures; the only path to the reviewed tier runs through a human and a git PR.</p>
         </div>
 
@@ -375,7 +336,7 @@
           the opposite failure - a human review queue so large that nothing ever
           gets reviewed.
         </p>
-        <div class="timeline article-wide">
+        <div class="timeline article-wide" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
           <article class="card step">
             <span>01</span>
             <h3>Capture</h3>
@@ -541,8 +502,8 @@
           </p>
         </div>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: four layers - devices on top, then harnesses, then the two brains, then one master skill registry at the bottom - connected by MCP.">
-          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+        <div class="paper-fig article-wide" role="group" aria-label="Diagram: four layers - devices on top, then harnesses, then the two brains, then one master skill registry at the bottom - connected by MCP." tabindex="0">
+          <svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aM2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
@@ -604,7 +565,7 @@
 
             <text x="500" y="420" font-size="12" text-anchor="middle" fill="var(--muted)">Any harness on any device discovers the same skills the same way - connect-and-go.</text>
             <text x="500" y="442" font-size="11" text-anchor="middle" fill="var(--muted)">routing policy travels inside the MCP connection itself</text>
-          </svg></div>
+          </svg>
           <p class="figcap"><strong>Figure 3.</strong> The four-layer adapter stack. Skills, harness conventions, and device knowledge live in the brain, not in each harness's private configuration.</p>
         </div>
 
@@ -677,8 +638,8 @@
           lives in the brain, not in any harness.
         </p>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: any harness loads the memory-verb skill from the brain over MCP; the skill routes writes and reads to either the personal brain or the company brain based on ownership, never both.">
-          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+        <div class="paper-fig article-wide" role="group" aria-label="Diagram: any harness loads the memory-verb skill from the brain over MCP; the skill routes writes and reads to either the personal brain or the company brain based on ownership, never both." tabindex="0">
+          <svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aR1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
@@ -722,7 +683,7 @@
             <rect x="30" y="262" width="940" height="52" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
             <text x="500" y="284" font-size="12" text-anchor="middle" fill="var(--ink)">Routing rules live in the skill: explicit destination wins &middot; ambiguous &rarr; ask, never guess &middot; never dual-write &middot; search one brain only</text>
             <text x="500" y="302" font-size="11" text-anchor="middle" fill="var(--muted)">change the rules once in the brain - every harness on every device updates</text>
-          </svg></div>
+          </svg>
           <p class="figcap"><strong>Figure 4.</strong> Memory routing as a served skill. The split is enforced at the routing layer, so no harness can accidentally cross it.</p>
         </div>
 
@@ -756,8 +717,8 @@
           </p>
         </div>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: Qwen 3.8 Max feeds planning outputs - architecture, policy RFC, scrub and runner design; Qwen 3.8 Flash Next on two DGX Sparks feeds the 1,837-page sweep and its 36 digests; a footer notes reasoning stayed in-network.">
-          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+        <div class="paper-fig article-wide" role="group" aria-label="Diagram: Qwen 3.8 Max feeds planning outputs - architecture, policy RFC, scrub and runner design; Qwen 3.8 Flash Next on two DGX Sparks feeds the 1,837-page sweep and its 36 digests; a footer notes reasoning stayed in-network." tabindex="0">
+          <svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aT2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
@@ -799,7 +760,7 @@
             <!-- Footer bar -->
             <rect x="30" y="290" width="940" height="34" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
             <text x="500" y="312" font-size="12" text-anchor="middle" fill="var(--muted)">Reasoning in-network - company content never left the LAN during the sweep.</text>
-          </svg></div>
+          </svg>
           <p class="figcap"><strong>Figure 5.</strong> Judgment gets the strongest model; volume gets cheap local throughput. Neither role alone would have worked.</p>
         </div>
 
@@ -925,22 +886,11 @@
             <h2>Everyone Gets a Jarvis</h2>
             <p>Bounded agents package colleagues' expertise while people retain authority - the governance stance this paper operationalizes.</p>
           </a>
-          <a class="hub-card featured-card" href="/essays/">
+          <a class="hub-card featured-card" href="essays.html">
             <h2>Essays</h2>
             <p>Every article across the tracks, searchable by title, excerpt, and date.</p>
           </a>
         </div>
       </section>
-    </main><footer class="footer">
-  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
-  <div class="footer-socials" aria-label="Social profiles">
-    <a href="https://github.com/jensenloke">GitHub ↗</a>
-    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
-    <a href="https://x.com/jensenloke">X ↗</a>
-    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
-    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
-    <a href="https://github.com/Success-IT">Success IT ↗</a>
-  </div>
-  <p>Singapore<br>© 2026</p>
-</footer></body>
-</html>
+    </main>
+<footer><div><a class="brand" href="index.html">Jensen Loke.</a><p>Useful systems. Thoughtful work.</p></div><div class="footer-links"><a href="https://github.com/jensenloke">GitHub</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn</a><a href="https://x.com/jensenloke">X</a></div><p class="copyright">© 2026 Jensen Loke · Singapore</p></footer></body></html>

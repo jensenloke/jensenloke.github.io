@@ -30,7 +30,7 @@ Cross-cutting pages (not tracks). The nav groups everything as **Essays · Talks
 - Track index pages carry an HTML comment marking where new entries go (newest first). Empty tracks show an `.empty-note` describing what is planned.
 - Talk media lives in `talks/<talk-slug>/public-assets/` and must be **safe to publish publicly**. Confidential screenshots (e.g. internal product UI) are deliberately excluded — don't pull media in from outside the repo.
 - Plain semantic HTML with accessibility attributes (aria-labels, landmarks); system font stacks only, no web fonts.
-- `assets/styles.css` is the shared design system (mint/teal/slate palette, Inter/system font stack, 8px radii) for homepage, tracks, indexes, articles, and papers. Talk decks keep their styles inline.
+- `assets/styles.css` is the shared Atelier design system (cool white, cobalt accents, system sans-serif typography, ruled rows) for homepage, tracks, indexes, articles, and papers. `assets/cues.css` and `assets/cues.js` add finite brand/row interactions and article reading progress; honor reduced-motion settings and avoid background animation loops. Talk decks keep their styles inline.
 
 ## Workflow
 
