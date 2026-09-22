@@ -284,6 +284,15 @@
             The company half must solve one problem above all others: many writers,
             most of them models, none of them allowed to decide what is true.
           </p>
+          <p class="note">
+            Historical section (as built and audited, early to mid September 2026).
+            The captures tier, nightly verifier digest, and human-PR promotion gate
+            described here were retired on 21&ndash;22 September 2026 in favour of
+            server-enforced per-agent write fences in the stock engine. It is kept
+            as the record of what the audit in &sect;4 tested; the current design
+            and the reasons for the change are in the
+            <a href="#revision-2026-09">Revision</a> at the end.
+          </p>
         </div>
 
         <div class="paper-fig article-wide" role="img" aria-label="Diagram: agent writes flow into the unreviewed captures tier through an intake scrub, a nightly verifier produces recommend-only digests, and only a human git PR can promote knowledge into the reviewed tier; a barrier blocks agents from writing to reviewed directly.">
@@ -350,7 +359,7 @@
             <!-- Git authority note -->
             <text x="20" y="322" font-size="11.5" fill="var(--muted)">Durable authority: git-backed Markdown. Database and vector index are projections - diffable, revertible, replaceable.</text>
           </svg></div>
-          <p class="figcap"><strong>Figure 2.</strong> The company knowledge pipeline. Agents can only enter at captures; the only path to the reviewed tier runs through a human and a git PR.</p>
+          <p class="figcap"><strong>Figure 2.</strong> The company knowledge pipeline as built in September 2026 (superseded 22 Sep 2026 &mdash; see the Revision). Agents could only enter at captures; the only path to the reviewed tier ran through a human and a git PR.</p>
         </div>
 
         <div class="grid-4 article-wide">
