@@ -6,12 +6,12 @@
     <title>Two Brains, One Operator - Jensen Loke</title>
     <meta
       name="description"
-      content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge. Revised September 2026: records the move from human-gated promotion to server-enforced write fences."
+      content="Why personal and corporate agent memory must split, how each half is governed - server-enforced write fences for the company brain, a permissive universal adapter for the personal one - and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge."
     />
     <link rel="stylesheet" href="../assets/styles.css" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
     <meta property="og:title" content="Two Brains, One Operator - Jensen Loke" />
-    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen planned the architecture and audited 1,837 pages of company knowledge. Revised September 2026: records the move to server-enforced write fences." />
+    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed - server-enforced write fences for the company brain, a permissive universal adapter for the personal one - and how Qwen planned the architecture and audited 1,837 pages of company knowledge." />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://jensenloke.github.io/essays/two-brains-one-operator.html" />
     <style>
@@ -74,18 +74,20 @@
             and different costs of being wrong.
           </p>
           <p>
-            I describe both halves. The company brain enforces an integrity
-            boundary in the server itself - agents write only to an unreviewed
-            tier; humans promote through git - and was audited by a local-model
-            verifier loop that swept 1,837 pages and surfaced real credential
-            leaks. The personal brain plays a different role: a universal harness
-            adapter that serves skills, harness configuration, and a device
-            framework to any agent harness on any device. Both halves were built
-            with Qwen: Qwen 3.8 Max for architecture and policy design, and
-            Qwen 3.8 Flash Next served from two NVIDIA DGX Sparks for the
-            high-volume audit. A dated revision at the end records the September
-            2026 move from human-gated promotion to server-enforced write fences,
-            and credits the tools - Qwen, Devin, Codex - that built each part.
+            I describe both halves. The company brain is one shared source with
+            server-enforced write fences per agent - an agent can only write
+            inside its own prefixes, a frozen archive is searchable and labelled
+            historical, and I approve clients and handle exceptions. It was
+            audited by a local-model verifier loop that swept 1,837 pages and
+            surfaced real credential leaks. The personal brain plays a different
+            role: a universal harness adapter that serves skills, harness
+            configuration, and a device framework to any agent harness on any
+            device. Both halves were built with Qwen: Qwen 3.8 Max for
+            architecture and policy design, and Qwen 3.8 Flash Next served from
+            two NVIDIA DGX Sparks for the high-volume audit. Revision notes at
+            the end record the earlier human-gated design and why I replaced it;
+            Section 6 credits the tools - Qwen, Devin, Codex - that built each
+            part.
           </p>
         </div>
       </section>
@@ -180,8 +182,9 @@
               Several enrolled agents - support, engineering, synthesis,
               verification - plus humans, all writing about customers, tickets,
               products, and credentials. A wrong or leaked page can harm people
-              outside the building. Memory must be governed: nothing an agent
-              writes becomes company truth without a human signature.
+              outside the building. Memory must be governed: every agent writes
+              only inside a fence the server enforces, and Git history is the
+              audit trail.
             </p>
           </div>
         </div>
@@ -228,7 +231,7 @@
               <tr>
                 <td data-label="Property">Promotion model</td>
                 <td data-label="Personal">Self-promoting. Write it, it is true for you.</td>
-                <td data-label="Company">Human-gated. An agent's write is a claim, never truth.</td>
+                <td data-label="Company">Fenced. Agents write directly, but only where the server lets them; every write is a revision in Git.</td>
               </tr>
               <tr>
                 <td data-label="Property">Failure containment</td>
@@ -279,97 +282,117 @@
 
       <section id="company" aria-labelledby="s3-title">
         <div class="section-head">
-          <h2 id="s3-title">3. The Company Brain: Integrity by Construction</h2>
+          <h2 id="s3-title">3. The Company Brain: Fences, Not Gates</h2>
           <p>
             The company half must solve one problem above all others: many writers,
-            most of them models, none of them allowed to decide what is true.
-          </p>
-          <p class="note">
-            Historical section (as built and audited, early to mid September 2026).
-            The captures tier, nightly verifier digest, and human-PR promotion gate
-            described here were retired on 21&ndash;22 September 2026 in favour of
-            server-enforced per-agent write fences in the stock engine. It is kept
-            as the record of what the audit in &sect;4 tested; the current design
-            and the reasons for the change are in the
-            <a href="#revision-2026-09">Revision</a> at the end.
+            most of them models, and no reviewer with time to read them all.
           </p>
         </div>
+        <p>
+          One engine - stock upstream GBrain 0.51 with its managed writer - serves
+          three sources. One shared company source, ~750 pages: the shared
+          documentation folders (decisions, standards, domain, platform, runbooks,
+          incidents, sources) plus a <code>products/&lt;product&gt;/</code> folder
+          per registered product and an <code>agents/&lt;agent&gt;/</code> folder
+          per writer. A frozen <code>archive</code> source holds ~1,160 historical
+          imports - searchable, read-only, every hit labelled historical. A
+          restricted <code>internal</code> source sits empty with no grants,
+          created so restricted material has a home the agents cannot see.
+        </p>
+        <p>
+          Every writer is a fenced client. Each agent's credential - an OAuth
+          client I approve once in the admin page - carries a server-enforced
+          list of write prefixes: its own <code>agents/&lt;name&gt;/</code>
+          folder plus <code>products/</code>. A write outside the fence returns
+          permission-denied from the server; I verified that live, it is not
+          policy prose. Reads span the shared source and the archive.
+        </p>
+        <p>
+          The write protocol is revision-safe and asynchronous. The agent reads
+          the page, rewrites it, and calls <code>put_page</code> with the expected
+          revision and a request id; the caller polls a receipt until the write
+          is committed and the Markdown file is on disk. A lost response replays
+          the same request id; a revision conflict is re-read and retried, never
+          forced.
+        </p>
+        <p>
+          Git-backed Markdown stays the authority; the database and the vector
+          index are projections. Nightly native maintenance - backlinks,
+          embeddings, orphan scan, a weekly exceptions digest - runs inside the
+          engine. There is no custom verifier and no review queue.
+        </p>
+        <p>
+          My role shrank to the edges: approve a new client, set its fence,
+          handle destructive operations, and decide anything touching
+          <code>internal</code> or the topology. Everything else is agents
+          writing.
+        </p>
 
-        <div class="paper-fig article-wide" role="img" aria-label="Diagram: agent writes flow into the unreviewed captures tier through an intake scrub, a nightly verifier produces recommend-only digests, and only a human git PR can promote knowledge into the reviewed tier; a barrier blocks agents from writing to reviewed directly.">
+        <div class="paper-fig article-wide" role="img" aria-label="Diagram: a fenced agent client approved once over OAuth writes put_page inside its agents/name or products prefixes into one shared company source; a dashed red barrier marks the server-enforced fence returning permission denied outside the prefix; archive and internal sources sit beside it; a bottom strip shows nightly native maintenance.">
           <div class="diagram-scroll" tabindex="0" role="region" aria-label="Figure diagram; scroll horizontally to explore"><svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
             <defs>
               <marker id="aM" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 z" fill="var(--muted)" />
               </marker>
-              <marker id="aW" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                <path d="M0,0 L8,4 L0,8 z" fill="var(--warning)" />
+              <marker id="aT3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--teal)" />
               </marker>
-              <marker id="aG2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                <path d="M0,0 L8,4 L0,8 z" fill="var(--good)" />
+              <marker id="aD" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="var(--danger)" />
               </marker>
             </defs>
 
-            <!-- Main flow row -->
-            <rect x="20" y="70" width="128" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
-            <text x="84" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Agent writes</text>
-            <text x="84" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">MCP put_page</text>
+            <!-- Fenced client -->
+            <rect x="20" y="70" width="180" height="70" rx="10" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="110" y="98" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Fenced agent client</text>
+            <text x="110" y="120" font-size="10.5" text-anchor="middle" fill="var(--muted)">OAuth &middot; approved once</text>
 
-            <rect x="188" y="70" width="170" height="60" rx="10" fill="var(--mint-fill)" stroke="var(--teal)" stroke-width="1.5" />
-            <text x="273" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Captures tier</text>
-            <text x="273" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">unreviewed &middot; ~1,900 pages</text>
+            <!-- Allowed write arrow -->
+            <line x1="200" y1="105" x2="316" y2="105" stroke="var(--teal)" stroke-width="2" marker-end="url(#aT3)" />
+            <text x="258" y="38" font-size="11" text-anchor="middle" fill="var(--muted)">put_page inside</text>
+            <text x="258" y="54" font-size="11" text-anchor="middle" fill="var(--muted)">agents/&lt;name&gt;/ or products/</text>
 
-            <rect x="398" y="70" width="128" height="60" rx="10" fill="var(--warn-bg)" stroke="var(--warning)" stroke-width="1.5" />
-            <text x="462" y="96" font-size="12.5" text-anchor="middle" fill="var(--warn-ink)">Intake scrub</text>
-            <text x="462" y="114" font-size="10.5" text-anchor="middle" fill="var(--warn-ink)">secrets redacted</text>
+            <!-- Shared company source -->
+            <rect x="320" y="60" width="250" height="90" rx="12" fill="var(--mint-fill)" stroke="var(--teal)" stroke-width="1.5" />
+            <text x="445" y="88" font-size="13" font-weight="700" text-anchor="middle" fill="var(--teal)">Shared company source</text>
+            <text x="445" y="110" font-size="11" text-anchor="middle" fill="var(--muted)">~750 pages &middot; folders by subject</text>
+            <text x="445" y="130" font-size="10.5" text-anchor="middle" fill="var(--muted)">products/&lt;id&gt;/ &middot; agents/&lt;name&gt;/</text>
 
-            <rect x="566" y="70" width="140" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
-            <text x="636" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Nightly verifier</text>
-            <text x="636" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">local model &middot; checks</text>
+            <!-- Denied write -->
+            <line x1="110" y1="140" x2="110" y2="220" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#aD)" />
+            <rect x="200" y="190" width="240" height="70" rx="10" fill="var(--surface)" stroke="var(--danger)" stroke-width="1.5" stroke-dasharray="5 4" />
+            <text x="320" y="216" font-size="12" text-anchor="middle" fill="var(--danger)">outside its prefix</text>
+            <text x="320" y="238" font-size="10.5" text-anchor="middle" fill="var(--danger)">server-enforced fence: write &rarr; permission denied</text>
+            <line x1="110" y1="220" x2="196" y2="220" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" />
 
-            <rect x="746" y="70" width="150" height="60" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
-            <text x="821" y="96" font-size="12.5" text-anchor="middle" fill="var(--ink)">Digest</text>
-            <text x="821" y="114" font-size="10.5" text-anchor="middle" fill="var(--muted)">recommend-only</text>
+            <!-- Archive and internal -->
+            <rect x="640" y="40" width="240" height="62" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="760" y="66" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">archive</text>
+            <text x="760" y="88" font-size="10.5" text-anchor="middle" fill="var(--muted)">~1,160 imports &middot; read-only &middot; labelled historical</text>
+            <rect x="640" y="120" width="240" height="62" rx="10" fill="var(--surface)" stroke="var(--border-soft)" />
+            <text x="760" y="146" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">internal</text>
+            <text x="760" y="168" font-size="10.5" text-anchor="middle" fill="var(--muted)">restricted &middot; no agent grants</text>
+            <line x1="570" y1="90" x2="636" y2="70" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#aM)" />
+            <line x1="570" y1="120" x2="636" y2="150" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" />
 
-            <line x1="148" y1="100" x2="184" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
-            <line x1="358" y1="100" x2="394" y2="100" stroke="var(--warning)" stroke-width="2" marker-end="url(#aW)" />
-            <line x1="526" y1="100" x2="562" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
-            <line x1="706" y1="100" x2="742" y2="100" stroke="var(--muted)" stroke-width="2" marker-end="url(#aM)" />
-
-            <!-- Promotion row -->
-            <rect x="566" y="230" width="140" height="60" rx="10" fill="var(--panel)" stroke="var(--accent)" stroke-width="1.5" />
-            <text x="636" y="256" font-size="12.5" text-anchor="middle" fill="var(--ink)">Human PR</text>
-            <text x="636" y="274" font-size="10.5" text-anchor="middle" fill="var(--muted)">git &middot; diffable &middot; revertible</text>
-
-            <rect x="746" y="230" width="150" height="60" rx="10" fill="rgba(78, 203, 154, 0.1)" stroke="var(--good)" stroke-width="1.5" />
-            <text x="821" y="256" font-size="12.5" text-anchor="middle" fill="var(--good)">Reviewed tier</text>
-            <text x="821" y="274" font-size="10.5" text-anchor="middle" fill="var(--muted)">company truth &middot; 19 pages</text>
-
-            <line x1="821" y1="130" x2="821" y2="168" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" />
-            <line x1="821" y1="168" x2="636" y2="168" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" />
-            <line x1="636" y1="168" x2="636" y2="226" stroke="var(--accent)" stroke-width="2" marker-end="url(#aM)" />
-            <line x1="706" y1="260" x2="742" y2="260" stroke="var(--good)" stroke-width="2" marker-end="url(#aG2)" />
-
-            <!-- Barrier -->
-            <line x1="273" y1="150" x2="273" y2="290" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" opacity="0.75" />
-            <line x1="273" y1="290" x2="742" y2="290" stroke="var(--danger)" stroke-width="2" stroke-dasharray="7 6" opacity="0.75" />
-            <text x="290" y="200" font-size="11.5" fill="var(--danger)">server-enforced barrier:</text>
-            <text x="290" y="218" font-size="11.5" fill="var(--danger)">agent write to reviewed</text>
-            <text x="290" y="236" font-size="11.5" fill="var(--danger)">&rarr; permission denied</text>
+            <!-- Maintenance strip -->
+            <rect x="20" y="288" width="860" height="30" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
+            <text x="450" y="307" font-size="11.5" text-anchor="middle" fill="var(--muted)">Nightly native maintenance: backlinks &middot; embeddings &middot; orphans &middot; weekly exceptions</text>
 
             <!-- Git authority note -->
-            <text x="20" y="322" font-size="11.5" fill="var(--muted)">Durable authority: git-backed Markdown. Database and vector index are projections - diffable, revertible, replaceable.</text>
+            <text x="20" y="336" font-size="11.5" fill="var(--muted)">Durable authority: git-backed Markdown. Database and vector index are projections - diffable, revertible, replaceable.</text>
           </svg></div>
-          <p class="figcap"><strong>Figure 2.</strong> The company knowledge pipeline as built in September 2026 (superseded 22 Sep 2026 &mdash; see the Revision). Agents could only enter at captures; the only path to the reviewed tier ran through a human and a git PR.</p>
+          <p class="figcap"><strong>Figure 2.</strong> The company brain today. Agents write directly, but only inside a fence the server enforces; the archive is searchable and frozen; I approve clients and handle exceptions.</p>
         </div>
 
         <div class="grid-4 article-wide">
           <div class="card">
-            <strong>Two sources, one engine</strong>
-            <p>A reviewed tier (company truth, 19 curated pages) and an unreviewed captures tier (~1,900 pages of imports and agent writes), served by one engine.</p>
+            <strong>One source, three fences</strong>
+            <p>A shared company source with subject folders and per-agent prefixes, plus a frozen archive and a restricted internal source beside it.</p>
           </div>
           <div class="card">
-            <strong>Enforced boundary</strong>
-            <p>Agent tokens can write only to captures. A write to the reviewed tier returns permission-denied - verified live, not assumed from policy prose.</p>
+            <strong>Fence enforced by the server</strong>
+            <p>A write outside the client's prefix returns permission-denied - verified live, not assumed from policy prose.</p>
           </div>
           <div class="card">
             <strong>Git is authority</strong>
@@ -377,61 +400,50 @@
           </div>
           <div class="card">
             <strong>Labelled retrieval</strong>
-            <p>Search serves both tiers but every unreviewed result carries its tier. An answer built on an agent note says so.</p>
+            <p>Search spans the shared source and the archive, and every archive hit is labelled historical. An answer built on an import says so.</p>
           </div>
         </div>
-        <p>
-          The promotion path is where most designs quietly give up and let the model
-          self-promote. This one does not, and the interesting part is how it avoids
-          the opposite failure - a human review queue so large that nothing ever
-          gets reviewed.
-        </p>
         <div class="timeline article-wide">
           <article class="card step">
             <span>01</span>
-            <h3>Capture</h3>
+            <h3>Connect</h3>
             <p>
-              Every agent write lands in the unreviewed tier, scrubbed for
-              credential-shaped strings at intake before it ever reaches a commit.
+              A tool logs in over OAuth and self-registers. I approve it once and
+              set its write prefixes.
             </p>
           </article>
           <article class="card step">
             <span>02</span>
-            <h3>Classify</h3>
+            <h3>Write</h3>
             <p>
-              Pages are separated by what they are: imported reference evidence,
-              agent assertions, and explicit promotion proposals. Evidence is
-              tagged observed - searchable, but never a review item.
+              The agent reads the page, rewrites it, and calls put_page with the
+              expected revision and a request id, then polls the receipt until
+              the write is committed.
             </p>
           </article>
           <article class="card step">
             <span>03</span>
-            <h3>Verify</h3>
+            <h3>Maintain</h3>
             <p>
-              A nightly local-model verifier rotates through pages, runs
-              deterministic checks plus a model-assisted comparison, and writes a
-              recommend-only digest. It cannot edit anything.
+              Nightly native jobs run inside the engine. A Monday exceptions
+              digest is the only thing that asks for my attention.
             </p>
           </article>
           <article class="card step">
             <span>04</span>
-            <h3>Promote</h3>
+            <h3>Escalate</h3>
             <p>
-              Only a human, through a git PR, moves knowledge into the reviewed
-              tier. Small mechanical changes may auto-merge once a classifier can
-              prove them small; anything touching a business fact or the rules
-              themselves stays human-gated.
+              A new client, a destructive operation, anything touching internal,
+              or a topology change comes to me. Nothing else does.
             </p>
           </article>
         </div>
         <p>
-          The classification step matters more than it looks. Before it existed, the
-          brain reported ~1,890 unverified pages - which read as 1,890 things
-          waiting for a human. Composition analysis showed the truth: most were
-          imported reference material that never needed a verdict. After retagging,
-          the real review queue was a few hundred agent assertions plus the small
-          set of explicit promotion proposals. The governance burden dropped by an
-          order of magnitude without weakening a single gate.
+          One insight from the old design survived. Before the restructure, the
+          brain reported ~1,900 unverified pages - which read as 1,900 things
+          waiting for a human. Composition analysis showed most were imported
+          reference material that never needed a verdict. That is why they now
+          live in a frozen archive rather than a review queue.
         </p>
       </section>
 
@@ -441,7 +453,8 @@
           <p>
             Governance rules are prose until something tests them. The test, in this
             case, was a full-corpus verification sweep run by local models over
-            several nights.
+            several nights in early September 2026, against the first version of
+            the company brain (see Revision notes).
           </p>
         </div>
         <div class="blueprint article-wide">
@@ -825,7 +838,7 @@
               80 pages per runner-hour - entirely in-network: company content,
               including the secrets being hunted, never left the LAN. It found
               the credential leaks, the standard-vs-engine drift, the duplicate
-              corpora, and the graph islands described in &sect;4. The audit that
+              corpora, and the graph islands described in Section 4. The audit that
               changed the architecture ran on hardware the operator owns, on an
               open-weight model.
             </p>
@@ -855,8 +868,8 @@
               tunnel, every legacy unscoped token revoked, and all five agent
               clients - two OpenClaw agents, one Hermes specialist, two coding
               harness clients - re-issued as fenced clients. Nightly native
-              maintenance timers replaced the custom verifier; the operator now
-              approves new clients and handles exceptions only.
+              maintenance timers replaced the custom verifier; I now approve new
+              clients and handle exceptions only.
             </p>
             <p>
               Personal brain, 18-22 Sep 2026: the numbered-root restructure (139
@@ -881,7 +894,7 @@
               personal schema pack, and the chunk reindex. Earlier, on 13 Sep:
               the harness skill inventory and the action-first design that made
               <code>/remember</code> and <code>/recall</code> the only top-level
-              memory routers - the pattern &sect;5 describes - plus the company
+              memory routers - the pattern Section 5 describes - plus the company
               deployment packaging branch.
             </p>
           </div>
@@ -902,7 +915,7 @@
           is high-volume and mechanically bounded - each page either passes the
           checks or it does not - so it gets cheap, fast, local throughput on
           hardware the operator owns. And the build itself used several
-          harnesses, which is exactly what &sect;5's adapter layer exists for.
+          harnesses, which is exactly what the Section 5 adapter layer exists for.
         </p>
       </section>
 
@@ -922,7 +935,7 @@
           </div>
           <div class="blueprint-row">
             <strong>Failure mode: over-gating</strong>
-            <p>Requiring human approval for everything looks safe and produces a queue nobody finishes - which means nothing actually gets reviewed. Governance must classify change size, not just enforce gates.</p>
+            <p>I ran a human review queue for two weeks. It reached 19 reviewed pages against ~1,900 waiting. That is not governance, it is a backlog.</p>
           </div>
           <div class="blueprint-row">
             <strong>Failure mode: under-gating</strong>
@@ -930,16 +943,14 @@
           </div>
           <div class="blueprint-row">
             <strong>What I would change</strong>
-            <p>Scrub at intake from day one. Distinguish evidence from assertion in the status vocabulary from day one. Test audit tooling against the real storage topology, not a fixture shaped like the happy path.</p>
+            <p>Start from the engine's own fences instead of building a promotion pipeline on top. Scrub at intake from day one. Separate evidence from assertion in the status vocabulary from day one. Test audit tooling against the real storage topology.</p>
           </div>
         </div>
         <p>
           The release posture follows directly. Reading the company brain is safe
-          today - retrieval labels unreviewed material as unreviewed. Writing
-          knowledge the organization trusts is still gated on growing the reviewed
-          tier, which is 19 pages against ~1,900 of captures. That ratio, not any
-          missing mechanism, is the remaining work.
-          <span style="color:var(--muted); font-size:0.85em">(Superseded - see the Revision below.)</span>
+          today - archive hits are labelled historical. Writing is open to every
+          fenced agent. The remaining work is off-host backup of the Git vault
+          and moving the nightly synthesis onto the engine's native provider path.
         </p>
       </section>
 
@@ -977,83 +988,38 @@
 
       <section id="revision-2026-09" aria-labelledby="revision-title">
         <div class="section-head">
-          <h2 id="revision-title">Revision - 22 September 2026: from human-gated promotion to server-enforced fences</h2>
-          <p>What changed after this paper was written, and what did not.</p>
+          <h2 id="revision-title">Revision notes</h2>
+          <p>22 September 2026 - the earlier design, and why I replaced it.</p>
         </div>
         <p>
-          Section 3 describes the design as built and audited in early to mid
-          September 2026 - captures tier, nightly verifier, human git PR,
-          reviewed tier - and it is kept above as the record. On 21-22 September
-          that pipeline was retired.
+          Until 21 September 2026 the company brain ran a different design:
+          agents could only write to an unreviewed captures tier, an intake scrub
+          redacted secrets, a nightly local-model verifier wrote recommend-only
+          digests, and only a human PR moved a page into a reviewed tier. It was
+          correct on paper, and it is what the Section 4 audit tested.
         </p>
         <p>
-          The reason is the bottleneck &sect;7 warned about. The reviewed tier
-          stalled at 19 pages against ~1,900 captures; the human queue was the
-          over-gating failure mode, not a safety margin. Once the intake scrub
-          and the audit had cleaned the corpus, the remaining risk was where an
-          agent could write, not whether a human had signed. The engine - GBrain
-          0.51 - ships that control natively: per-client write prefixes enforced
-          server-side, an archive source that is searchable but frozen, and OAuth
-          clients the operator approves once.
+          It did not work for me. The reviewed tier stalled at 19 pages against
+          ~1,900 captures; I was the bottleneck. Once intake scrubbing and the
+          audit had cleaned the corpus, the risk left was where an agent could
+          write, not whether I had signed - and the engine already shipped that
+          control natively. I also did not want to maintain a custom pipeline on
+          top of an engine whose authors had solved the problem differently.
         </p>
         <p>
-          The custom pipeline was also a maintenance burden, and the operator's
-          stated rule became "do not deviate from the engine authors' intention."
-          Every custom piece was replaced by the stock equivalent or archived;
-          nothing was deleted, and the old captures source is soft-archived and
-          restorable.
+          On 21-22 September I moved it to stock GBrain 0.51. The pipeline was
+          retired - nothing deleted; the old captures source is soft-archived and
+          restorable - and replaced by one shared source plus the frozen archive
+          plus internal, per-agent fences, OAuth clients with every legacy token
+          revoked, and native nightly maintenance. Devin did the cutover; the
+          details are in Section 6.
         </p>
         <p>
-          What survived: git-backed Markdown as the authority; labelled
-          retrieval, with archive hits always labelled historical; credential
-          isolation and the physical split of &sect;2 - all unchanged. The
-          local-model audit lesson - protect secrets, not just lies - now lives
-          at intake and in the fences.
-        </p>
-        <div class="scorecard article-wide">
-          <table>
-            <thead>
-              <tr>
-                <th>Aspect</th>
-                <th>Before (&sect;3)</th>
-                <th>After (22 Sep 2026)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="Aspect">Promotion model</td>
-                <td data-label="Before">Human git PR promotes captures into the reviewed tier.</td>
-                <td data-label="After">Direct write inside a server-enforced prefix; no promotion step.</td>
-              </tr>
-              <tr>
-                <td data-label="Aspect">Reviewed tier</td>
-                <td data-label="Before">19 pages.</td>
-                <td data-label="After">One shared source, ~750 pages, plus a frozen archive of ~1,160.</td>
-              </tr>
-              <tr>
-                <td data-label="Aspect">Agent credential</td>
-                <td data-label="Before">Unscoped bearer tokens.</td>
-                <td data-label="After">Per-agent fenced OAuth clients; legacy tokens revoked.</td>
-              </tr>
-              <tr>
-                <td data-label="Aspect">Human role</td>
-                <td data-label="Before">Review queue.</td>
-                <td data-label="After">Approve new clients; handle exceptions.</td>
-              </tr>
-              <tr>
-                <td data-label="Aspect">Custom code</td>
-                <td data-label="Before">Intake scrub, nightly verifier, promotion RFC.</td>
-                <td data-label="After">Stock engine timers; custom pieces archived, restorable.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          An honest caveat: the sentence in &sect;1 - "nothing an agent writes
-          becomes company truth without a human signature" - is no longer the
-          operating rule. The boundary is now who may write where, with Git
-          history as the audit trail. Whether that is enough is the open question
-          for the next revision.
+          What I gave up: the guarantee that a human had read every page before
+          an agent could cite it. What I kept: Git history as the audit trail,
+          labelled retrieval, credential isolation, and the physical split of
+          Section 2. Whether fences alone are enough is the question the next
+          revision should answer.
         </p>
       </section>
 
