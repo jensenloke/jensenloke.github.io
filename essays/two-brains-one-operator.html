@@ -6,12 +6,12 @@
     <title>Two Brains, One Operator - Jensen Loke</title>
     <meta
       name="description"
-      content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge."
+      content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks planned the architecture and audited 1,837 pages of company knowledge. Revised September 2026: records the move from human-gated promotion to server-enforced write fences."
     />
     <link rel="stylesheet" href="../assets/styles.css" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
     <meta property="og:title" content="Two Brains, One Operator - Jensen Loke" />
-    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen planned the architecture and audited 1,837 pages of company knowledge." />
+    <meta property="og:description" content="Why personal and corporate agent memory must split, how each half is governed, and how Qwen planned the architecture and audited 1,837 pages of company knowledge. Revised September 2026: records the move to server-enforced write fences." />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://jensenloke.github.io/essays/two-brains-one-operator.html" />
     <style>
@@ -49,7 +49,7 @@
           governed, and how Qwen 3.8 Max and Qwen 3.8 Flash Next on two DGX Sparks
           planned the architecture and audited 1,837 pages of company knowledge.
         </p>
-        <p class="article-byline">Jensen Loke &middot; September 2026 &middot; ~15 min read</p></div><main class="article" id="main">
+        <p class="article-byline">Jensen Loke &middot; September 2026 &middot; Revised 22 Sep 2026 &middot; ~15 min read</p></div><main class="article" id="main">
       <section>
         <p class="note">
           Public note: this paper describes a real production system but uses
@@ -83,7 +83,9 @@
             framework to any agent harness on any device. Both halves were built
             with Qwen: Qwen 3.8 Max for architecture and policy design, and
             Qwen 3.8 Flash Next served from two NVIDIA DGX Sparks for the
-            high-volume audit.
+            high-volume audit. A dated revision at the end records the September
+            2026 move from human-gated promotion to server-enforced write fences,
+            and credits the tools - Qwen, Devin, Codex - that built each part.
           </p>
         </div>
       </section>
@@ -748,11 +750,12 @@
 
       <section id="qwen" aria-labelledby="s6-title">
         <div class="section-head">
-          <h2 id="s6-title">6. Qwen's Division of Labor</h2>
+          <h2 id="s6-title">6. Division of Labor: Who Built What</h2>
           <p>
-            Both halves of this system were built with Qwen, and the build itself
-            demonstrates the pattern: a frontier-class model for judgment,
-            high-throughput local serving for volume.
+            Both halves of this system were built by a small team of models and
+            harnesses, and the build itself demonstrates the pattern: a
+            frontier-class model for judgment, high-throughput local serving for
+            volume, and coding agents for the hands-on cutover work.
           </p>
         </div>
 
@@ -800,10 +803,24 @@
             <rect x="30" y="290" width="940" height="34" rx="8" fill="var(--wash)" stroke="var(--border-soft)" />
             <text x="500" y="312" font-size="12" text-anchor="middle" fill="var(--muted)">Reasoning in-network - company content never left the LAN during the sweep.</text>
           </svg></div>
-          <p class="figcap"><strong>Figure 5.</strong> Judgment gets the strongest model; volume gets cheap local throughput. Neither role alone would have worked.</p>
+          <p class="figcap"><strong>Figure 5.</strong> The Qwen half of the build: judgment gets the strongest model; volume gets cheap local throughput. Neither role alone would have worked.</p>
         </div>
 
         <div class="grid-2 article-wide">
+          <div class="card">
+            <strong>Qwen 3.8 Flash Next - the audit, on local hardware</strong>
+            <p>
+              The headline worker. Served locally on two NVIDIA DGX Sparks behind
+              a LiteLLM front, it ran the 1,837-page verification sweep - 1,805
+              pages deep-inspected across 36 cycles over three nights, at roughly
+              80 pages per runner-hour - entirely in-network: company content,
+              including the secrets being hunted, never left the LAN. It found
+              the credential leaks, the standard-vs-engine drift, the duplicate
+              corpora, and the graph islands described in &sect;4. The audit that
+              changed the architecture ran on hardware the operator owns, on an
+              open-weight model.
+            </p>
+          </div>
           <div class="card">
             <strong>Qwen 3.8 Max - planning</strong>
             <p>
@@ -815,13 +832,57 @@
             </p>
           </div>
           <div class="card">
-            <strong>Qwen 3.8 Flash Next - volume</strong>
+            <strong>Devin (Cognition) - the cutover and the re-simplification</strong>
             <p>
-              Served locally through a LiteLLM front, addressing the compute
-              modules as one model endpoint; combed through 1,837 pages -
-              mechanical checks plus bounded compare-and-describe - at roughly 80
-              pages per hour; runs the nightly verification cycle that keeps the
-              brain's risk register current.
+              Company brain, 21-22 Sep 2026: upgraded the engine to stock
+              upstream GBrain 0.51 with its managed writer and retired the custom
+              capture-verify-promote pipeline in favour of the engine's native
+              model - one shared company source with folder prefixes, a frozen
+              <code>archive</code> source holding ~1,160 historical imports, a
+              restricted <code>internal</code> source, per-agent server-enforced
+              write fences (each agent writes only under its own
+              <code>agents/&lt;name&gt;/</code> plus <code>products/</code>),
+              native OAuth with dynamic client registration behind a Cloudflare
+              tunnel, every legacy unscoped token revoked, and all five agent
+              clients - two OpenClaw agents, one Hermes specialist, two coding
+              harness clients - re-issued as fenced clients. Nightly native
+              maintenance timers replaced the custom verifier; the operator now
+              approves new clients and handles exceptions only.
+            </p>
+            <p>
+              Personal brain, 18-22 Sep 2026: the numbered-root restructure (139
+              moves left as alias stubs so old links still resolve), a
+              <code>50-portfolio/</code> root mirroring this site 1:1,
+              reconciliation of 155 company pages out of the personal brain into
+              the company brain (pointer stubs left behind), the "state of the
+              brain" page, a portfolio gap-fill from a full site inventory, an
+              audit of all 13 MacBook harnesses against the registry with the two
+              dead company connections repaired, and a connector health-check
+              page any agent can run.
+            </p>
+          </div>
+          <div class="card">
+            <strong>Codex (OpenAI) - host operations and the action layer</strong>
+            <p>
+              On the personal brain's Mac mini host: the attended
+              0.48.5&rarr;0.50.5 engine upgrade (sha-verified backup, rollback
+              pair recorded), local patches rebased as a pinned integration
+              branch, vault Git backup to a private GitHub repo behind a
+              repo-scoped deploy key, page-type consolidation 57&rarr;30 with a
+              personal schema pack, and the chunk reindex. Earlier, on 13 Sep:
+              the harness skill inventory and the action-first design that made
+              <code>/remember</code> and <code>/recall</code> the only top-level
+              memory routers - the pattern &sect;5 describes - plus the company
+              deployment packaging branch.
+            </p>
+          </div>
+          <div class="card">
+            <strong>omp session (15 Sep) - the target architecture</strong>
+            <p>
+              The four-layer harness-to-brain architecture in Figure 3 -
+              connect-the-MCP-and-go, one master skill registry, company adapters
+              as rows - was agreed in an omp harness session. A harness session,
+              not a model claim.
             </p>
           </div>
         </div>
@@ -831,7 +892,8 @@
           for years - so it gets the strongest available reasoning. Verification
           is high-volume and mechanically bounded - each page either passes the
           checks or it does not - so it gets cheap, fast, local throughput on
-          hardware the operator owns.
+          hardware the operator owns. And the build itself used several
+          harnesses, which is exactly what &sect;5's adapter layer exists for.
         </p>
       </section>
 
@@ -868,6 +930,7 @@
           knowledge the organization trusts is still gated on growing the reviewed
           tier, which is 19 pages against ~1,900 of captures. That ratio, not any
           missing mechanism, is the remaining work.
+          <span style="color:var(--muted); font-size:0.85em">(Superseded - see the Revision below.)</span>
         </p>
       </section>
 
@@ -901,6 +964,88 @@
             </ul>
           </div>
         </div>
+      </section>
+
+      <section id="revision-2026-09" aria-labelledby="revision-title">
+        <div class="section-head">
+          <h2 id="revision-title">Revision - 22 September 2026: from human-gated promotion to server-enforced fences</h2>
+          <p>What changed after this paper was written, and what did not.</p>
+        </div>
+        <p>
+          Section 3 describes the design as built and audited in early to mid
+          September 2026 - captures tier, nightly verifier, human git PR,
+          reviewed tier - and it is kept above as the record. On 21-22 September
+          that pipeline was retired.
+        </p>
+        <p>
+          The reason is the bottleneck &sect;7 warned about. The reviewed tier
+          stalled at 19 pages against ~1,900 captures; the human queue was the
+          over-gating failure mode, not a safety margin. Once the intake scrub
+          and the audit had cleaned the corpus, the remaining risk was where an
+          agent could write, not whether a human had signed. The engine - GBrain
+          0.51 - ships that control natively: per-client write prefixes enforced
+          server-side, an archive source that is searchable but frozen, and OAuth
+          clients the operator approves once.
+        </p>
+        <p>
+          The custom pipeline was also a maintenance burden, and the operator's
+          stated rule became "do not deviate from the engine authors' intention."
+          Every custom piece was replaced by the stock equivalent or archived;
+          nothing was deleted, and the old captures source is soft-archived and
+          restorable.
+        </p>
+        <p>
+          What survived: git-backed Markdown as the authority; labelled
+          retrieval, with archive hits always labelled historical; credential
+          isolation and the physical split of &sect;2 - all unchanged. The
+          local-model audit lesson - protect secrets, not just lies - now lives
+          at intake and in the fences.
+        </p>
+        <div class="scorecard article-wide">
+          <table>
+            <thead>
+              <tr>
+                <th>Aspect</th>
+                <th>Before (&sect;3)</th>
+                <th>After (22 Sep 2026)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Aspect">Promotion model</td>
+                <td data-label="Before">Human git PR promotes captures into the reviewed tier.</td>
+                <td data-label="After">Direct write inside a server-enforced prefix; no promotion step.</td>
+              </tr>
+              <tr>
+                <td data-label="Aspect">Reviewed tier</td>
+                <td data-label="Before">19 pages.</td>
+                <td data-label="After">One shared source, ~750 pages, plus a frozen archive of ~1,160.</td>
+              </tr>
+              <tr>
+                <td data-label="Aspect">Agent credential</td>
+                <td data-label="Before">Unscoped bearer tokens.</td>
+                <td data-label="After">Per-agent fenced OAuth clients; legacy tokens revoked.</td>
+              </tr>
+              <tr>
+                <td data-label="Aspect">Human role</td>
+                <td data-label="Before">Review queue.</td>
+                <td data-label="After">Approve new clients; handle exceptions.</td>
+              </tr>
+              <tr>
+                <td data-label="Aspect">Custom code</td>
+                <td data-label="Before">Intake scrub, nightly verifier, promotion RFC.</td>
+                <td data-label="After">Stock engine timers; custom pieces archived, restorable.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          An honest caveat: the sentence in &sect;1 - "nothing an agent writes
+          becomes company truth without a human signature" - is no longer the
+          operating rule. The boundary is now who may write where, with Git
+          history as the audit trail. Whether that is enough is the open question
+          for the next revision.
+        </p>
       </section>
 
       <section aria-labelledby="related-title">
