@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Last Project You Build Alone - Jensen Loke</title>
+    <meta
+      name="description"
+      content="Why a second brain should be custom to its owner, independent of any one AI harness, and able to give every future agent durable context."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+    <meta property="og:title" content="The Last Project You Build Alone - Jensen Loke" />
+    <meta property="og:description" content="Why a second brain should be custom to its owner, independent of any one AI harness, and able to give every future agent durable context." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jensenloke.github.io/second-brain/the-last-project-you-build-alone.html" />
+    <link rel="stylesheet" href="/assets/cues.css" />
+    <script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav">
+      <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/essays/" aria-current="page">Essays</a>
+        <a href="/talks/">Talks &amp; Trainings</a>
+        <a href="/work/">Projects</a>
+      </nav>
+    </header>
+
+    <header class="site-header">
+      <div class="article-header">
+        <p class="article-kicker">Building a Second Brain &middot; Agent memory &middot; Personal infrastructure</p>
+        <h1 class="article-title">The Last Project You Build Alone</h1>
+        <p class="article-subtitle">
+          A second brain is not another notes app. It is the custom memory layer
+          that helps every future agent understand you, your work, and what came before.
+        </p>
+        <p class="article-byline">Jensen Loke &middot; <time datetime="2026-09-23">23 September 2026</time> &middot; ~6 min read</p>
+      </div>
+    </header>
+
+    <main class="article" id="main">
+      <section>
+        <p class="note">
+          This essay describes the personal-brain architecture I use today and the
+          lessons I have drawn from building it. The operational ontology discussed
+          near the end is future research, clearly separated from what is working now.
+        </p>
+      </section>
+
+      <section aria-labelledby="last-title">
+        <div class="section-head">
+          <h2 id="last-title">The last project you build alone</h2>
+        </div>
+        <p>
+          I think your second brain may be the last project you build alone.
+        </p>
+        <p>
+          Not because you stop building. The opposite happens. Once your agents can
+          remember your decisions, preferences, projects, corrections, and ways of
+          working, every new project starts with more context than the one before it.
+          You no longer begin by explaining yourself from zero.
+        </p>
+        <p>
+          The second brain becomes the common memory behind the tools. One agent can
+          help with research, another can write code, and another can review the result.
+          They may have different interfaces and different strengths, but they do not
+          each have to meet you as a stranger.
+        </p>
+        <p>
+          It is also the one project you never really finish. Every decision, failure,
+          new relationship, and completed piece of work can improve the context available
+          to the next agent. The system grows with its owner.
+        </p>
+      </section>
+
+      <section aria-labelledby="memory-title">
+        <div class="section-head">
+          <h2 id="memory-title">Agents remember differently</h2>
+        </div>
+        <p>
+          I work across several AI agents and coding harnesses. Each one has a different
+          idea of memory. One reads repository instructions. Another can search previous
+          conversations. Another builds a profile from past sessions. Some remember
+          automatically; some only remember when asked.
+        </p>
+        <p>
+          These features are useful, but they fragment the person using them. A correction
+          made in one harness may not reach another. A project decision can be buried in a
+          conversation that the next agent cannot see. Switching tools means rebuilding
+          context, even when the underlying work has not changed.
+        </p>
+        <p>
+          That is why I do not want any one harness to own my durable memory. The harness
+          should be able to use the memory, but the memory should survive the harness.
+        </p>
+      </section>
+
+      <section aria-labelledby="bitwarden-title">
+        <div class="section-head">
+          <h2 id="bitwarden-title">The Bitwarden test</h2>
+        </div>
+        <p>
+          I already accept this separation for passwords. I use Bitwarden because I do
+          not want my credentials to belong to one browser. A browser can fill a password,
+          but the vault remains independent. If I change browsers or devices, the durable
+          record comes with me.
+        </p>
+        <p>
+          Agent memory should work in a similar way. A harness can keep temporary context
+          for the task in front of it. It can remember its own interface preferences or
+          recent sessions. But the durable record of who I am, what I have decided, and
+          what I have learned should not disappear when I change tools.
+        </p>
+        <div class="comparison article-wide" aria-label="Three layers of agent memory">
+          <article class="card">
+            <h3>Working context</h3>
+            <p>What the agent needs for the task and conversation happening now.</p>
+          </article>
+          <article class="card">
+            <h3>Harness memory</h3>
+            <p>Useful continuity that belongs to a particular agent or interface.</p>
+          </article>
+          <article class="card">
+            <h3>Independent brain</h3>
+            <p>Durable knowledge that should remain available across authorised harnesses.</p>
+          </article>
+        </div>
+        <p>
+          The point is not to eliminate harness memory. It is to decide which memories
+          should be portable, correctable, attributable, and governed outside the tool
+          that happened to create them.
+        </p>
+      </section>
+
+      <section aria-labelledby="custom-title">
+        <div class="section-head">
+          <h2 id="custom-title">The useful part is custom to you</h2>
+        </div>
+        <p>
+          A generic notes product can give everyone the same folders, search box, and
+          embedding model. It cannot arrive knowing which parts of your life belong
+          together—or which parts must remain apart.
+        </p>
+        <p>
+          My second brain has to reflect what matters to me: the projects I am building,
+          the people connected to them, the sources I trust, the way I prefer to write,
+          and the decisions that are still active. It also has to preserve corrections.
+          Remembering the wrong thing confidently is worse than admitting that something
+          is unknown.
+        </p>
+        <p>
+          The structure is personal because relevance is personal. Two people can read
+          the same article and need different things from it. One wants a quotation for
+          a paper. Another wants the idea connected to a product decision from six months
+          ago. A useful brain has to know which relationship matters to its owner.
+        </p>
+      </section>
+
+      <section aria-labelledby="boundary-title">
+        <div class="section-head">
+          <h2 id="boundary-title">One person can still need two brains</h2>
+        </div>
+        <p>
+          Independence from the harness does not mean putting everything into one vault.
+          My personal memory and my company knowledge have different owners, subjects,
+          permissions, and costs of being wrong. I separate them even when the same human
+          is operating both systems.
+        </p>
+        <p>
+          That boundary matters more as agents become capable of writing. An agent reading
+          a personal reflection should not silently turn it into company policy. An agent
+          working inside company systems should not copy operational knowledge into a
+          personal store. Memory needs routing, provenance, and access control—not merely
+          better retrieval.
+        </p>
+        <p>
+          I explored that architecture in
+          <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a>.
+          The important idea here is simpler: memory should remain independent from the
+          harness while staying accountable to its owner.
+        </p>
+      </section>
+
+      <section aria-labelledby="working-title">
+        <div class="section-head">
+          <h2 id="working-title">What I have working now</h2>
+        </div>
+        <p>
+          The personal system I use today exposes a small, consistent memory contract to
+          different harnesses. At the user-facing level, the two important operations are
+          <code>remember</code> and <code>recall</code>. A request is routed to the right
+          brain, and the selected brain handles its own search, provenance, and write rules.
+        </p>
+        <p>
+          This does not make every agent identical. Nor should it. Each harness still has
+          its own context window, tools, instructions, and way of approaching a task. The
+          shared brain supplies continuity without erasing those differences.
+        </p>
+        <p>
+          The result is practical. A new session can retrieve the writing voice I have
+          already defined. It can find the history of this website, the research threads
+          behind an article, and the publication boundaries I have set. I can correct the
+          durable record once instead of hoping every harness learns the correction separately.
+        </p>
+        <p>
+          It still has flaws. Retrieval can surface irrelevant material. Old notes need
+          maintenance. A memory can be well sourced and still be stale. Building the brain
+          does not remove judgement; it gives judgement a durable place to accumulate.
+        </p>
+      </section>
+
+      <section aria-labelledby="compound-title">
+        <div class="section-head">
+          <h2 id="compound-title">Every project should leave the next one stronger</h2>
+        </div>
+        <p>
+          The compounding effect is the reason I think of the second brain as infrastructure.
+          A project should leave behind more than its final output. It should leave behind
+          the decisions, sources, reusable patterns, failed approaches, and open questions
+          that will make the next project easier.
+        </p>
+        <p>
+          The agent can then do more than retrieve an old file. It can recognise that a new
+          question continues an existing line of research. It can connect a design choice
+          to the reason it was made. It can tell me when new evidence conflicts with an old
+          conclusion instead of silently stacking both versions together.
+        </p>
+        <p>
+          This is the shift: the second brain stops being a place where work is stored and
+          becomes part of how new work begins.
+        </p>
+      </section>
+
+      <section aria-labelledby="future-title">
+        <div class="section-head">
+          <h2 id="future-title">Future work: from memory to an operational brain</h2>
+        </div>
+        <p>
+          The current system is strongest at durable knowledge: what I know, why I believe
+          it, where it came from, and which brain owns it. That is not the same as modelling
+          the live state of an organisation or giving an agent a safe way to change it.
+        </p>
+        <p>
+          My next research question is how this memory layer connects to an operational
+          one: an ontology for the things that exist now; functions for reusable logic;
+          documents for evidence; actions for governed change; automations for responding
+          to events; and an AI layer that can discover and combine those building blocks.
+        </p>
+        <p>
+          I have prototypes and research material for parts of this model. I have not yet
+          established the complete architecture as a finished public system. The next essays
+          will separate what I have built and verified from what remains an experiment.
+        </p>
+        <p>
+          Memory gives an agent a past. The next challenge is helping it understand the
+          present—and participate safely in what happens next.
+        </p>
+      </section>
+
+      <section aria-labelledby="related-title">
+        <div class="section-head">
+          <h2 id="related-title">Related</h2>
+        </div>
+        <ul>
+          <li><a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a> - the architecture and governance behind the personal and company split.</li>
+          <li><a href="./knowledge-management-layer-success-it.html">Why a Knowledge Management Layer Still Matters</a> - why access and search do not provide an operating model by themselves.</li>
+          <li><a href="../engineering/codegraph-tour.html">From Company Knowledge to Verified Changes</a> - how durable context connects to structural evidence and verification in engineering work.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p>
+      <div class="footer-socials" aria-label="Social profiles">
+        <a href="https://github.com/jensenloke">GitHub ↗</a>
+        <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+        <a href="https://x.com/jensenloke">X ↗</a>
+        <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+        <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+        <a href="https://github.com/Success-IT">Success IT ↗</a>
+      </div>
+      <p>Singapore<br />© 2026</p>
+    </footer>
+  </body>
+</html>
