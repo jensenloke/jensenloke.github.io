@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prompt Fight: AI Bros vs. Insurance Pros — Jensen</title>
+  <meta name="description" content="Jensen Loke's slides for Prompt Fight: AI Bros vs. Insurance Pros at the PLUS 2026 Singapore Symposium: a local AI setup and ANDREW, an agent that drafts a D&O underwriting worksheet.">
+  <style>
+    :root {
+      --ink: #060a14;
+      --panel: #0b1322;
+      --text: #eef2f8;
+      --muted: #93a1b6;
+      --blue: #5b7cfa;
+      --sky: #4cc2ff;
+      --amber: #f2b84b;
+      --line: rgba(91, 124, 250, .28);
+      --shadow: 0 1.2cqw 4cqw rgba(0, 0, 0, .42);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background: #02050b;
+      color: var(--text);
+      font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    }
+    button { font: inherit; }
+
+    .stage {
+      width: 100vw; height: 100vh;
+      display: grid; place-items: center;
+      background: radial-gradient(circle at 50% 120%, rgba(76, 194, 255, .14), transparent 42%), #02050b;
+    }
+    .deck {
+      position: relative;
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      container-type: size;
+      background: var(--ink);
+      box-shadow: 0 0 7rem rgba(0,0,0,.8);
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: none;
+      padding: 5.2cqh 5.4cqw;
+      overflow: hidden;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,.015), transparent 32%),
+        radial-gradient(circle at 91% 12%, rgba(76, 194, 255, .12), transparent 25%),
+        radial-gradient(circle at 8% 86%, rgba(91, 124, 250, .09), transparent 23%),
+        var(--ink);
+    }
+    .slide.active { display: block; animation: enter .32s ease-out; }
+    @keyframes enter {
+      from { opacity: 0; transform: translateX(1.2%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
+    .slide::before {
+      content: "";
+      position: absolute; inset: 1.8cqh 1.2cqw;
+      pointer-events: none;
+      background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 4.8cqw 4.8cqw;
+      opacity: .06;
+      mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+    }
+
+    .topline {
+      display: flex; align-items: center; justify-content: space-between; gap: 2cqw;
+      height: 5cqh; margin-bottom: 2.4cqh;
+      border-bottom: 1px dashed rgba(91, 124, 250, .36);
+      color: var(--muted);
+      font-size: 1.05cqw; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
+    }
+    .lockup { display: flex; align-items: center; gap: .85cqw; }
+    .badge { padding: .42cqh .65cqw; border: 1px solid var(--sky); color: var(--sky); letter-spacing: .18em; line-height: 1; }
+    .slide-no { color: var(--amber); }
+
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-stretch: condensed; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+    h1 { font-size: 6.4cqw; line-height: .9; }
+    h2 { font-size: 3.45cqw; line-height: .94; }
+    h3 { font-size: 1.45cqw; line-height: 1.05; text-transform: uppercase; letter-spacing: .06em; }
+    p { font-size: 1.22cqw; line-height: 1.35; }
+    .eyebrow { color: var(--sky); font-size: 1.05cqw; font-weight: 800; letter-spacing: .28em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+    .sky { color: var(--sky); }
+    .amber { color: var(--amber); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .panel {
+      position: relative;
+      border: 1px solid rgba(255,255,255,.13);
+      background: linear-gradient(145deg, rgba(16,27,48,.92), rgba(6,10,20,.88));
+      box-shadow: var(--shadow);
+    }
+    .panel.edge { border-left: .35cqw solid var(--blue); }
+    .panel.sky-edge { border-left: .35cqw solid var(--sky); }
+
+    .footer-rule {
+      position: absolute; left: 5.4cqw; right: 5.4cqw; bottom: 2.3cqh;
+      display: flex; justify-content: space-between;
+      color: rgba(255,255,255,.42);
+      font-size: .62cqw; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    }
+    .section-title { margin-top: 1.5cqh; }
+    .section-title .eyebrow { margin-bottom: 1.1cqh; }
+
+    /* Cover */
+    .cover-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 4cqw; height: 74cqh; align-items: center; }
+    .cover h1 span { display: block; }
+    .cover h1 .vs { font-size: 3.2cqw; color: var(--muted); letter-spacing: .12em; margin: 1.2cqh 0; }
+    .cover h1 .hot { background: linear-gradient(90deg, var(--sky), var(--blue)); color: transparent; background-clip: text; -webkit-background-clip: text; }
+    .cover-sub { margin-top: 3cqh; max-width: 44cqw; color: #d6dcea; font-size: 1.45cqw; }
+    .speaker-name { margin-top: 4.5cqh; font-size: 1.25cqw; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+    .speaker-role { margin-top: .6cqh; color: var(--muted); font-size: .8cqw; letter-spacing: .12em; text-transform: uppercase; }
+    .case-card { padding: 4cqh 2.4cqw; border: 1px solid var(--sky); background: rgba(8,16,32,.92); box-shadow: 0 0 3cqw rgba(76,194,255,.16); }
+    .case-card .eyebrow { font-size: .8cqw; }
+    .case-name { margin-top: 2cqh; font-size: 2.6cqw; font-weight: 900; text-transform: uppercase; line-height: 1; }
+    .case-meta { margin-top: 1cqh; color: var(--muted); font-size: .95cqw; letter-spacing: .1em; text-transform: uppercase; }
+    .case-rows { display: grid; gap: 1.2cqh; margin-top: 3.2cqh; padding-top: 2.4cqh; border-top: 1px solid rgba(255,255,255,.14); }
+    .case-rows div { display: flex; justify-content: space-between; gap: 1cqw; font-size: 1.15cqw; }
+    .case-rows span { color: var(--muted); }
+
+    /* About */
+    .bio-grid { display: grid; grid-template-columns: 17cqw 1fr; gap: 3.5cqw; align-items: center; margin-top: 10cqh; }
+    .bio-mark { display: grid; place-items: center; width: 16cqw; height: 16cqw; border: 1px solid var(--sky); color: var(--sky); font-size: 7cqw; font-weight: 900; box-shadow: .8cqw 1cqh 0 rgba(91,124,250,.45); }
+    .bio-mark-sub { margin-top: 2cqh; color: var(--muted); font-size: .72cqw; letter-spacing: .16em; text-transform: uppercase; }
+    .bio-copy h2 { font-size: 3cqw; line-height: 1; text-transform: none; font-stretch: normal; letter-spacing: -.01em; }
+    .bio-copy p { margin-top: 2.4cqh; max-width: 56cqw; color: #c9d2e2; font-size: 1.45cqw; }
+    .bio-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2cqw; margin-top: 11cqh; }
+    .bio-fact { padding: 3cqh 1.4cqw; }
+    .bio-fact span { display: block; color: var(--sky); font-size: .82cqw; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .bio-fact strong { display: block; margin-top: 1.2cqh; font-size: 1.4cqw; line-height: 1.2; }
+
+    /* Local AI */
+    .architecture-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 2.3cqw; margin-top: 3.4cqh; height: 58cqh; }
+    .lab-photo { position: relative; overflow: hidden; margin: 0; }
+    .lab-photo img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.06) saturate(.78); }
+    .lab-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,10,20,.92), transparent 55%); }
+    .photo-caption { position: absolute; z-index: 2; left: 1.5cqw; right: 1.5cqw; bottom: 2.2cqh; }
+    .photo-caption strong { display: block; font-size: 1.15cqw; text-transform: uppercase; }
+    .photo-caption span { display: block; margin-top: .5cqh; color: #c4cad8; font-size: .78cqw; }
+    .arch-panel { padding: 2.7cqh 1.8cqw; }
+    .arch-chain { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7cqw; margin-top: 3cqh; }
+    .arch-node { position: relative; min-height: 13cqh; display: flex; flex-direction: column; justify-content: center; padding: 1.4cqh .75cqw; border: 1px solid rgba(255,255,255,.16); text-align: center; background: rgba(5,8,18,.7); }
+    .arch-node:not(:last-child)::after { content: "→"; position: absolute; z-index: 2; right: -.85cqw; top: 5.2cqh; color: var(--sky); font-size: 1.2cqw; }
+    .arch-node strong { font-size: 1.05cqw; text-transform: uppercase; }
+    .arch-node span { margin-top: .55cqh; color: var(--muted); font-size: .8cqw; line-height: 1.25; }
+    .arch-node.hot { border-color: var(--sky); box-shadow: inset 0 0 1.8cqw rgba(76,194,255,.1); }
+    .arch-principles { display: grid; grid-template-columns: 1fr 1fr; gap: 1cqw; margin-top: 4cqh; }
+    .principle { padding: 1.45cqh 1cqw; border-top: 1px solid rgba(76,194,255,.34); }
+    .principle strong { display: block; color: var(--sky); font-size: .88cqw; letter-spacing: .12em; text-transform: uppercase; }
+    .principle span { display: block; margin-top: .7cqh; color: var(--muted); font-size: .95cqw; line-height: 1.32; }
+
+    /* Harness */
+    .harness { display: grid; grid-template-columns: 1fr 2.2cqw 1.25fr 2.2cqw 1fr 2.2cqw 1fr 2.2cqw 1.05fr; align-items: stretch; margin-top: 3.5cqh; }
+    .stage-col { display: flex; flex-direction: column; }
+    .stage-tag { margin-bottom: 1cqh; font-size: .8cqw; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .stage-tag.code { color: var(--amber); }
+    .stage-tag.model { color: var(--sky); }
+    .stage-tag.human { color: #d6dcea; }
+    .stage-box { flex: 1; min-height: 42cqh; padding: 2.4cqh 1.1cqw; }
+    .stage-box h3 { font-size: 1.35cqw; }
+    .stage-box p { margin-top: 1.6cqh; color: #b9c5d8; font-size: 1cqw; line-height: 1.4; }
+    .stage-box.code { border-top: .3cqh solid var(--amber); }
+    .stage-box.model { border-top: .3cqh solid var(--sky); }
+    .stage-box.human { border-top: .3cqh solid #d6dcea; }
+    .teams { display: grid; gap: .7cqh; margin-top: 1.4cqh; }
+    .teams span { padding: 1cqh .6cqw; border: 1px solid rgba(76,194,255,.3); color: #d6e6f5; font-size: .9cqw; }
+    .link { display: grid; place-items: center; color: var(--sky); font-size: 1.3cqw; }
+    .harness-foot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2cqw; margin-top: 2.6cqh; }
+    .rule { padding: 1.5cqh 1.1cqw; border-left: .28cqw solid var(--blue); background: rgba(91,124,250,.06); font-size: 1cqw; line-height: 1.35; }
+    .rule b { display: block; margin-bottom: .6cqh; font-size: .82cqw; letter-spacing: .16em; text-transform: uppercase; }
+
+    /* Demo */
+    .demo-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 2.4cqw; margin-top: 5cqh; }
+    .brief { min-height: 58cqh; padding: 4cqh 2.2cqw; }
+    .brief-rows { display: grid; gap: 2.4cqh; margin-top: 3.4cqh; }
+    .brief-rows div { display: grid; grid-template-columns: 11cqw 1fr; gap: 1cqw; font-size: 1.4cqw; padding-bottom: 2cqh; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .brief-rows span { color: var(--muted); font-size: .95cqw; letter-spacing: .12em; text-transform: uppercase; }
+    .watch { min-height: 58cqh; padding: 4cqh 2.2cqw; }
+    .watch-list { display: grid; gap: 3.2cqh; margin-top: 3.4cqh; }
+    .watch-row { display: grid; grid-template-columns: 3.4cqw 1fr; gap: 1cqw; align-items: center; }
+    .watch-row b { display: grid; place-items: center; width: 3cqw; height: 3cqw; border: 1px solid var(--sky); color: var(--sky); font-size: 1.2cqw; }
+    .watch-row strong { display: block; font-size: 1.35cqw; text-transform: uppercase; }
+    .watch-row span { display: block; margin-top: .5cqh; color: var(--muted); font-size: 1cqw; }
+    .live-dot { display: inline-block; width: .8cqw; height: .8cqw; margin-right: .6cqw; border-radius: 50%; background: var(--sky); box-shadow: 0 0 1cqw var(--sky); vertical-align: middle; }
+
+    /* Controls and notes */
+    .controls {
+      position: fixed; z-index: 50; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
+      display: flex; gap: .45rem; align-items: center;
+      padding: .45rem .65rem;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+      background: rgba(4,6,14,.82); backdrop-filter: blur(12px);
+      opacity: 0; transition: opacity .2s;
+    }
+    body:hover .controls, .controls:focus-within { opacity: 1; }
+    .controls button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; color: white; background: rgba(255,255,255,.08); cursor: pointer; }
+    .controls button:hover { background: var(--blue); }
+    .counter { min-width: 4.2rem; text-align: center; color: var(--muted); font: .76rem ui-monospace, monospace; }
+    .progress { position: fixed; z-index: 60; left: 0; bottom: 0; width: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--sky)); transition: width .25s; }
+    .notes {
+      display: none;
+      position: absolute; z-index: 40; left: 4cqw; right: 4cqw; bottom: 4cqh;
+      max-height: 28cqh; overflow: auto;
+      padding: 1.5cqh 1.2cqw;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(3,5,12,.96); color: #e9eaf0;
+      font-size: .84cqw; line-height: 1.45;
+      box-shadow: var(--shadow);
+    }
+    body.show-notes .slide.active .notes { display: block; }
+
+    @media print {
+      @page { size: 16in 9in; margin: 0; }
+      html, body { width: auto; height: auto; overflow: visible; background: white; }
+      .stage, .deck { display: block; width: 16in; height: auto; overflow: visible; box-shadow: none; }
+      .slide, .slide.active { position: relative; display: block; width: 16in; height: 9in; break-after: page; padding: .52in .86in; animation: none; }
+      .controls, .progress, .notes { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="deck" id="deck" aria-live="polite">
+
+      <!-- 01 — Cover -->
+      <section class="slide cover active" data-title="Prompt Fight: AI Bros vs. Insurance Pros">
+        <div class="topline">
+          <div class="lockup"><span class="badge">PLUS</span><span>2026 Singapore Symposium</span></div>
+          <span>1 Oct 2026 · 11:05 am</span>
+        </div>
+        <div class="cover-grid">
+          <div>
+            <div class="eyebrow">Prompt Fight</div>
+            <h1><span class="hot">AI Bros</span><span class="vs">vs.</span><span>Insurance Pros</span></h1>
+            <p class="cover-sub">One D&amp;O underwriting worksheet, drafted by an AI agent running on hardware I own. A human still signs it.</p>
+            <div class="speaker-name">Jensen Loke</div>
+            <div class="speaker-role">CEO, Success IT</div>
+          </div>
+          <div class="case-card">
+            <div class="eyebrow">Today's case study</div>
+            <div class="case-name">Sheng Siong<br>Group</div>
+            <div class="case-meta">SGX-listed · Supermarket retail</div>
+            <div class="case-rows">
+              <div><span>Cover</span><strong>Directors &amp; Officers</strong></div>
+              <div><span>Limit</span><strong>S$10m</strong></div>
+              <div><span>Claims history</span><strong>None</strong></div>
+              <div><span>Current cover</span><strong>New policy</strong></div>
+              <div><span>Sources</span><strong>Public filings only</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-rule"><span>Numbers in code · Words in the model · Judgement with the human</span><span>01 / 05</span></div>
+        <aside class="notes">Wait for the host's handover. One line on the frame: the agent drafts, the engine prices, the underwriter decides. The case-study card repeats the organiser's assumptions: no claims, new policy, everything else from public sources on the insured's website.</aside>
+      </section>
+
+      <!-- 02 — About -->
+      <section class="slide" data-title="About Jensen Loke">
+        <div class="topline"><div class="lockup"><span class="badge">01</span><span>Your speaker</span></div><span class="slide-no">02</span></div>
+        <div class="bio-grid">
+          <div>
+            <div class="bio-mark">JL</div>
+            <div class="bio-mark-sub">Jensen Loke · Singapore</div>
+          </div>
+          <div class="bio-copy">
+            <div class="eyebrow">CEO, product builder and community organiser</div>
+            <h2 style="margin-top:1.6cqh">I design products, workflows and teams that make complex services work better.</h2>
+            <p>Across consumer and corporate digital products, the goal has stayed the same: use technology to solve real business problems and improve outcomes.</p>
+          </div>
+        </div>
+        <div class="bio-facts">
+          <div class="bio-fact panel edge"><span>Consumer products</span><strong>DBS digital banking</strong></div>
+          <div class="bio-fact panel edge"><span>Corporate platforms</span><strong>Temasek · Ant Financial · Amazon</strong></div>
+          <div class="bio-fact panel edge"><span>Now</span><strong>CEO, Success IT</strong></div>
+          <div class="bio-fact panel edge"><span>Community</span><strong>1,000+ Agentic Builders</strong></div>
+        </div>
+        <div class="footer-rule"><span>linkedin.com/in/jensenloke</span><span>02 / 05</span></div>
+        <aside class="notes">Thirty seconds at most; the slot is short. I'm on the AI side of the fight, not an underwriter. My career has been building digital products across banking and corporate platforms. Today I run Success IT and help convene the Agentic Builders Collective.</aside>
+      </section>
+
+      <!-- 03 — Local AI -->
+      <section class="slide" data-title="Local AI at Home">
+        <div class="topline"><div class="lockup"><span class="badge">02</span><span>Where the agent runs</span></div><span class="slide-no">03</span></div>
+        <div class="section-title"><div class="eyebrow">From desk to model</div><h2>The agent runs<br>on my own hardware.</h2></div>
+        <div class="architecture-grid">
+          <figure class="lab-photo panel">
+            <img src="public-assets/local-setup.jpeg" alt="Jensen's home local AI hardware setup">
+            <figcaption class="photo-caption"><strong>The actual home lab</strong><span>Compact compute, a Mac mini, networking, and honest cable management.</span></figcaption>
+          </figure>
+          <div class="arch-panel panel edge">
+            <div class="eyebrow" style="font-size:.76cqw">The simple architecture</div>
+            <div class="arch-chain">
+              <div class="arch-node"><strong>Mac</strong><span>Agent app<br>and harness</span></div>
+              <div class="arch-node"><strong>Tailscale</strong><span>Private encrypted access</span></div>
+              <div class="arch-node"><strong>LiteLLM</strong><span>Stable API<br><span class="mono">dgx-current</span></span></div>
+              <div class="arch-node hot"><strong>DGX Spark</strong><span>Qwen 3.8 27B<br>local inference</span></div>
+            </div>
+            <div class="arch-principles">
+              <div class="principle"><strong>Private by default</strong><span>The model backend stays on loopback; remote access stays inside the tailnet.</span></div>
+              <div class="principle"><strong>One stable endpoint</strong><span>The agent does not need to know which inference engine is underneath.</span></div>
+              <div class="principle"><strong>No per-token bill</strong><span>Research runs cost electricity and time, not API spend.</span></div>
+              <div class="principle"><strong>Swap the model</strong><span>Any OpenAI-compatible model, local or cloud, plugs into the same agent.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-rule"><span>Compute · Network · Router · Model</span><span>03 / 05</span></div>
+        <aside class="notes">This answers "how does it work, and what does it cost". The model runs on one DGX Spark in my home lab, reached privately over Tailscale through a LiteLLM router. For an underwriter that means the research stays on hardware I control, and a run has no per-token bill. The same agent can point at a cloud model instead; that's one setting.</aside>
+      </section>
+
+      <!-- 04 — Harness -->
+      <section class="slide" data-title="Harness Architecture">
+        <div class="topline"><div class="lockup"><span class="badge">03</span><span>How the agent works</span></div><span class="slide-no">04</span></div>
+        <div class="section-title"><div class="eyebrow">ANDREW · A Narrative D&amp;O Risk Evaluation Worksheet</div><h2>Research in parallel.<br>Price in code.</h2></div>
+        <div class="harness">
+          <div class="stage-col"><div class="stage-tag code">Code</div><div class="stage-box panel code"><h3>Gather</h3><p>Pick the listed company. Market data and candidate annual-report PDFs are fetched once and shared.</p></div></div>
+          <div class="link">→</div>
+          <div class="stage-col"><div class="stage-tag model">Model · parallel</div><div class="stage-box panel model"><h3>Research teams</h3>
+            <div class="teams"><span>Market &amp; securities</span><span>Financials</span><span>Governance &amp; audit</span><span>Shareholding</span><span>Adverse news &amp; regulatory</span></div></div></div>
+          <div class="link">→</div>
+          <div class="stage-col"><div class="stage-tag model">Model</div><div class="stage-box panel model"><h3>Synthesise</h3><p>A lead underwriter merges the findings into one proposal. Every answer carries a value, a rationale and a source.</p></div></div>
+          <div class="link">→</div>
+          <div class="stage-col"><div class="stage-tag human">Human</div><div class="stage-box panel human"><h3>Review</h3><p>The underwriter re-sets modifiers and toggles exclusions before anything is priced.</p></div></div>
+          <div class="link">→</div>
+          <div class="stage-col"><div class="stage-tag code">Code</div><div class="stage-box panel code"><h3>Price &amp; refer</h3><p>The worksheet's rating tables and about 38 referral triggers. Premium, CLEAR or REFER, and the formula shown.</p></div></div>
+        </div>
+        <div class="harness-foot">
+          <div class="rule"><b class="amber">Numbers in code</b>The model never does pricing math. The engine reproduces the worksheet's worked example to the cent.</div>
+          <div class="rule"><b class="sky">Words in the model</b>Research and narrative come with citations. "None identified" is a finding; a blank is not.</div>
+          <div class="rule"><b>Judgement with the human</b>The agent refers when it's unsure instead of bluffing a number. An underwriter signs off.</div>
+        </div>
+        <div class="footer-rule"><span>Agent + deterministic engine + human review</span><span>04 / 05</span></div>
+        <aside class="notes">This is "how I approached it". Not one big prompt: specialist research teams read the public filings in parallel, a lead model writes the cited proposal, the underwriter reviews it, and the pricing and referral checks are ordinary code built from the worksheet's own formulas. The leveling assumptions (no claims, new policy) are enforced in code, not left to the model.</aside>
+      </section>
+
+      <!-- 05 — Demo -->
+      <section class="slide" data-title="Live Demo">
+        <div class="topline"><div class="lockup"><span class="badge">04</span><span>Live demo</span></div><span class="slide-no">05</span></div>
+        <div class="section-title"><div class="eyebrow"><span class="live-dot"></span>Live · Sheng Siong Group</div><h2>Let's underwrite it.</h2></div>
+        <div class="demo-grid">
+          <div class="brief panel edge">
+            <div class="eyebrow" style="font-size:.76cqw">The brief</div>
+            <div class="brief-rows">
+              <div><span>Insured</span><strong>Sheng Siong Group Ltd · SGX-listed</strong></div>
+              <div><span>Cover</span><strong>Directors &amp; Officers liability</strong></div>
+              <div><span>Limit</span><strong>S$10m</strong></div>
+              <div><span>Claims</span><strong>None · new policy, no current cover</strong></div>
+              <div><span>Inputs</span><strong>Annual reports, SGX filings, public news</strong></div>
+            </div>
+          </div>
+          <div class="watch panel sky-edge">
+            <div class="eyebrow" style="font-size:.76cqw">What to watch</div>
+            <div class="watch-list">
+              <div class="watch-row"><b>1</b><div><strong>The research lanes</strong><span>Each team reading filings, with sources as it goes.</span></div></div>
+              <div class="watch-row"><b>2</b><div><strong>The cited proposal</strong><span>Risk narrative, modifiers and exclusions, each with its reason.</span></div></div>
+              <div class="watch-row"><b>3</b><div><strong>The human review</strong><span>Where I push back on the agent's calls.</span></div></div>
+              <div class="watch-row"><b>4</b><div><strong>The price and verdict</strong><span>Premium, CLEAR or REFER, and the formula behind it.</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-rule"><span>Prompt Fight · PLUS 2026 Singapore Symposium</span><span>05 / 05</span></div>
+        <aside class="notes">Switch to the terminal. Start a live Sheng Siong run to show the research lanes working, then switch to the pre-run completed before the session for the output: a full run takes longer than the slot. Walk the output: premium, referral status, two judgement calls. Then cover challenges, surprises, and what I'd build with more time.</aside>
+      </section>
+    </div>
+  </main>
+
+  <nav class="controls" aria-label="Presentation controls">
+    <button type="button" id="prev" aria-label="Previous slide">←</button>
+    <span class="counter" id="counter">1 / 5</span>
+    <button type="button" id="next" aria-label="Next slide">→</button>
+    <button type="button" id="fullscreen" aria-label="Toggle fullscreen">⛶</button>
+  </nav>
+  <div class="progress" id="progress"></div>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const counter = document.getElementById('counter');
+      const progress = document.getElementById('progress');
+      let index = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.replace('#slide-', ''), 10) || 1) - 1));
+
+      function show(next, updateHash = true) {
+        index = Math.max(0, Math.min(slides.length - 1, next));
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+        counter.textContent = `${index + 1} / ${slides.length}`;
+        progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+        document.title = `${slides[index].dataset.title} — Jensen`;
+        if (updateHash) history.replaceState(null, '', `#slide-${index + 1}`);
+      }
+
+      document.getElementById('prev').addEventListener('click', () => show(index - 1));
+      document.getElementById('next').addEventListener('click', () => show(index + 1));
+      document.getElementById('fullscreen').addEventListener('click', async () => {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        else await document.exitFullscreen();
+      });
+
+      document.addEventListener('keydown', event => {
+        if (['ArrowRight', 'PageDown', 'Enter'].includes(event.key) || (event.key === ' ' && !event.shiftKey)) { event.preventDefault(); show(index + 1); }
+        if (['ArrowLeft', 'PageUp', 'Backspace'].includes(event.key) || (event.key === ' ' && event.shiftKey)) { event.preventDefault(); show(index - 1); }
+        if (event.key === 'Home') show(0);
+        if (event.key === 'End') show(slides.length - 1);
+        if (event.key.toLowerCase() === 'f') document.getElementById('fullscreen').click();
+        if (event.key.toLowerCase() === 'n') document.body.classList.toggle('show-notes');
+      });
+
+      let touchStart = null;
+      document.addEventListener('touchstart', event => { touchStart = event.changedTouches[0].clientX; }, { passive: true });
+      document.addEventListener('touchend', event => {
+        if (touchStart === null) return;
+        const delta = event.changedTouches[0].clientX - touchStart;
+        if (Math.abs(delta) > 50) show(index + (delta < 0 ? 1 : -1));
+        touchStart = null;
+      }, { passive: true });
+
+      show(index, false);
+    })();
+  </script>
+</body>
+</html>
