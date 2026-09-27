@@ -41,6 +41,7 @@ Cross-cutting pages (not tracks). The nav groups everything as **Essays · Talks
 - **New talk:** add an entry to `talks/index.html`; if the deck is hosted here, add the self-contained folder `talks/<slug>/` too.
 - **New training:** add an entry to `trainings/index.html` (newest first). Deck-based class: host the self-contained deck under `trainings/<slug>/` and link the deck plus any handout. Training site: link the hosted site or repository and related talks/writing.
 - **New work/repo:** add a card or compact row to `work/index.html`.
+- **Explainer videos:** built as Remotion projects in `video/<slug>/` (Node tooling, kept uncommitted so the site stays build-free). Only the rendered MP4 and a poster JPG are committed, next to the article in `<track>/media/`, and embedded with a native `<video>`. Narration uses macOS `say` via the project's `voiceover.sh`, which sets scene lengths from the audio.
 
 ## Gotchas
 

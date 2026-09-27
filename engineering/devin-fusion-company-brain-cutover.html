@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How Devin Fusion Ran a Five-Day Company-Brain Cutover - Jensen Loke</title>
+  <meta
+    name="description"
+    content="A field report on a 688M-token Devin Fusion session: what a Claude Fable 5.1 lead and a SWE-2 sidekick did to our company brain in five days, why the job was so token-heavy, and where the saving over a single frontier model really comes from."
+  />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+  <meta property="og:title" content="How Devin Fusion Ran a Five-Day Company-Brain Cutover - Jensen Loke" />
+  <meta property="og:description" content="688M tokens, one Devin session, two models. Why the job was token-heavy, and why the Fusion saving is mostly input, not output." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jensenloke.github.io/engineering/devin-fusion-company-brain-cutover.html" />
+  <meta property="og:image" content="https://jensenloke.github.io/engineering/media/devin-fusion-token-economics-poster.jpg" />
+    <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header>
+<header class="site-header">
+    <div class="article-header">
+
+      <p class="article-kicker">Success IT Engineering &middot; Devin Ambassador field report &middot; Agentic engineering</p>
+      <h1 class="article-title">How Devin Fusion Ran a Five-Day Company-Brain Cutover</h1>
+      <p class="article-subtitle">
+        One Devin CLI session, two models, ~688 million tokens of context. What got done,
+        why the job was so token-heavy, and where the saving over a single frontier model
+        actually comes from.
+      </p>
+      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-09-27">27 September 2026</time> &middot; ~10 min read &middot; Follows <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a></p>
+    </div>
+  </header>
+
+  <main class="article" id="main">
+    <section aria-labelledby="video-title">
+      <div class="section-head">
+        <h2 id="video-title">The short version, in two minutes</h2>
+      </div>
+      <div class="article-wide">
+        <video
+          controls
+          preload="metadata"
+          playsinline
+          poster="media/devin-fusion-token-economics-poster.jpg"
+          style="width:100%;height:auto;display:block;border:1px solid var(--border)"
+          aria-label="Video: the token economics of a Devin Fusion session, narrated with subtitles"
+        >
+          <source src="media/devin-fusion-token-economics.mp4" type="video/mp4" />
+          <a href="media/devin-fusion-token-economics.mp4">Download the video (MP4, 10 MB)</a>
+        </video>
+      </div>
+      <p class="figcap">Narrated, with burned-in subtitles. All costs in the video are list-price reconstructions from the method below. Also on <a href="https://youtu.be/NBUjcY3s2cc">YouTube</a>.</p>
+      <p class="note">
+        <strong>Disclosure.</strong> I am a Devin ambassador. This describes a real production system; hostnames,
+        page identifiers, customer names, tokens and credentials are omitted. Counts, dates and token figures come
+        from Git history and the Devin CLI's local session store on my machine. Every dollar figure is a list-price
+        reconstruction, not a bill.
+      </p>
+    </section>
+
+    <section aria-labelledby="project-title">
+      <div class="section-head">
+        <h2 id="project-title">What the project was</h2>
+      </div>
+      <p>
+        Success IT runs a fleet of AI agents - support, engineering and synthesis agents, coding harnesses such as
+        Devin and Codex, and humans - that share one durable memory about our products, tickets and runbooks. That
+        memory is the <em>company brain</em>: a GBrain engine serving Git-backed Markdown over MCP.
+      </p>
+      <p>
+        The design, argued in <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a>, is
+        <strong>fences, not gates</strong>: agents write directly, but only inside a prefix the server enforces;
+        Git history is the audit trail; a frozen archive holds historical imports, labelled as such; and I only get
+        pinged for exceptions. My brief to Devin was blunt:
+      </p>
+      <blockquote class="callout">
+        "I need assurance that the whole process is EASY. I don't want to have to review all the information all the
+        time. I only want to handle exceptions." And: "Let's not deviate from the intention of the authors of GBrain."
+      </blockquote>
+      <p>
+        So the work was the opposite of building a pipeline. Retire my custom capture-verify-promote pipeline, move
+        to the engine's stock model, then make the brain genuinely useful for development, product understanding
+        and support.
+      </p>
+    </section>
+
+    <section aria-labelledby="done-title">
+      <div class="section-head">
+        <h2 id="done-title">What got done, 21-26 September</h2>
+        <p>Seven merged pull requests on our private brain repository, plus two issues filed upstream on GBrain.</p>
+      </div>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Phase</th><th>What Devin did</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Phase">Cutover</td><td data-label="What Devin did">Moved to stock GBrain 0.51 and its managed writer; retired the custom pipeline. One shared company source, a frozen archive of ~1,160 imports, a restricted internal source. Agent clients re-issued as server-fenced clients, and verified live that a write outside the fence is refused.</td></tr>
+            <tr><td data-label="Phase">Re-carve</td><td data-label="What Devin did">~760 pages had been wrongly archived. Classified them <em>before</em> moving anything, then refiled them by subject with lineage metadata.</td></tr>
+            <tr><td data-label="Phase">Searchability</td><td data-label="What Devin did">Resolved all 35 same-title groups by comparing bodies: one canonical copy, near-duplicates archived with a pointer, genuinely different chapters kept and retitled. Titled 46 untitled pages. Whole tree: 1,525 files, zero broken frontmatter.</td></tr>
+            <tr><td data-label="Phase">Sync stall</td><td data-label="What Devin did">Diagnosed a managed-sync wedge from the engine source, wrote a recovery loop that stops only on a real block, and reported it upstream instead of forking - <a href="https://github.com/garrytan/gbrain/issues/5353">gbrain #5353</a>, since fixed on master.</td></tr>
+            <tr><td data-label="Phase">Synthesis</td><td data-label="What Devin did">Wired the engine's native synthesis to our existing model gateway, then caught its own mistake (below) and proposed a configurable evidence budget upstream - <a href="https://github.com/garrytan/gbrain/issues/5461">gbrain #5461</a>.</td></tr>
+            <tr><td data-label="Phase">Lean model agent</td><td data-label="What Devin did">Gave the brain's own model calls a minimal agent (~2.2k-token prompt, no tools) instead of riding on a 13k-token support persona.</td></tr>
+            <tr><td data-label="Phase">Retrieval</td><td data-label="What Devin did">14 product hub pages with aliases so product nicknames resolve. Found that the engine silently skips <code>index.md</code> as a metafile and renamed the hubs. Marked 16 empty pages as stubs so agents flag rather than cite them.</td></tr>
+            <tr><td data-label="Phase">Maintenance</td><td data-label="What Devin did">Tightened the nightly jobs and purged 1,899 dead index rows with the engine's native purge, after a fresh backup; the files stay in Git.</td></tr>
+            <tr><td data-label="Phase">Evaluation</td><td data-label="What Devin did">Wrote a 15-question eval on our oldest product line, ran it over MCP as a fenced agent, and graded every raw answer. Retrieval 11/15, citations 13/15, correct-and-complete 10.5/15 - and <strong>zero invented answers</strong>.</td></tr>
+            <tr><td data-label="Phase">Handover</td><td data-label="What Devin did">Two handover documents for successor agents, grounded on a fresh status check, with a "do not redo / do not undo" list.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="finding-title">
+      <div class="section-head">
+        <h2 id="finding-title">The finding I would not have found on my own</h2>
+      </div>
+      <p>
+        On day two, Devin reported that native synthesis was working well: a clean two-method reconciliation
+        procedure, with a real conflict flagged between two manuals. On day three it came back with a correction.
+        It had captured the exact request the engine sent to the model, and the evidence block for the relevant page
+        contained <em>only provenance</em>. The detailed answer had come from another agent's injected memory, not
+        from the brain. The lean agent, given the same block, had answered "the excerpt contains only provenance" -
+        the faithful answer.
+      </p>
+      <p>
+        In Devin's words: "I reported that answer as good yesterday; that was wrong." It then rerouted the engine's
+        model calls to the lean agent, rewrote the agent instructions to read the full page before quoting, and
+        filed the evidence-budget issue upstream. That is the behaviour I want from a coworker.
+      </p>
+    </section>
+
+    <section aria-labelledby="split-title">
+      <div class="section-head">
+        <h2 id="split-title">How Fusion split the work</h2>
+      </div>
+      <p>
+        <a href="https://cognition.com/blog/devin-fusion">Devin Fusion</a> runs two full agents in one session. The
+        lead (Claude Fable 5.1 Medium) owns the plan, the interpretation of ambiguity, the correctness-critical
+        authoring, the review, and every word to me. The sidekick (SWE-2 Medium) does the hands-on work from a
+        bounded brief: running the sync loop, patching scripts, generating the 14 hubs, executing the 75 MCP calls
+        of the eval, collecting evidence read-only. Cognition's own description of the lead: it "should take minimal
+        actions, and only read what is absolutely necessary. By default it should delegate and monitor, while making
+        the significant decisions."
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Dimension</th><th>Value</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Dimension">Messages from me</td><td data-label="Value">613</td><td data-label="Source">session store, role = user</td></tr>
+            <tr><td data-label="Dimension">Lead-agent messages</td><td data-label="Value">6,977</td><td data-label="Source">session store, role = assistant</td></tr>
+            <tr><td data-label="Dimension">Lead tool calls</td><td data-label="Value">997</td><td data-label="Source">tool-call table</td></tr>
+            <tr><td data-label="Dimension">Sidekick handoffs</td><td data-label="Value">61</td><td data-label="Source">tool-call table, <code>sidekick</code> tool</td></tr>
+            <tr><td data-label="Dimension">Lead turns with a recorded context size</td><td data-label="Value">3,602</td><td data-label="Source"><code>num_tokens_preceding</code></td></tr>
+            <tr><td data-label="Dimension">Average context per lead turn</td><td data-label="Value">~191k tokens</td><td data-label="Source">mean of the above</td></tr>
+            <tr><td data-label="Dimension">Sum of lead context across all turns</td><td data-label="Value">~688M tokens</td><td data-label="Source">sum of the above</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="tokens-title">
+      <div class="section-head">
+        <h2 id="tokens-title">Why this job was so token-heavy</h2>
+      </div>
+      <p>
+        This was not greenfield coding. It was operations and data cleanup: reading whole pages before moving them,
+        comparing duplicate bodies, reading engine source to diagnose a sync stall, and reading every eval answer
+        before grading it. The lead carried ~191k tokens of context on every turn, for 3,602 turns.
+      </p>
+      <p>
+        The transcript also carries one metered window - 66 lead steps between 24 Sep 07:31 and 25 Sep 04:21 UTC,
+        about 21 hours in the middle of the work:
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Metered window (lead)</th><th>Tokens</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Metered window">Prompt tokens</td><td data-label="Tokens">9,059,571</td></tr>
+            <tr><td data-label="Metered window">&nbsp;&nbsp;of which cached</td><td data-label="Tokens">7,862,134 (86.8%)</td></tr>
+            <tr><td data-label="Metered window">&nbsp;&nbsp;of which uncached</td><td data-label="Tokens">1,197,437</td></tr>
+            <tr><td data-label="Metered window">Completion tokens</td><td data-label="Tokens">70,277</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        That is <strong>about 129 tokens read for every token written</strong>. The frontier model barely typed. It
+        wrote briefs, read reports, reviewed diffs and talked to me. A workload shaped like this is exactly where the
+        question "which model reads what" decides the bill.
+      </p>
+    </section>
+
+    <section aria-labelledby="cost-title">
+      <div class="section-head">
+        <h2 id="cost-title">What it would have cost on other pairings</h2>
+        <p>List prices in USD per million tokens, from the vendors' pricing pages on 26 September 2026.</p>
+      </div>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Model</th><th>Input</th><th>Cache hit</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Model">Claude Fable 5.1</td><td data-label="Input">$10.00</td><td data-label="Cache hit">$0.25</td><td data-label="Output">$50.00</td></tr>
+            <tr><td data-label="Model">Claude Opus 5</td><td data-label="Input">$5.00</td><td data-label="Cache hit">$0.50</td><td data-label="Output">$25.00</td></tr>
+            <tr><td data-label="Model">Claude Sonnet 5</td><td data-label="Input">$2.00</td><td data-label="Cache hit">$0.20</td><td data-label="Output">$10.00</td></tr>
+            <tr><td data-label="Model">SWE-2 (Cognition)</td><td data-label="Input">$3.00</td><td data-label="Cache hit">$0.30</td><td data-label="Output">$15.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Assumptions</h3>
+      <ul>
+        <li><strong>Lead volume:</strong> 688M context tokens, split at the measured 86.8% cached / 13.2% uncached (597M / 90.8M). Lead output: ~0.35M tokens of stored text; I allow 1M to cover reasoning tokens.</li>
+        <li><strong>Sidekick volume:</strong> not recorded locally. I assume it processed the same context volume as the lead at the same cache ratio, and produced five times the output (5M tokens) because it writes the code and scripts. It could be half or double.</li>
+        <li>Cache writes priced as base input; batch discounts ignored. The metered window covers 21 of ~118 hours, so treat every figure as an order of magnitude.</li>
+      </ul>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Configuration</th><th>Lead</th><th>Sidekick</th><th>Total (list)</th><th>vs. what I ran</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Configuration"><strong>Fusion: Fable 5.1 lead + SWE-2 sidekick</strong> (what I ran)</td><td data-label="Lead">~$1,110</td><td data-label="Sidekick">~$525</td><td data-label="Total"><strong>~$1,640</strong></td><td data-label="vs.">-</td></tr>
+            <tr><td data-label="Configuration">Fable 5.1 lead + Opus 5 sidekick</td><td data-label="Lead">~$1,110</td><td data-label="Sidekick">~$880</td><td data-label="Total">~$1,990</td><td data-label="vs.">+21%</td></tr>
+            <tr><td data-label="Configuration">Fable 5.1 lead + Sonnet 5 sidekick</td><td data-label="Lead">~$1,110</td><td data-label="Sidekick">~$350</td><td data-label="Total">~$1,460</td><td data-label="vs.">-11% per token (see below)</td></tr>
+            <tr><td data-label="Configuration">Fable 5.1 alone, doing both roles</td><td data-label="Lead">~$1,110</td><td data-label="Sidekick">~$1,310</td><td data-label="Total">~$2,420</td><td data-label="vs.">+48%</td></tr>
+            <tr><td data-label="Configuration">Opus 5 alone, doing both roles</td><td data-label="Lead">~$780</td><td data-label="Sidekick">~$880</td><td data-label="Total">~$1,660</td><td data-label="vs.">about the same money, weaker lead</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="figcap">
+        Lead on Fable: 90.8M uncached &times; $10 + 597M cached &times; $0.25 + 1M out &times; $50. Sidekick on SWE-2:
+        90.8M &times; $3 + 597M &times; $0.30 + 5M &times; $15. Other rows substitute prices. Rounded to the nearest $10.
+      </p>
+    </section>
+
+    <section aria-labelledby="reading-title">
+      <div class="section-head">
+        <h2 id="reading-title">Where the saving actually comes from</h2>
+      </div>
+      <p>
+        My first instinct was that Fusion saves money because the expensive model does not type. The numbers say
+        otherwise. Here is the sidekick line, priced on Fable versus on SWE-2:
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Sidekick line</th><th>On Fable 5.1</th><th>On SWE-2</th><th>Difference</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Line">Uncached input (90.8M)</td><td data-label="Fable">$908</td><td data-label="SWE-2">$272</td><td data-label="Difference"><strong>$636</strong></td></tr>
+            <tr><td data-label="Line">Cached input (597M)</td><td data-label="Fable">$149</td><td data-label="SWE-2">$179</td><td data-label="Difference">-$30</td></tr>
+            <tr><td data-label="Line">Output (5M)</td><td data-label="Fable">$250</td><td data-label="SWE-2">$75</td><td data-label="Difference">$175</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ol>
+        <li>
+          <strong>About 80% of the gap is uncached input, not output.</strong> Fable alone costs ~48% more than the
+          pairing - equivalently, Fusion is ~32% cheaper, against the 41% Cognition reports for Fusion with Fable 5 on
+          its FrontierCode benchmark. Most of that comes from the bulk context the sidekick reads at $3 per million
+          instead of $10. Output savings are real but small.
+        </li>
+        <li>
+          <strong>The lead's own bill is mostly cache misses.</strong> Of the lead's ~$1,110, about $908 (82%) is
+          uncached input. Fable 5.1's cache-hit rate ($0.25) is half of Opus 5's ($0.50), so a frontier lead that
+          stays in cache is cheap to keep reading. Missing the cache is what costs money.
+        </li>
+        <li>
+          <strong>Splitting only pays if neither model loses its cache.</strong> "Ask the smart model" tools re-send
+          the task context on every call, uncached. In Fusion, the lead and the sidekick each keep their own
+          persistent, cached context, and model switches happen at context compaction, which would miss the cache
+          anyway. 87% of my lead's context was a cache hit.
+        </li>
+        <li>
+          <strong>Caching is why the job was affordable at all.</strong> At Fable list rates the lead's 688M context
+          tokens cost ~$1,060 with that hit rate (90.8M &times; $10 + 597M &times; $0.25), against ~$6,880 with no cache
+          at all. That saving belongs to caching, not to Fusion specifically - but it is the constraint any
+          multi-model split has to preserve.
+        </li>
+        <li>
+          <strong>Against Opus 5 as sidekick, SWE-2 saves roughly $350 here.</strong> Against Sonnet 5 it is
+          <em>not</em> cheaper per token. The argument for SWE-2 is price per task - fewer retries and fewer expensive
+          review rounds for the lead. Across 61 handoffs I sent one consolidated rework brief that I can recall, but
+          one project cannot prove that counterfactual, so I will not claim it.
+        </li>
+        <li>
+          <strong>In practice the bill was a plan quota.</strong> The session metadata records zero credit cost, and I
+          hit my self-serve plan's usage limit on day five. The table is what this work is worth at list price, not
+          what I paid.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="felt-title">
+      <div class="section-head">
+        <h2 id="felt-title">What the pairing felt like to operate</h2>
+      </div>
+      <ul>
+        <li><strong>Judgment stayed with the lead.</strong> The eval questions, the grading rubric, the upstream issue text and every architecture decision were authored by Fable; the sidekick executed the 75 MCP calls from the spec and handed back raw results. When I asked it to think harder, the answer was a ranked list of five retrieval optimisations with payoff estimates - not more tool calls.</li>
+        <li><strong>The sidekick survived interrupts.</strong> Twice I paused the session because another agent was working on the same system. When I said "continue", the lead first re-checked the vault, the writer queue and the sync position rather than assuming nothing had changed.</li>
+        <li><strong>Reports were reviewed, not trusted.</strong> The lead read query results itself when ranking moved the wrong way, read a 20-page sample itself before recommending I keep another agent's ingest, and read every eval answer before grading. That is where the frontier model earned its rate.</li>
+        <li><strong>Handovers were part of the job.</strong> When I said we were close to the usage limit, the output was a 274-line handover grounded on a fresh status check, committed and linked, so the next agent on any harness could pick it up.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="next-title">
+      <div class="section-head">
+        <h2 id="next-title">Where it stands</h2>
+      </div>
+      <p>
+        Stock GBrain, one shared source with server-enforced writer fences, direct writes, native maintenance timers,
+        a frozen labelled archive, and Git as the authority. No custom review pipeline. I approve clients and handle
+        exceptions. Next on the handover list: retype 717 session-note pages so documentation questions can filter
+        them, extend product aliases for the variants the eval missed, re-run the same 15 questions for a
+        before/after, and hand the five genuine content gaps to a human.
+      </p>
+      <p class="note">
+        Method: counts come from the Devin CLI's local session database and transcript (message roles, tool-call
+        table, per-turn context sizes, and one metered window with prompt, cached and completion tokens), read
+        read-only. The session ran from 21 Sep 02:34 UTC to 26 Sep 00:18 UTC. An earlier, smaller Fusion session on
+        the same repository (14-15 Sep) is not included. Fusion design details from
+        <a href="https://cognition.com/blog/devin-fusion">Cognition's Devin Fusion post</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="related-title">
+      <div class="section-head">
+        <h2 id="related-title">Related</h2>
+        <p>The design this cutover implemented, and the systems around it.</p>
+      </div>
+      <ul>
+        <li>
+          <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a> - why personal and company
+          agent memory split, and the fenced design this session put into production.
+        </li>
+        <li>
+          <a href="./codegraph-tour.html">From Company Knowledge to Verified Changes</a> - how the company brain
+          fits alongside CodeGraph and verifiers in our engineering workflow.
+        </li>
+        <li>
+          <a href="../second-brain/the-last-project-you-build-alone.html">The Last Project You Build Alone</a> - why
+          a brain should outlive any one AI harness.
+        </li>
+        <li>
+          <a href="https://cognition.com/blog/devin-fusion">Devin Fusion</a> - Cognition's design notes on the
+          sidekick harness.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer>
+</body>
+</html>
