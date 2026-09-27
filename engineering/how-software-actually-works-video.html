@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How Software Actually Works, in 95 Seconds - Jensen Loke</title>
+  <meta
+    name="description"
+    content="A 95-second video tour of the How Software Actually Works class: terminal, files, apps, browser, deployment, git, agents and build day. Made in code with Remotion."
+  />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+  <meta property="og:title" content="How Software Actually Works, in 95 Seconds - Jensen Loke" />
+  <meta property="og:description" content="The eight layers of the How Software Actually Works class in a 95-second video, made in code with Remotion." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jensenloke.github.io/engineering/how-software-actually-works-video.html" />
+  <meta property="og:image" content="https://i.ytimg.com/vi/FeC6vwJIoLI/hqdefault.jpg" />
+    <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header>
+<header class="site-header">
+    <div class="article-header">
+
+      <p class="article-kicker">Success IT Engineering &middot; Video &middot; Foundations for the AI era</p>
+      <h1 class="article-title">How Software Actually Works, in 95 Seconds</h1>
+      <p class="article-subtitle">
+        A two-hour class, compressed into one short video: the mental map behind every app you
+        use, and the map you hand to an AI agent so it can build with you.
+      </p>
+      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-09-28">28 September 2026</time> &middot; 95-second video &middot; Companion to the <a href="../trainings/how-software-actually-works/">class deck</a></p>
+    </div>
+  </header>
+
+  <main class="article" id="main">
+    <section aria-labelledby="video-title">
+      <div class="section-head">
+        <h2 id="video-title">Watch</h2>
+      </div>
+      <div class="article-wide">
+        <div style="position:relative;width:100%;aspect-ratio:16/9;border:1px solid var(--border)">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/FeC6vwJIoLI"
+            title="Video: How Software Actually Works, a 95-second tour of the eight layers"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            loading="lazy"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+      <p class="figcap">With on-screen captions. Also on <a href="https://youtu.be/FeC6vwJIoLI">YouTube ↗</a>.</p>
+    </section>
+
+    <section aria-labelledby="why-title">
+      <div class="section-head">
+        <h2 id="why-title">Why this class exists</h2>
+      </div>
+      <p>
+        AI writes code now. The scarce skill is steering: knowing where code lives, how it runs, and how it
+        ships. You do not need to become a programmer to do that. You need the map. The class walks through
+        it in seven layers plus a build day, with a live demo at each one. The video is the same map at speed.
+      </p>
+    </section>
+
+    <section aria-labelledby="map-title">
+      <div class="section-head">
+        <h2 id="map-title">The map, layer by layer</h2>
+      </div>
+      <ol>
+        <li><strong>Terminal</strong> - how you, and agents, talk to the machine. Every file has one address: its path.</li>
+        <li><strong>Files</strong> - bytes plus a promise. Rename <code>notes.md</code> to <code>notes.txt</code> and the bytes don't change, only the promise does.</li>
+        <li><strong>Apps</strong> - every app is a restaurant: frontend is the dining room, backend the kitchen, database the pantry, auth the keycard.</li>
+        <li><strong>Browser</strong> - name, address, request, files, pixels. HTML is the skeleton, CSS the skin, JavaScript the muscle.</li>
+        <li><strong>Deployment</strong> - localhost to break things, Vercel to go public, Supabase for memory and logins, Docker to box the whole machine.</li>
+        <li><strong>Git and CI/CD</strong> - a time machine for folders, and robots that check every change before it ships.</li>
+        <li><strong>Agents</strong> - <code>AGENTS.md</code> is always-on orientation; skills are runbooks loaded on demand. Both are plain text in the repo.</li>
+        <li><strong>Build day</strong> - a todo app takes ten minutes by hand and under a minute by agent. The app is the tip; hosting, accounts, backups and security are the iceberg.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="made-title">
+      <div class="section-head">
+        <h2 id="made-title">How the video was made</h2>
+      </div>
+      <p>
+        The video is code. It was built with <a href="https://www.remotion.dev/">Remotion</a>, which renders
+        React components frame by frame into an MP4. Every animation, from the typed terminal commands to the
+        request packet travelling to the database and back, is a function of the frame number, so each render
+        comes out identical. The colours and type are lifted from the class deck, so the video and the slides
+        read as one piece.
+      </p>
+      <p>
+        The starting point was <a href="https://gist.github.com/ThariqS/3d446e7c7aa9eb94f468194deb73028f">a
+        CLAUDE.md for Remotion projects</a>: a briefing file that teaches a coding agent the framework's rules.
+        That is layer 7 of the class in practice. Hand the agent the map, and it can build the thing with you.
+      </p>
+    </section>
+
+    <section aria-labelledby="related-title">
+      <div class="section-head">
+        <h2 id="related-title">Related</h2>
+        <p>The full class, and other writing on working with agents.</p>
+      </div>
+      <ul>
+        <li>
+          <a href="../trainings/how-software-actually-works/">How Software Actually Works</a> - the full 54-slide
+          class deck, with quizzes, checkpoints and speaker notes.
+        </li>
+        <li>
+          <a href="../trainings/how-software-actually-works/handout.html">The one-page handout</a> - the eight-layer
+          map on a printable A4 sheet.
+        </li>
+        <li>
+          <a href="../talks/#trainings">Talks &amp; Trainings</a> - other classes and training material.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer>
+</body>
+</html>
