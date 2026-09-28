@@ -192,6 +192,15 @@
     .watch-row span { display: block; margin-top: .5cqh; color: var(--muted); font-size: 1cqw; }
     .live-dot { display: inline-block; width: .8cqw; height: .8cqw; margin-right: .6cqw; border-radius: 50%; background: var(--sky); box-shadow: 0 0 1cqw var(--sky); vertical-align: middle; }
 
+    /* Connect */
+    .qr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.6cqw; margin-top: 5cqh; }
+    .qr-card { display: flex; flex-direction: column; align-items: center; padding: 3.6cqh 2cqw 3.2cqh; text-align: center; color: inherit; text-decoration: none; }
+    .qr-card img { display: block; width: 17cqw; height: 17cqw; padding: .9cqw; background: #fff; box-shadow: .6cqw .8cqh 0 rgba(91,124,250,.45); }
+    .qr-card .eyebrow { margin-top: 3.4cqh; font-size: .82cqw; }
+    .qr-card strong { display: block; margin-top: 1.2cqh; font-size: 1.7cqw; }
+    .qr-card span { display: block; margin-top: .8cqh; color: var(--muted); font-size: .95cqw; }
+    .qr-card.repo { border-color: var(--sky); box-shadow: 0 0 3cqw rgba(76,194,255,.14), var(--shadow); }
+
     /* Controls and notes */
     .controls {
       position: fixed; z-index: 50; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
@@ -258,7 +267,7 @@
             </div>
           </div>
         </div>
-        <div class="footer-rule"><span>Numbers in code · Words in the model · Judgement with the human</span><span>01 / 05</span></div>
+        <div class="footer-rule"><span>Numbers in code · Words in the model · Judgement with the human</span><span>01 / 06</span></div>
         <aside class="notes">Wait for the host's handover. One line on the frame: the agent drafts, the engine prices, the underwriter decides. The case-study card repeats the organiser's assumptions: no claims, new policy, everything else from public sources on the insured's website.</aside>
       </section>
 
@@ -282,7 +291,7 @@
           <div class="bio-fact panel edge"><span>Now</span><strong>CEO, Success IT</strong></div>
           <div class="bio-fact panel edge"><span>Community</span><strong>1,000+ Agentic Builders</strong></div>
         </div>
-        <div class="footer-rule"><span>linkedin.com/in/jensenloke</span><span>02 / 05</span></div>
+        <div class="footer-rule"><span>linkedin.com/in/jensenloke</span><span>02 / 06</span></div>
         <aside class="notes">Thirty seconds at most; the slot is short. I'm on the AI side of the fight, not an underwriter. My career has been building digital products across banking and corporate platforms. Today I run Success IT and help convene the Agentic Builders Collective.</aside>
       </section>
 
@@ -311,7 +320,7 @@
             </div>
           </div>
         </div>
-        <div class="footer-rule"><span>Compute · Network · Router · Model</span><span>03 / 05</span></div>
+        <div class="footer-rule"><span>Compute · Network · Router · Model</span><span>03 / 06</span></div>
         <aside class="notes">This answers "how does it work, and what does it cost". The model runs on one DGX Spark in my home lab, reached privately over Tailscale through a LiteLLM router. For an underwriter that means the research stays on hardware I control, and a run has no per-token bill. The same agent can point at a cloud model instead; that's one setting.</aside>
       </section>
 
@@ -336,7 +345,7 @@
           <div class="rule"><b class="sky">Words in the model</b>Research and narrative come with citations. "None identified" is a finding; a blank is not.</div>
           <div class="rule"><b>Judgement with the human</b>The agent refers when it's unsure instead of bluffing a number. An underwriter signs off.</div>
         </div>
-        <div class="footer-rule"><span>Agent + deterministic engine + human review</span><span>04 / 05</span></div>
+        <div class="footer-rule"><span>Agent + deterministic engine + human review</span><span>04 / 06</span></div>
         <aside class="notes">This is "how I approached it". Not one big prompt: specialist research teams read the public filings in parallel, a lead model writes the cited proposal, the underwriter reviews it, and the pricing and referral checks are ordinary code built from the worksheet's own formulas. The leveling assumptions (no claims, new policy) are enforced in code, not left to the model.</aside>
       </section>
 
@@ -365,15 +374,42 @@
             </div>
           </div>
         </div>
-        <div class="footer-rule"><span>Prompt Fight · PLUS 2026 Singapore Symposium</span><span>05 / 05</span></div>
+        <div class="footer-rule"><span>Prompt Fight · PLUS 2026 Singapore Symposium</span><span>05 / 06</span></div>
         <aside class="notes">Switch to the terminal. Start a live Sheng Siong run to show the research lanes working, then switch to the pre-run completed before the session for the output: a full run takes longer than the slot. Walk the output: premium, referral status, two judgement calls. Then cover challenges, surprises, and what I'd build with more time.</aside>
+      </section>
+      <!-- 06 — Connect -->
+      <section class="slide" data-title="Connect">
+        <div class="topline"><div class="lockup"><span class="badge">05</span><span>Scan to connect</span></div><span class="slide-no">06</span></div>
+        <div class="section-title"><div class="eyebrow">Thank you</div><h2>Take the agent home.</h2></div>
+        <div class="qr-grid">
+          <a class="qr-card panel" href="https://x.com/jensenloke" target="_blank" rel="noopener">
+            <img src="public-assets/qr-x.svg" alt="QR code for Jensen Loke on X, x.com/jensenloke">
+            <div class="eyebrow">X · Twitter</div>
+            <strong>@jensenloke</strong>
+            <span>x.com/jensenloke</span>
+          </a>
+          <a class="qr-card panel" href="https://www.linkedin.com/in/jensenloke/" target="_blank" rel="noopener">
+            <img src="public-assets/qr-linkedin.svg" alt="QR code for Jensen Loke on LinkedIn, linkedin.com/in/jensenloke">
+            <div class="eyebrow">LinkedIn</div>
+            <strong>Jensen Loke</strong>
+            <span>linkedin.com/in/jensenloke</span>
+          </a>
+          <a class="qr-card panel repo" href="https://github.com/jensenloke/andrew-do-worksheet" target="_blank" rel="noopener">
+            <img src="public-assets/qr-andrew-repo.svg" alt="QR code for the ANDREW open-source repository on GitHub">
+            <div class="eyebrow">Open source · GitHub</div>
+            <strong>ANDREW</strong>
+            <span>github.com/jensenloke/andrew-do-worksheet</span>
+          </a>
+        </div>
+        <div class="footer-rule"><span>Prompt Fight · PLUS 2026 Singapore Symposium</span><span>06 / 06</span></div>
+        <aside class="notes">Leave this up through Q&amp;A. ANDREW is open source: underwriters can run it on their own laptop against any OpenAI-compatible model, local or cloud.</aside>
       </section>
     </div>
   </main>
 
   <nav class="controls" aria-label="Presentation controls">
     <button type="button" id="prev" aria-label="Previous slide">←</button>
-    <span class="counter" id="counter">1 / 5</span>
+    <span class="counter" id="counter">1 / 6</span>
     <button type="button" id="next" aria-label="Next slide">→</button>
     <button type="button" id="fullscreen" aria-label="Toggle fullscreen">⛶</button>
   </nav>
