@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Company Brain Structure - Jensen Loke</title>
+    <meta
+      name="description"
+      content="The structure of a shared company second brain at the level already made public: three governed sources, a subject-folder taxonomy, per-product and per-agent write prefixes, OAuth fences the server enforces, revision-safe writes, and git-backed Markdown as the durable authority."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+    <meta property="og:title" content="Company Brain Structure - Jensen Loke" />
+    <meta property="og:description" content="The structure of a shared company second brain at the level already made public: three governed sources, a subject-folder taxonomy, per-product and per-agent write prefixes, server-enforced OAuth fences, and git-backed Markdown as authority." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jensenloke.github.io/second-brain/company-brain-structure.html" />
+    <style>
+      /* Scoped: the source/folder topology rendered as a dark terminal-style figure. */
+      .tree-panel{background:#141a28;border-radius:14px;padding:22px 20px;overflow-x:auto;margin-block:26px 10px}
+      .tree-panel pre{margin:0;width:max-content;min-width:100%;font:13px/1.62 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;color:#c9d2e4;white-space:pre;background:none;border:none;padding:0}
+      .tree-panel .r{color:#8fb0ff;font-weight:700}
+      .tree-panel .n{color:#7fd6a8}
+      .tree-panel .c{color:#78839b}
+      .tree-panel .w{color:#ffc46b;font-weight:700}
+      .tree-panel .d{color:#f0a0a4}
+      .tree-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted);margin-block:0 22px}
+      .tree-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+    </style>
+      <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
+<body><a class="skip-link" href="#main">Skip to content</a><header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header><div class="article-hero"><p class="article-kicker">Building a Second Brain &middot; Structure reference</p>
+  <h1 class="article-title">Company Brain Structure</h1>
+  <p class="article-subtitle">
+    How a shared company second brain is shaped for many writers, most of them models:
+    three governed sources, a subject-folder taxonomy, and write-fences the server enforces.
+  </p>
+  <p class="article-byline">Jensen Loke &middot; <time datetime="2026-09-30">30 September 2026</time> &middot; snapshot &middot; ~5 min read</p></div><main class="article" id="main">
+  <section>
+    <p class="note">
+      This is the company half of the two-brain split described in
+      <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a>.
+      It is published at the same conceptual level as that essay: the shape and the
+      governance model, not hostnames, server paths, internal identifiers, product or
+      agent names, security specifics, or live counts. The personal half has its own
+      <a href="./personal-brain-structure.html">structure reference</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="problem-title">
+    <div class="section-head">
+      <h2 id="problem-title">The problem the structure solves</h2>
+    </div>
+    <p>
+      A company brain has to solve one problem above all others: <strong>many writers,
+      most of them models, and no reviewer with time to read them all.</strong> The
+      structure below is the answer. It is not a filing convenience - the folder
+      taxonomy, the source split, and the write-fences are what make autonomous
+      writing survivable without a human reading every change.
+    </p>
+    <p>
+      One engine serves three sources. Git-backed Markdown is the durable authority;
+      the database and the vector index are projections of it - diffable, revertible,
+      replaceable. That single choice is what lets agents write freely: any bad write
+      is a commit you can inspect and roll back.
+    </p>
+  </section>
+
+  <section aria-labelledby="tree-title">
+    <div class="section-head">
+      <h2 id="tree-title">The topology</h2>
+      <p>Three sources beside one another, and the folder shape of the shared source.</p>
+    </div>
+    <div class="tree-panel article-wide" role="img" aria-label="Company brain topology: one shared company source with subject folders decisions, standards, domain, platform, runbooks, incidents and sources, plus a products folder per registered product and an agents folder per writer; beside it a frozen read-only archive of historical imports labelled historical, and a restricted internal source with no agent grants. Fenced agent clients write only inside their own agents prefix and products.">
+<pre><span class="r">company-brain/</span>                              <span class="c">one engine · three sources · git is authority</span>
+│
+├── <span class="r">shared/</span>                                  <span class="c">the one writable company source (~hundreds of pages)</span>
+│   │
+│   ├── <span class="r">decisions/</span>                            <span class="c">records of what was decided and why</span>
+│   ├── <span class="r">standards/</span>                            <span class="c">company conventions and policy</span>
+│   ├── <span class="r">domain/</span>                               <span class="c">business-domain knowledge</span>
+│   ├── <span class="r">platform/</span>                             <span class="c">platform / engineering reference</span>
+│   ├── <span class="r">runbooks/</span>                             <span class="c">operational procedures</span>
+│   ├── <span class="r">incidents/</span>                            <span class="c">incident records</span>
+│   ├── <span class="r">sources/</span>                              <span class="c">imported / external source material</span>
+│   │
+│   ├── <span class="r">products/</span>                             <span class="n">&lt;product&gt;/</span>  <span class="c">one folder per registered product</span>
+│   │       <span class="c">└─ product hub + its pages; a product id is the join key</span>
+│   │
+│   └── <span class="r">agents/</span>                               <span class="n">&lt;agent&gt;/</span>   <span class="c">one folder per writer</span>
+│           <span class="c">└─ each agent's own records; the default write fence</span>
+│
+├── <span class="r">archive/</span>                                  <span class="c">frozen · read-only · searchable</span>
+│       <span class="c">historical imports (~thousands of pages); every hit labelled historical,</span>
+│       <span class="c">never silently substituted for current company evidence</span>
+│
+└── <span class="r">internal/</span>                                 <span class="d">restricted · no agent grants · deliberately empty</span>
+        <span class="c">a home for restricted material that agents cannot see</span>
+
+
+<span class="w">write fences (server-enforced, per OAuth client):</span>
+  an agent may <span class="n">put_page</span> only inside  <span class="n">agents/&lt;its-own-name&gt;/</span>  +  <span class="n">products/</span>
+  a write outside that prefix  →  <span class="d">permission denied</span>  <span class="c">(verified live, not policy prose)</span>
+  reads span  <span class="n">shared/</span>  +  <span class="n">archive/</span></pre>
+    </div>
+    <div class="tree-legend article-wide" aria-label="Tree legend">
+      <span><i style="background:#8fb0ff"></i>source / folder</span>
+      <span><i style="background:#7fd6a8"></i>writable / per-item</span>
+      <span><i style="background:#78839b"></i>annotation</span>
+      <span><i style="background:#f0a0a4"></i>restricted / denied</span>
+      <span><i style="background:#ffc46b"></i>the fence itself</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="why-title">
+    <div class="section-head">
+      <h2 id="why-title">Why the shape is what it is</h2>
+    </div>
+    <div class="grid-2 article-wide">
+      <div class="card">
+        <strong>Three sources, not one</strong>
+        <p>A writable shared source, a frozen archive, and a restricted internal source that sits empty with no grants. Separation is the point: current evidence, historical evidence, and material agents must never touch are structurally distinct, not just tagged.</p>
+      </div>
+      <div class="card">
+        <strong>Subject folders + two axes</strong>
+        <p>Shared documentation is filed by subject (decisions, standards, domain, platform, runbooks, incidents, sources). Alongside it, <code>products/&lt;id&gt;/</code> joins knowledge to a product and <code>agents/&lt;name&gt;/</code> gives every writer its own space.</p>
+      </div>
+      <div class="card">
+        <strong>Fences the server enforces</strong>
+        <p>Each agent&rsquo;s credential carries a server-enforced list of write prefixes - its own <code>agents/&lt;name&gt;/</code> plus <code>products/</code>. A write outside the fence returns permission-denied from the server. An agent cannot widen its own surface at runtime.</p>
+      </div>
+      <div class="card">
+        <strong>Archive is labelled, not trusted</strong>
+        <p>The archive is searchable and frozen; every hit is labelled historical. This replaced an old design where ~1,900 imported pages read as ~1,900 things waiting for a human verdict. Most never needed one - so they were frozen, not queued.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="write-title">
+    <div class="section-head">
+      <h2 id="write-title">How a write lands</h2>
+      <p>Revision-safe and asynchronous: a pending response is never treated as a completed write.</p>
+    </div>
+    <div class="timeline article-wide">
+      <article class="card step">
+        <span>01</span>
+        <h3>Read</h3>
+        <p>The agent reads the complete canonical page first - including its current revision.</p>
+      </article>
+      <article class="card step">
+        <span>02</span>
+        <h3>Write</h3>
+        <p>It rewrites the whole page and calls <code>put_page</code> with the expected revision and a fresh request id.</p>
+      </article>
+      <article class="card step">
+        <span>03</span>
+        <h3>Confirm</h3>
+        <p>It polls a receipt until the write is committed and the Markdown file is on disk, then reads the page back in full.</p>
+      </article>
+      <article class="card step">
+        <span>04</span>
+        <h3>Recover</h3>
+        <p>A lost response replays the same request id; a revision conflict is re-read and retried, never forced.</p>
+      </article>
+      <article class="card step">
+        <span>05</span>
+        <h3>Maintain</h3>
+        <p>Nightly native jobs run inside the engine: backlinks, embeddings, orphan scan, and a weekly exceptions digest.</p>
+      </article>
+    </div>
+    <p>
+      My role shrank to the edges: approve a new client, set its fence, handle
+      destructive operations, and decide anything touching <code>internal</code> or the
+      topology. Everything else is agents writing inside their fences, against a record
+      that git makes revertible.
+    </p>
+  </section>
+
+  <section aria-labelledby="verbs-title">
+    <div class="section-head">
+      <h2 id="verbs-title">Retrieval is not one verb</h2>
+      <p>Described conceptually; the exact ranking and provider behaviour is deployment state, not a published guarantee.</p>
+    </div>
+    <div class="article-wide" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Verb</th><th>LLM?</th><th>What it is for</th></tr></thead>
+        <tbody>
+          <tr><td><code>search</code></td><td>no</td><td>Literal-oriented hybrid retrieval. Use it when you know the exact token, name, or slug fragment.</td></tr>
+          <tr><td><code>query</code></td><td>optional</td><td>Hybrid retrieval that may expand into sub-queries. Use it for &ldquo;all the X that do Y&rdquo; concept and landscape questions.</td></tr>
+          <tr><td><code>recall</code></td><td>no</td><td>Returns the service&rsquo;s recall payload. Inspect the shape rather than assuming a populated fact store.</td></tr>
+          <tr><td><code>synthesize</code></td><td>yes</td><td>Cross-page composition with citations and gap reporting. Output is a draft that still needs grounding checks.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      The operating rule that matters more than the verb choice: <strong>a ranked excerpt
+      is not a support procedure.</strong> Inspect source, type, slug, revision, and
+      applicability, then read the complete page. Do not infer completeness from index
+      size or a retrieval score - a confident-looking top hit from the wrong product is
+      the failure mode this rule exists to prevent.
+    </p>
+  </section>
+
+  <section aria-labelledby="boundary-title">
+    <div class="section-head">
+      <h2 id="boundary-title">The boundary that makes it safe</h2>
+    </div>
+    <p>
+      The company brain and the <a href="./personal-brain-structure.html">personal
+      brain</a> are separate systems with different owners, subjects, permissions, and
+      costs of being wrong. Company work stays in company sources. The personal brain is
+      never a fallback, never auto-searched, never federated into a company query, and
+      never a place a company-only agent quietly writes personal or unrelated material.
+    </p>
+    <p>
+      Saving is manual and explicit. Knowledge enters through an authorized save request;
+      session completion, entity mentions, and useful findings alone do not trigger a
+      write. Reading never authorizes a save. These rules - not the retrieval quality -
+      are what let a room full of model writers share one brain without eroding trust in it.
+    </p>
+  </section>
+
+  <section aria-labelledby="related-title">
+    <div class="section-head">
+      <h2 id="related-title">Related</h2>
+    </div>
+    <ul>
+      <li><a href="./personal-brain-structure.html">Personal Brain Structure</a> - the other half: one numbered PARA vault, enumerated and redacted.</li>
+      <li><a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a> - the full architecture and governance argument this reference summarizes.</li>
+      <li><a href="./knowledge-management-layer-success-it.html">Why a Knowledge Management Layer Still Matters</a> - why access and search alone are not an operating model.</li>
+      <li><a href="./">Building a Second Brain</a> - the research track this reference belongs to.</li>
+    </ul>
+  </section>
+</main><footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer></body>
+</html>
