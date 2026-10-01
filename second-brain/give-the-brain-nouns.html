@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Give the Brain Nouns - Jensen Loke</title>
+    <meta name="description" content="How an ontology gives an agent a shared model of the things, relationships, and current state behind a second brain." />
+    <link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header">
+      <p class="article-kicker">Building a Second Brain &middot; Part 3 of 8 &middot; Draft</p>
+      <h1 class="article-title">Give the Brain Nouns</h1>
+      <p class="article-subtitle">An ontology gives agents a stable way to talk about the people, projects, sources, systems, and decisions that make up your world.</p>
+      <p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p>
+    </div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Research status.</strong> Typed relationships and graph retrieval exist in the systems I use and study. A complete operational ontology across my second brain remains future work.</p></section>
+
+      <section aria-labelledby="noun-title"><div class="section-head"><h2 id="noun-title">A name is the beginning of a contract</h2></div>
+        <p>My notes contain many versions of the same thing. A repository can appear as a URL, a project name, a meeting topic, and a line in a task list. A person may appear by name in one document and by role in another. Retrieval can find these mentions. It still has to decide whether they refer to the same entity.</p>
+        <p>An ontology makes that decision explicit. It gives the brain nouns.</p>
+        <p>Instead of treating every mention as fresh text, the system can recognise an <code>Article</code>, <code>Project</code>, <code>Person</code>, <code>Claim</code>, or <code>Source</code>. Each object has properties, and each relationship has a name. An article <em>cites</em> a source. A claim <em>appears in</em> an article. A project <em>owns</em> a repository.</p>
+      </section>
+
+      <section aria-labelledby="folders-title"><div class="section-head"><h2 id="folders-title">This is more than a better folder tree</h2></div>
+        <p>A folder tells me where something was filed. An ontology tells me what the thing is and how it relates to the rest of the system.</p>
+        <p>That difference matters because real work crosses folders. This essay belongs to a research track, continues a previous article, draws on several sources, tests a design idea, and may later become part of a talk. Forcing it into one location hides most of those relationships.</p>
+        <p>A graph can preserve them without making seven copies of the article. It also gives the agent a controlled vocabulary. When I ask for “unfinished second-brain writing supported by CodeGraph research”, the agent can traverse named relationships instead of hoping those words happen to occur together.</p>
+      </section>
+
+      <section aria-labelledby="state-title"><div class="section-head"><h2 id="state-title">The ontology carries present tense</h2></div>
+        <p>The most useful objects carry state. An <code>Article</code> can be <code>draft</code>, <code>reviewed</code>, or <code>published</code>. A <code>Claim</code> can be <code>supported</code>, <code>disputed</code>, or <code>future work</code>. A <code>Source</code> can have a retrieval date and a freshness rule.</p>
+        <p>Those states should not be inferred from whichever paragraph an agent retrieved first. They should be read from an authoritative object, with the document retained as evidence.</p>
+        <div class="comparison article-wide" aria-label="Questions answered by documents and ontology">
+          <article class="card"><h3>Documents ask</h3><p>What was written? What was the reasoning? Which source supports this claim?</p></article>
+          <article class="card"><h3>Ontology asks</h3><p>What exists now? How is it connected? Which state and owner are authoritative?</p></article>
+        </div>
+      </section>
+
+      <section aria-labelledby="small-title"><div class="section-head"><h2 id="small-title">Start with the few nouns that change decisions</h2></div>
+        <p>The temptation is to model everything. That creates an elegant schema nobody can maintain. I prefer to start with the nouns that change what the agent should do.</p>
+        <p>For a personal publishing system, five may be enough: <code>Article</code>, <code>Claim</code>, <code>Source</code>, <code>Series</code>, and <code>Repository</code>. The useful relationships are equally small: <em>supports</em>, <em>continues</em>, <em>implements</em>, and <em>contradicts</em>.</p>
+        <p>The test is practical. Does adding the type prevent a real mistake, improve a useful query, or make authority clearer? If it does none of those, it may only be decorative structure.</p>
+      </section>
+
+      <section aria-labelledby="boundary-title"><div class="section-head"><h2 id="boundary-title">A graph does not make every link true</h2></div>
+        <p>Named relationships still need provenance. Some links are asserted by me. Some are extracted from documents. Some are suggestions awaiting review. The system should not flatten those into the same level of truth.</p>
+        <p>This is especially important when personal and company knowledge remain separate. A shared name does not grant permission to join records across those boundaries. The ontology must respect ownership before it improves convenience.</p>
+        <p>Once the nouns and relationships are stable, the next question becomes possible: what can the system reliably do with them?</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul>
+        <li>Previous: <a href="./documents-are-evidence-not-the-world.html">Documents Are Evidence, Not the World</a></li>
+        <li>Next: <a href="./give-the-brain-verbs.html">Give the Brain Verbs</a></li>
+        <li>Related: <a href="../engineering/codegraph-tour.html">From Company Knowledge to Verified Changes</a></li>
+      </ul></section>
+    </main>
+    <footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

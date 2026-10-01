@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Documents Are Evidence, Not the World - Jensen Loke</title>
+    <meta name="description" content="Why retrieval needs an operational model around it: documents explain the world, but they do not represent its current state." />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="stylesheet" href="/assets/cues.css" />
+    <script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header">
+      <p class="article-kicker">Building a Second Brain &middot; Part 2 of 8 &middot; Draft</p>
+      <h1 class="article-title">Documents Are Evidence, Not the World</h1>
+      <p class="article-subtitle">Retrieval can tell an agent what people wrote. It cannot, by itself, tell the agent what is true now or what it is allowed to change.</p>
+      <p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p>
+    </div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Research status.</strong> Sourced retrieval and separate personal and company memory are working now. The operational model described here is the next layer I am testing.</p></section>
+
+      <section aria-labelledby="answer-title"><div class="section-head"><h2 id="answer-title">A good answer can still describe the wrong moment</h2></div>
+        <p>Imagine asking an agent how to publish an article. It finds a clear checklist, a previous release note, and a conversation where I changed the process. All three documents are relevant. Only one may describe the process I use today.</p>
+        <p>The agent has found evidence. It has not yet found the current state of the world.</p>
+        <p>This is the limit I keep reaching with retrieval. Search can locate a procedure, but it does not automatically know whether that procedure is still binding. It can find a project plan, but it does not know whether the project is active. It can quote a decision without knowing whether I later reversed it.</p>
+      </section>
+
+      <section aria-labelledby="documents-title"><div class="section-head"><h2 id="documents-title">What a document is good at</h2></div>
+        <p>Documents preserve explanations. They hold the reasoning behind a decision, the wording of a policy, the details of a meeting, and the evidence behind a claim. That history matters because an agent should be able to show where an answer came from.</p>
+        <p>My current second-brain work treats provenance as part of the answer. A useful result should identify its source, its age, and the boundary around what was searched. The same principle appears in my <a href="../engineering/codegraph-tour.html">CodeGraph work</a>: a dependency result carries evidence and limitations rather than pretending to be a complete safety guarantee.</p>
+        <p>Documents answer a vital question: <em>What has been recorded about this?</em></p>
+      </section>
+
+      <section aria-labelledby="missing-title"><div class="section-head"><h2 id="missing-title">What the document cannot own</h2></div>
+        <p>A document should not be forced to represent live operational state. A sentence saying that an article is ready for publication is different from the article actually having the state <code>ready</code>. A meeting note naming an owner is different from the system currently assigning that person responsibility.</p>
+        <div class="comparison article-wide" aria-label="Documents and operational state compared">
+          <article class="card"><h3>Document</h3><p>Explains what was said, decided, observed, or proposed. Its strength is evidence and context.</p></article>
+          <article class="card"><h3>Operational object</h3><p>Represents what exists now, how it is connected, who owns it, and which changes are valid.</p></article>
+        </div>
+        <p>If these are collapsed into one thing, the agent starts treating prose as authority. That is dangerous. A draft can look like a policy. A historical incident can look current. A suggestion can look approved.</p>
+      </section>
+
+      <section aria-labelledby="two-title"><div class="section-head"><h2 id="two-title">The two layers should strengthen each other</h2></div>
+        <p>The answer is not to replace documents with a database. The two layers do different jobs.</p>
+        <p>The operational layer can say that an article is a draft, belongs to the second-brain series, cites four sources, and is waiting for my review. The document layer can explain the argument, preserve the source material, and show why I made each editorial choice.</p>
+        <p>A strong agent should move between them. It can inspect the current article object, retrieve the notes supporting a disputed claim, and return with both the state and the evidence. If the two disagree, the disagreement becomes visible instead of being smoothed over by a fluent answer.</p>
+      </section>
+
+      <section aria-labelledby="now-title"><div class="section-head"><h2 id="now-title">What works now, and what comes next</h2></div>
+        <p>Today, I have durable memory behind multiple agent harnesses, explicit routing between personal and company knowledge, sourced pages, and graph-aware retrieval. That is already more useful than a pile of unconnected chat histories.</p>
+        <p>I do not yet have one finished public system where every retrieved document resolves cleanly to a live operational object. That connection is the research programme.</p>
+        <p>The next step is to give the brain nouns: explicit things such as <code>Article</code>, <code>Claim</code>, <code>Source</code>, <code>Project</code>, and <code>Decision</code>, with relationships that an agent can inspect instead of infer again on every turn.</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul>
+        <li>Previous: <a href="./the-last-project-you-build-alone.html">The Last Project You Build Alone</a></li>
+        <li>Next: <a href="./give-the-brain-nouns.html">Give the Brain Nouns</a></li>
+        <li>Related: <a href="./knowledge-management-layer-success-it.html">Why a Knowledge Management Layer Still Matters</a></li>
+      </ul></section>
+    </main>
+    <footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

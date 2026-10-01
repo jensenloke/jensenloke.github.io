@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>From Second Brain to Working System - Jensen Loke</title><meta name="description" content="A target architecture and research roadmap connecting durable memory, documents, ontology, functions, actions, automations, and AI coordination." /><link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script></head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a><header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header"><p class="article-kicker">Building a Second Brain &middot; Part 8 of 8 &middot; Draft</p><h1 class="article-title">From Second Brain to Working System</h1><p class="article-subtitle">Memory gives an agent continuity. An operational model gives it a safe way to participate in what happens next.</p><p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p></div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Series synthesis.</strong> This is the target architecture I am researching. Some layers work independently today; the complete integrated system remains future work.</p></section>
+
+      <section aria-labelledby="start-title"><div class="section-head"><h2 id="start-title">The project began with memory</h2></div>
+        <p>I wanted my AI memory to survive whichever harness I happened to use. Like a password vault, the durable record should remain independent while authorised tools come and go.</p>
+        <p>That led to a personal second brain, a separate company brain, and simple user-facing operations for remembering and recalling. It solved an important problem: a new agent no longer had to meet me as a stranger.</p>
+        <p>It also exposed the next problem. Memory can explain what happened. It does not automatically model what exists now or provide a governed way to change it.</p>
+      </section>
+
+      <section aria-labelledby="stack-title"><div class="section-head"><h2 id="stack-title">Each building block answers one question</h2></div>
+        <div class="comparison article-wide" aria-label="Operational second-brain building blocks">
+          <article class="card"><h3>Documents</h3><p>What has been recorded, and what evidence supports the answer?</p></article>
+          <article class="card"><h3>Ontology</h3><p>What exists now, what state is it in, and how is it connected?</p></article>
+          <article class="card"><h3>Functions</h3><p>What tested calculation or transformation can the system perform?</p></article>
+          <article class="card"><h3>Actions</h3><p>Which governed changes may be proposed or executed?</p></article>
+          <article class="card"><h3>Automations</h3><p>When should a bounded function or action run without a fresh request?</p></article>
+          <article class="card"><h3>AI coordination</h3><p>How should the system interpret intent and choose among the other layers?</p></article>
+        </div>
+        <p>No single layer replaces the others. Documents without state become stale instructions. Ontology without evidence becomes unexplained authority. Functions without actions blur calculation and permission. Automations without bounded effects become unattended agents.</p>
+      </section>
+
+      <section aria-labelledby="now-title"><div class="section-head"><h2 id="now-title">What I can demonstrate now</h2></div>
+        <p>The current work is real but distributed. My brain architecture provides portable, sourced memory with explicit personal and company boundaries. The knowledge layer supports hybrid and graph-aware retrieval. CodeGraph exposes structural relationships and returns an evidence envelope rather than a bare answer.</p>
+        <p>Separate surfaces in my independent local prototype demonstrate typed objects and links, cited document chunks, versioned functions, governed action proposals, approval and stale-state checks, automation runs, and visible tool traces. They are proof slices, not one finished integrated journey.</p>
+        <p>These pieces demonstrate the contracts. They do not establish production readiness. Identity, persistence, general domain onboarding, and the integration between the knowledge and operational stores still need deeper work.</p>
+      </section>
+
+      <section aria-labelledby="next-title"><div class="section-head"><h2 id="next-title">The next experiment should complete one journey</h2></div>
+        <p>I do not need another wide product mock-up. I need one narrow journey that works with real boundaries:</p>
+        <p><strong>Find evidence → inspect the affected object → propose a change → review it → execute it → explain the outcome.</strong></p>
+        <p>A personal publishing workflow is a useful first domain because I own the data and the decision. The system can connect articles, claims, sources, talks, and repositories. It can retrieve the evidence behind a claim, run repeatable checks, and propose a publication-state change without publishing on its own.</p>
+        <p>If that journey survives stale state, missing permission, unavailable retrieval, duplicate delivery, and source changes, the architecture has earned the right to grow.</p>
+      </section>
+
+      <section aria-labelledby="measure-title"><div class="section-head"><h2 id="measure-title">Measure the failures we want the system to prevent</h2></div>
+        <p>A polished answer is not the main success metric. I want to know whether the system cites the correct source, resolves the correct object, reuses the correct function, blocks an unauthorised action, rejects a stale proposal, and explains what it did.</p>
+        <p>Some of the most valuable tests should end in refusal. The agent should stop when evidence conflicts, when ownership is ambiguous, when the object changed after review, or when no authorised action exists.</p>
+        <p>This is where my work on pattern linting, CodeGraph, and built-in verifiers connects back to the second brain. Complexity becomes useful when it produces checks that can fail clearly.</p>
+      </section>
+
+      <section aria-labelledby="last-title"><div class="section-head"><h2 id="last-title">The last project you build alone becomes shared infrastructure</h2></div>
+        <p>The second brain remains custom because it reflects my projects, relationships, boundaries, and ways of working. But custom does not mean isolated. Once its contracts are stable, agents can help maintain it, extend it, and use it to begin the next project with more context.</p>
+        <p>Documents give the system a past. Ontology gives it a present. Functions and actions give it bounded capability. Automations give it continuity. The AI layer helps assemble those pieces around a human request.</p>
+        <p>The goal is not a brain that acts like me. It is a system that helps agents work with me without forgetting what matters or quietly stepping beyond their authority.</p>
+      </section>
+
+      <section aria-labelledby="series-title"><div class="section-head"><h2 id="series-title">Read the complete series</h2></div><ol><li><a href="./the-last-project-you-build-alone.html">The Last Project You Build Alone</a></li><li><a href="./documents-are-evidence-not-the-world.html">Documents Are Evidence, Not the World</a></li><li><a href="./give-the-brain-nouns.html">Give the Brain Nouns</a></li><li><a href="./give-the-brain-verbs.html">Give the Brain Verbs</a></li><li><a href="./when-work-should-continue-without-you.html">When the Work Should Continue Without You</a></li><li><a href="./three-ways-to-ask.html">Three Ways to Ask</a></li><li><a href="./how-aip-puts-the-pieces-together.html">How AIP Puts the Pieces Together</a></li><li><strong>From Second Brain to Working System</strong></li></ol></section>
+    </main><footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

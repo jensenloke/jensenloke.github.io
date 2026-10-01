@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>Three Ways to Ask - Jensen Loke</title><meta name="description" content="Documents search, ontology search, and function search answer different questions. Agents need to know which one they are asking." /><link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script></head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a><header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header"><p class="article-kicker">Building a Second Brain &middot; Part 6 of 8 &middot; Draft</p><h1 class="article-title">Three Ways to Ask</h1><p class="article-subtitle">Evidence, current state, and available capability live in different places. A useful agent should know which one it needs.</p><p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p></div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>My abstraction.</strong> I use <code>documents_search</code>, <code>ontology_search</code>, and <code>function_search</code> as plain names for three retrieval modes. These are not official Palantir tool names. Document and object search exist in my prototype; discoverable function search is future work.</p></section>
+
+      <section aria-labelledby="one-title"><div class="section-head"><h2 id="one-title">One search box hides three different questions</h2></div>
+        <p>Suppose I ask an agent, “Is this appliance still under warranty, and what should I do next?”</p>
+        <p>The agent may need the warranty document, the appliance's current fault history, and a calculator that applies the coverage rules. Those are not three versions of the same search. They are three kinds of knowledge.</p>
+        <p>If the agent sends everything to document retrieval, it may find a policy and miss the current object. If it only inspects objects, it may see a green status without the evidence behind it. If it writes new checking logic, it may duplicate a function that already exists.</p>
+      </section>
+
+      <section aria-labelledby="documents-title"><div class="section-head"><h2 id="documents-title"><code>documents_search</code>: what does the evidence say?</h2></div>
+        <p>This search is for explanations, policies, research, meeting notes, manuals, and prior decisions. It should return passages with citations and enough source context to judge freshness and authority.</p>
+        <p>For the warranty question, it might retrieve the receipt, policy, and repair manual. Its answer is narrative: here is what the relevant material says, and here is where it came from.</p>
+        <p>My existing knowledge systems already do versions of this through keyword, semantic, and graph-aware retrieval. The important contract is that an excerpt remains attached to its source.</p>
+      </section>
+
+      <section aria-labelledby="ontology-title"><div class="section-head"><h2 id="ontology-title"><code>ontology_search</code>: what exists now?</h2></div>
+        <p>This search is for objects, properties, state, and relationships. It can answer which appliance failed, when it was bought, which repairs were recorded, which warranty covers it, and who owns the next decision.</p>
+        <p>In my local prototype, this capability appears as object search followed by explicit link traversal. I call the broader idea <code>ontology_search</code> because the agent is querying the model of the world rather than passages about it.</p>
+        <p>The result should be structured enough to drive the next step: stable identifiers, typed properties, named relationships, and the actions available on the object.</p>
+      </section>
+
+      <section aria-labelledby="function-title"><div class="section-head"><h2 id="function-title"><code>function_search</code>: what can the system already do?</h2></div>
+        <p>This search is for capability. It should help the agent discover a tested function for calculating coverage or comparing repair cost with replacement cost before it invents another implementation.</p>
+        <p>A useful result needs more than a function name. It should include the input and output contract, version, owner, test status, permission boundary, and examples of where the function is already used.</p>
+        <p>I have a versioned function registry in the prototype, but the agent cannot yet search it as a first-class tool. This part is a design direction, clearly ahead of the current implementation.</p>
+      </section>
+
+      <section aria-labelledby="route-title"><div class="section-head"><h2 id="route-title">The route depends on the verb in the question</h2></div>
+        <div class="comparison article-wide" aria-label="Three retrieval modes">
+          <article class="card"><h3>Explain or justify</h3><p>Search documents and return cited evidence.</p></article>
+          <article class="card"><h3>Find or inspect</h3><p>Search the ontology and traverse current relationships.</p></article>
+          <article class="card"><h3>Calculate or transform</h3><p>Search registered functions and inspect their contracts.</p></article>
+        </div>
+        <p>Real tasks use more than one route. The warranty question may start with the appliance object, retrieve the policy, find the coverage calculator, run it, and then prepare a repair decision for review. The sequence matters because each result narrows the next choice.</p>
+      </section>
+
+      <section aria-labelledby="next-title"><div class="section-head"><h2 id="next-title">Search is still not coordination</h2></div>
+        <p>Giving an agent three tools does not tell it when to use each one, how to combine their results, or when to stop and ask for authority. That is the role of the coordination layer.</p>
+        <p>Palantir uses AIP for this part of its platform. The next essay explains the pattern without treating AIP as magic and without claiming my research prototype is the finished product.</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul><li>Previous: <a href="./when-work-should-continue-without-you.html">When the Work Should Continue Without You</a></li><li>Next: <a href="./how-aip-puts-the-pieces-together.html">How AIP Puts the Pieces Together</a></li><li>Related: <a href="../engineering/codegraph-tour.html">From Company Knowledge to Verified Changes</a></li></ul></section>
+    </main><footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>How AIP Puts the Pieces Together - Jensen Loke</title><meta name="description" content="A plain-language explanation of AIP as a coordination layer across documents, ontology, functions, actions, and automations." /><link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script></head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a><header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header"><p class="article-kicker">Building a Second Brain &middot; Part 7 of 8 &middot; Draft</p><h1 class="article-title">How AIP Puts the Pieces Together</h1><p class="article-subtitle">The model supplies judgement under uncertainty. The surrounding platform supplies evidence, state, tools, permission, and accountability.</p><p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p></div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Research status.</strong> This essay explains Palantir AIP using public documentation and patterns I have tested in an independent local prototype. The prototype is not Palantir software, a replacement for it, or a finished production system.</p></section>
+
+      <section aria-labelledby="model-title"><div class="section-head"><h2 id="model-title">The model is only one participant</h2></div>
+        <p>It is easy to describe an AI system as if the model does everything. The model reads the request, finds the facts, understands the business, chooses a tool, changes the system, and explains the result.</p>
+        <p>That story hides where trust comes from.</p>
+        <p>The language model is useful because it can interpret an ambiguous request and choose among possible next steps. It should not be the source of live state, the owner of business rules, or the authority that grants itself permission.</p>
+      </section>
+
+      <section aria-labelledby="journey-title"><div class="section-head"><h2 id="journey-title">Follow one request through the layers</h2></div>
+        <p>Consider a target flow for a modest request: “Get my next talk ready for delivery.” The integrated journey is not running end to end today; this is the behaviour I want to test.</p>
+        <ol>
+          <li><strong>Understand intent.</strong> AIP would interpret “ready” as a review task, not permission to release the talk.</li>
+          <li><strong>Resolve the object.</strong> Ontology search would identify the talk, venue, related essays, and current state.</li>
+          <li><strong>Find evidence.</strong> Document search would retrieve the speaker notes and event requirements.</li>
+          <li><strong>Discover capability.</strong> My future <code>function_search</code> would find an existing timing checker. Palantir's documented Function tool calls functions configured by the builder; it is not a general function-discovery tool.</li>
+          <li><strong>Run logic.</strong> The timing function would return structured results the model could explain.</li>
+          <li><strong>Prepare change.</strong> The agent would prepare a proposal to run the action that marks the talk ready, with an exact diff and rationale.</li>
+          <li><strong>Request authority.</strong> I would review the proposal. Approval would recheck the current state before anything changed.</li>
+          <li><strong>Leave evidence.</strong> The outcome and its sources would remain visible for the next person or agent.</li>
+        </ol>
+        <p>The value comes from the hand-offs. Each layer answers a different question and constrains the next one.</p>
+      </section>
+
+      <section aria-labelledby="aip-title"><div class="section-head"><h2 id="aip-title">I think of AIP as the coordination layer</h2></div>
+        <p>Palantir's public documentation describes <a href="https://www.palantir.com/docs/foundry/chatbot-studio">AIP Chatbot Studio</a> as combining language models with Ontology context, document context, and configured tools. Its documented tools include object queries, functions, and actions; Action tools can run automatically or after user confirmation.</p>
+        <p><a href="https://www.palantir.com/docs/foundry/logic">AIP Logic</a> provides another shape: AI-powered functions that can use ontology context, return outputs, or prepare edits. Automate can then run bounded logic when a condition is met.</p>
+        <p>I read these products as one coherent method. Keep facts and permissions outside the model. Give the model typed ways to inspect and propose. Make the path from request to decision visible.</p>
+      </section>
+
+      <section aria-labelledby="complexity-title"><div class="section-head"><h2 id="complexity-title">Complexity should appear as trace, not theatre</h2></div>
+        <p>A capable system may call several tools, traverse multiple relationships, and evaluate several rules. The user should not have to admire that complexity. They should be able to inspect it when the result matters.</p>
+        <p>The useful interface shows which object was selected, which evidence was retrieved, which function ran, what change was proposed, and which rule required confirmation. This is how the system earns trust after the demonstration ends.</p>
+        <p>My prototype already exposes tool traces and uses proposal-first actions. The larger integration with durable knowledge, discoverable functions, real identity, and production persistence remains unfinished.</p>
+      </section>
+
+      <section aria-labelledby="human-title"><div class="section-head"><h2 id="human-title">Human authority belongs at the decision boundary</h2></div>
+        <p>Human in the loop should not mean approving every search result. It should mean placing authority where a decision becomes consequential.</p>
+        <p>The system can retrieve, compare, calculate, and prepare. A human can own the judgement to publish, spend, assign, notify, or change a record. Over time, narrow actions with strong evidence may earn more automation. That progression should be deliberate and measurable.</p>
+        <p>The final essay turns the full series into one architecture and a practical roadmap from the second brain I have now to the operational system I want to build.</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul><li>Previous: <a href="./three-ways-to-ask.html">Three Ways to Ask</a></li><li>Next: <a href="./from-second-brain-to-working-system.html">From Second Brain to Working System</a></li><li>Related: <a href="../talks/human-in-the-loop/">Human in the Loop</a></li></ul></section>
+    </main><footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

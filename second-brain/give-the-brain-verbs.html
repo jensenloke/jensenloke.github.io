@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" />
+    <title>Give the Brain Verbs - Jensen Loke</title>
+    <meta name="description" content="Why functions and actions should be separate: one packages reusable logic, while the other governs change." />
+    <link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header"><p class="article-kicker">Building a Second Brain &middot; Part 4 of 8 &middot; Draft</p><h1 class="article-title">Give the Brain Verbs</h1><p class="article-subtitle">Functions package what the system knows how to do. Actions govern whether and how that capability may change the world.</p><p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~4 min read</p></div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Research status.</strong> I have working local prototypes for typed functions and proposal-first actions. They demonstrate the pattern; they are not a finished production platform.</p></section>
+
+      <section aria-labelledby="answer-title"><div class="section-head"><h2 id="answer-title">Knowing the answer is different from doing the thing</h2></div>
+        <p>In one prototype test, the system prepared a valid change, then the underlying object changed before approval. The proposal was rejected as stale. That failure was the correct result.</p>
+        <p>The first task is a calculation. It takes inputs, applies logic, and returns a result. The second changes shared state. It needs authority, validation, and a record of who approved it.</p>
+        <p>In my architecture, I give these two responsibilities different names. A <strong>function</strong> computes. An <strong>action</strong> governs change. Palantir Functions can participate in edits through function-backed Actions; the boundary I care about is that consequential change still passes through an explicit action contract.</p>
+      </section>
+
+      <section aria-labelledby="function-title"><div class="section-head"><h2 id="function-title">Functions make capability reusable</h2></div>
+        <p>A function is a named piece of logic with a clear contract. It declares the inputs it accepts and the output it returns. It can be versioned, tested, and used by more than one application or agent.</p>
+        <p>In a support workflow, a function might calculate response risk from priority, age, and ownership. It returns a score and explanation. It does not quietly reassign or close the case. Its value comes from producing the same inspectable result wherever it is called.</p>
+        <p>This resembles the role of the reusable layers in my engineering work. Pattern linting answers whether code matches a known risk shape. CodeGraph answers how code is connected. A verifier proves a property about the resulting change. Each capability has a boundary instead of being hidden inside one large prompt.</p>
+      </section>
+
+      <section aria-labelledby="action-title"><div class="section-head"><h2 id="action-title">Actions put a contract around change</h2></div>
+        <p>An action starts where a function's answer stops. <code>Reassign case</code>, <code>request customer input</code>, and <code>close case</code> all change state. They should declare which object they affect, what parameters they accept, which conditions must be true, and which permission is required.</p>
+        <p>The local action prototype I have been building uses a deliberate path:</p>
+        <ol>
+          <li>Validate the request and its typed inputs.</li>
+          <li>Preview the exact before-and-after change.</li>
+          <li>Create a proposal without changing the object.</li>
+          <li>Ask the authorised person to approve or dismiss it.</li>
+          <li>Revalidate against current state before execution.</li>
+          <li>Record the outcome in an audit trail.</li>
+        </ol>
+        <p>The revalidation step matters. A proposal can be sensible when created and unsafe ten minutes later. Approval should apply to the current object, not to a stale memory of it.</p>
+      </section>
+
+      <section aria-labelledby="agent-title"><div class="section-head"><h2 id="agent-title">The agent should not have a secret side door</h2></div>
+        <p>If a human must use a governed action to change an object, an agent should use the same path. Giving the agent a raw database tool would make every rule in the action layer optional.</p>
+        <p>In my prototype, the agent can prepare a proposal. It cannot claim the proposal was executed, and it cannot bypass the approval queue. A rejected or stale proposal is still useful evidence because it shows what the agent tried to do and why the system stopped it.</p>
+        <p>This design is inspired by patterns documented in Palantir's public material on <a href="https://www.palantir.com/docs/foundry/functions/overview">Functions</a> and <a href="https://www.palantir.com/docs/foundry/action-types/overview">Action types</a>. I am studying the pattern, not claiming that my prototype reproduces the platform.</p>
+      </section>
+
+      <section aria-labelledby="verbs-title"><div class="section-head"><h2 id="verbs-title">Good verbs make the system easier to trust</h2></div>
+        <p>A vague tool such as <code>update_anything</code> transfers too much judgement into the prompt. A specific action such as <code>mark_claim_reviewed</code> can require a claim, a reviewer, supporting evidence, and a reason.</p>
+        <p>The smaller contract is less flexible, but that is the point. It makes the consequential part of the system boring enough to inspect.</p>
+        <p>Once the verbs are explicit, some of them can run repeatedly. That introduces a new question: when should work continue without waiting for me to start it?</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul><li>Previous: <a href="./give-the-brain-nouns.html">Give the Brain Nouns</a></li><li>Next: <a href="./when-work-should-continue-without-you.html">When the Work Should Continue Without You</a></li><li>Related: <a href="../engineering/codegraph-tour.html">From Company Knowledge to Verified Changes</a></li></ul></section>
+    </main>
+    <footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>

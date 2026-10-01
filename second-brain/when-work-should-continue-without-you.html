@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" />
+    <title>When the Work Should Continue Without You - Jensen Loke</title>
+    <meta name="description" content="A practical model for bounded automation: triggers, conditions, effects, retries, escalation, and human authority." />
+    <link rel="stylesheet" href="../assets/styles.css" /><link rel="stylesheet" href="/assets/cues.css" /><script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav"><a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a><nav aria-label="Main navigation"><a href="/essays/" aria-current="page">Essays</a><a href="/talks/">Talks &amp; Trainings</a><a href="/work/">Projects</a></nav></header>
+    <header class="site-header"><div class="article-header"><p class="article-kicker">Building a Second Brain &middot; Part 5 of 8 &middot; Draft</p><h1 class="article-title">When the Work Should Continue Without You</h1><p class="article-subtitle">Automation is not an agent with unlimited initiative. It is a policy that says when a bounded piece of work may run.</p><p class="article-byline">Jensen Loke &middot; Draft for review &middot; ~3 min read</p></div></header>
+    <main class="article" id="main">
+      <section><p class="note"><strong>Research status.</strong> Scheduled maintenance and background jobs already support my knowledge systems. Ontology-backed operational automation is still a prototype and research direction.</p></section>
+
+      <section aria-labelledby="repeat-title"><div class="section-head"><h2 id="repeat-title">Useful work should not depend on remembering to start it</h2></div>
+        <p>A second brain decays quietly. Links break. Sources become stale. Drafts remain unfinished. A useful system should notice some of these conditions without waiting for me to ask the perfect question.</p>
+        <p>I already use scheduled maintenance and background work for parts of this problem. The deeper lesson is that automation needs more structure than a recurring prompt.</p>
+        <p>An automation should say what wakes it up, which conditions must hold, what effect it may attempt, and what happens when it fails.</p>
+      </section>
+
+      <section aria-labelledby="shape-title"><div class="section-head"><h2 id="shape-title">The shape is simple</h2></div>
+        <div class="comparison article-wide" aria-label="The parts of an automation">
+          <article class="card"><h3>Trigger</h3><p>An event or schedule makes the automation eligible to run.</p></article>
+          <article class="card"><h3>Condition</h3><p>Current state determines whether work is actually needed.</p></article>
+          <article class="card"><h3>Effect</h3><p>A function runs, an action executes, or a bounded effect creates a review task or notification.</p></article>
+        </div>
+        <p>For this essay series, a weekly trigger could inspect published articles. The condition could find sources older than a defined freshness window. The effect could create a review task with the affected claims and citations.</p>
+        <p>A function performs reusable logic and returns a result. An action is the governed contract for changing state. An automation decides when either should run.</p>
+        <p>That is safer than telling an agent to “keep my website current”. The automation knows what to inspect and what output it is allowed to create. It does not silently rewrite an article.</p>
+      </section>
+
+      <section aria-labelledby="policy-title"><div class="section-head"><h2 id="policy-title">Automation is policy expressed as running software</h2></div>
+        <p>Every automation contains a policy, whether or not it is written down. A threshold says when something deserves attention. A retry rule says which failures are temporary. An escalation path says when a human should take over.</p>
+        <p>Making those choices explicit improves both operations and writing. I can explain why an automation ran, which object triggered it, which condition passed, which action it proposed, and where it stopped.</p>
+        <p>Palantir's public documentation describes <a href="https://www.palantir.com/docs/foundry/automate">Automate</a> in similar terms: conditions are evaluated continuously or on a schedule, then effects may run actions, functions, AIP Logic functions, or notifications. The transferable idea is the separation between <em>when</em> and <em>what</em>.</p>
+      </section>
+
+      <section aria-labelledby="failure-title"><div class="section-head"><h2 id="failure-title">Failure is part of the design</h2></div>
+        <p>A background process will eventually meet stale state, missing permission, a network timeout, or an ambiguous object. “Try again” is only one possible response.</p>
+        <p>A bounded automation should have a retry limit, an idempotency rule, and an escalation path. It should avoid producing the same task twice. It should record partial failure. If the underlying object changed, it should re-evaluate instead of forcing through the old plan.</p>
+        <p>The safest effect is often a proposal or notification rather than a direct mutation. Automation can keep the work moving while a human keeps authority over the consequential step.</p>
+      </section>
+
+      <section aria-labelledby="agent-title"><div class="section-head"><h2 id="agent-title">The agent still has to choose the right capability</h2></div>
+        <p>Triggers and effects solve repetition. They do not solve discovery. When an unfamiliar request arrives, the agent still needs to decide whether it should search documents, inspect live objects, or find a reusable function.</p>
+        <p>Putting every question through one search box hides those differences. The next essay introduces the three searches I want the operational brain to expose.</p>
+      </section>
+
+      <section aria-labelledby="related-title"><div class="section-head"><h2 id="related-title">Continue the series</h2></div><ul><li>Previous: <a href="./give-the-brain-verbs.html">Give the Brain Verbs</a></li><li>Next: <a href="./three-ways-to-ask.html">Three Ways to Ask</a></li><li>Related: <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a></li></ul></section>
+    </main>
+    <footer class="footer"><p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p><div class="footer-socials"><a href="https://github.com/jensenloke">GitHub ↗</a><a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a></div><p>Singapore<br />© 2026</p></footer>
+  </body>
+</html>
