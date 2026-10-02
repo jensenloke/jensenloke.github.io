@@ -436,6 +436,7 @@
     .video-placeholder strong { display: block; font-size: 1.5cqw; letter-spacing: .12em; text-transform: uppercase; }
     .video-placeholder span { display: block; margin-top: 1cqh; color: var(--muted); font-size: .7cqw; }
     .video-shell.no-video video { display: none; }
+    .video-shell .print-poster { display: none; }
     .score-strip { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr .82fr; gap: 1cqw; margin-top: 1.4cqh; }
     .score-card { padding: 1.55cqh 1.1cqw; border: 1px solid rgba(255,255,255,.15); background: rgba(10,14,29,.86); }
     .score-card strong { display: block; font-size: 1.65cqw; color: var(--green); }
@@ -526,6 +527,11 @@
       .stage, .deck { display: block; width: 16in; height: auto; overflow: visible; box-shadow: none; }
       .slide, .slide.active, .slide.thanks, .slide.thanks.active { position: relative; display: block; width: 16in; height: 9in; break-after: page; padding: .52in .86in; animation: none; }
       .controls, .progress, .notes { display: none !important; }
+      .slide.thanks, .slide.thanks.active { display: grid !important; place-items: center; }
+      .video-shell video { display: none !important; }
+      .video-shell .print-poster { display: block; position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: contain; background: #050711; }
+      .video-placeholder { inset: auto 0 0 0; display: block; z-index: 2; padding: 1.3cqh 1.2cqw 1.1cqh; text-align: center; background: rgba(2, 3, 10, .94); border-top: 1px solid var(--qwen-bright); }
+      .video-placeholder strong { font-size: 1.05cqw; letter-spacing: .12em; }
     }
   </style>
 </head>
@@ -733,6 +739,7 @@
           <div class="video-shell no-video" id="videoShell">
             <video id="demoVideo" src="assets/insurance-demo.mp4" controls preload="metadata" playsinline></video>
             <div class="video-placeholder"><div><strong>&lt;demo video&gt;</strong><span>40-second four-model build-off walkthrough</span></div></div>
+            <img class="print-poster" src="assets/demo-poster.png" alt="Demo video still: four-model build-off walkthrough">
           </div>
           <div class="score-strip">
             <div class="score-card"><strong>130 / 130</strong><span>Local Qwen 3.8 27B · 100 functional + 30 build quality</span></div>
