@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Devin Issue Pilot - Jensen Loke</title>
+  <meta
+    name="description"
+    content="A design for issue-driven Devin automation: every new issue in the parent repo starts a Devin session that asks its questions on the issue, opens PRs, and never merges. The flow, the guards, and the exact automation settings."
+  />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+  <meta property="og:title" content="The Devin Issue Pilot - Jensen Loke" />
+  <meta property="og:description" content="Every new issue starts a Devin session. It asks its questions on the issue, opens PRs, and never merges. The flow, the guards, and the settings." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jensenloke.github.io/engineering/devin-issue-pilot.html" />
+    <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header>
+<header class="site-header">
+    <div class="article-header">
+
+      <p class="article-kicker">Success IT Engineering &middot; Devin Ambassador field report &middot; Agentic engineering</p>
+      <h1 class="article-title">The Devin Issue Pilot</h1>
+      <p class="article-subtitle">
+        Every new issue in the parent repo starts a Devin session. Devin asks its questions on the issue,
+        a reply from one of two named humans wakes it to carry on, and it opens PRs but never merges.
+        The full flow, the guards, and the automation settings.
+      </p>
+      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-10-05">5 October 2026</time> &middot; ~6 min read</p>
+    </div>
+  </header>
+
+  <main class="article" id="main">
+    <section aria-labelledby="idea-title">
+      <div class="section-head">
+        <h2 id="idea-title">The idea</h2>
+      </div>
+      <p>
+        We already run Devin as a coding agent; the question this pilot answers is whether it can own the
+        <em>issue</em> as well as the fix. The design: our sales lead files issues exactly as she does today -
+        a screen name, a document number, a screenshot, no tags to remember. Every new issue in the parent repo
+        triggers a Devin session. Devin reads the issue, the playbook and past fixes, then either asks numbered
+        questions in plain English, flags that a business decision is needed, or claims the issue and works it.
+        It opens PRs to <code>dev</code>/<code>develop</code> but never merges; I merge. After the merge, Devin
+        verifies the dev deploy and posts test steps, and the issue only closes once the fix is confirmed working
+        and recorded in the company brain.
+      </p>
+      <p class="note">
+        <strong>Disclosure.</strong> I am a Devin ambassador. This describes a real production design; repository
+        names, usernames, customer data and internal identifiers are omitted.
+      </p>
+    </section>
+
+    <section aria-labelledby="flow-title">
+      <div class="section-head">
+        <h2 id="flow-title">The flow</h2>
+        <p>One issue, start to close.</p>
+      </div>
+      <ol>
+        <li>
+          <strong>The sales lead opens an issue.</strong> Screen name, document number, screenshot. Nothing to tag.
+        </li>
+        <li>
+          <strong>A Devin session starts.</strong> It reads the issue, the playbook, and past fixes.
+        </li>
+        <li>
+          <strong>Triage.</strong> Labelled <code>devin:skip</code>, or claimed by another agent? Devin stays silent.
+        </li>
+        <li>
+          <strong>Three exits from triage.</strong> Needs info &rarr; Devin comments numbered questions in plain
+          English, with options to pick from. Needs a business decision &rarr; Devin comments
+          <em>Needs a decision</em>, with the reason. Clear enough &rarr; Devin claims it: label
+          <code>agent:devin</code>, status In progress.
+        </li>
+        <li>
+          <strong>A reply wakes it.</strong> The sales lead or I answer in a comment, and Devin carries on:
+          fixes, tests, self-reviews, opens a PR.
+        </li>
+        <li>
+          <strong>PR ready.</strong> Devin comments <em>PR ready for review</em>, with links.
+        </li>
+        <li>
+          <strong>I review and merge</strong>, then comment <code>merged</code> on the issue.
+        </li>
+        <li>
+          <strong>Devin verifies dev.</strong> The comment wakes it to confirm the dev deploy and check it on dev.
+        </li>
+        <li>
+          <strong>Ready to test.</strong> Devin comments test steps for the sales lead and sets the status
+          <em>Ready to test in dev</em>.
+        </li>
+        <li>
+          <strong>She tests.</strong> Works &rarr; she comments with a works screenshot; Devin records the fix in
+          the company brain and closes the issue. Still broken &rarr; she comments what went wrong, and a new
+          Devin session reads the thread and the handover notes.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="lead-title">
+      <div class="section-head">
+        <h2 id="lead-title">What the sales lead does</h2>
+        <p>The whole point is that her workflow barely changes.</p>
+      </div>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>She wants to&hellip;</th><th>She does this</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr>
+              <td data-label="She wants to…">Report a problem</td>
+              <td data-label="She does this">Open an issue as now. Name the screen and the document number, and attach a screenshot. Nothing to tag.</td>
+              <td data-label="Example">an issue</td>
+            </tr>
+            <tr>
+              <td data-label="She wants to…">Answer Devin</td>
+              <td data-label="She does this">Reply in a comment. Don't edit the issue text: an edit does not wake Devin, a comment does.</td>
+              <td data-label="Example"><code>1a, 2b</code></td>
+            </tr>
+            <tr>
+              <td data-label="She wants to…">Test the fix</td>
+              <td data-label="She does this">Wait for the <em>Ready to test in dev</em> comment, follow its steps on dev, then reply <code>works</code> or with what she saw and a screenshot.</td>
+              <td data-label="Example"><code>works</code></td>
+            </tr>
+            <tr>
+              <td data-label="She wants to…">Keep Devin off an issue</td>
+              <td data-label="She does this">Comment <code>devin stop</code>, or add the <code>devin:skip</code> label. Devin replies once to confirm and then stays out.</td>
+              <td data-label="Example"><code>devin stop</code></td>
+            </tr>
+            <tr>
+              <td data-label="She wants to…">Bring Devin to an old issue</td>
+              <td data-label="She does this">Issues opened before the pilot are left alone. Mention <code>@devin</code> in a comment to hand one over.</td>
+              <td data-label="Example"><code>@devin</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="posts-title">
+      <div class="section-head">
+        <h2 id="posts-title">What Devin posts on the issue</h2>
+        <p>Four comment shapes, each with one job.</p>
+      </div>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Comment</th><th>Audience</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr>
+              <td data-label="Comment"><strong>Question</strong></td>
+              <td data-label="Audience">Sales lead</td>
+              <td data-label="Contents">Numbered, one decision each, options to pick from. No code terms. Reply with e.g. &ldquo;1a&rdquo;.</td>
+            </tr>
+            <tr>
+              <td data-label="Comment"><strong>PR ready for review</strong></td>
+              <td data-label="Audience">Me</td>
+              <td data-label="Contents">PR links, what changed, the tests Devin broke on purpose and what it could not verify.</td>
+            </tr>
+            <tr>
+              <td data-label="Comment"><strong>Ready to test in dev</strong></td>
+              <td data-label="Audience">Sales lead</td>
+              <td data-label="Contents">Where to click, which test document to use, what she should see.</td>
+            </tr>
+            <tr>
+              <td data-label="Comment"><strong>Needs a decision</strong></td>
+              <td data-label="Audience">Either of us</td>
+              <td data-label="Contents">A business rule, price or customer data change. The sales lead answers, and calls me when unsure. Anything needing production or UAT data still goes to me.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <blockquote class="callout">
+        1. Should the Due Date also show on the printed invoice? a) Yes, same as the long-form printout
+        b) No, long-form only. Reply with e.g. &ldquo;1a&rdquo;.
+      </blockquote>
+      <p class="figcap">A real question shape: one decision, lettered options, no code terms.</p>
+    </section>
+
+    <section aria-labelledby="guards-title">
+      <div class="section-head">
+        <h2 id="guards-title">Guards</h2>
+      </div>
+      <ul>
+        <li>
+          <strong>Only comments by the two of us wake Devin.</strong> Devin's own comments - and our support
+          bot's - don't, so two bots can't loop.
+        </li>
+        <li>
+          <strong>One Devin at a time per issue.</strong> A working session holds the <code>devin:working</code>
+          label and re-reads the thread before it stops, so a second quick reply is still answered.
+        </li>
+        <li>
+          <strong>Each session is capped at 30 ACUs.</strong> A comment on an issue Devin isn't handling costs
+          only a short silent session. Devin writes its own comments, so a session with nothing to say posts nothing.
+        </li>
+        <li>
+          <strong>Same rules as today.</strong> PRs to <code>dev</code>/<code>develop</code> only, no merges,
+          dev database only, never UAT or production.
+        </li>
+        <li>
+          <strong>Off switch for everything:</strong> disable the automation in Devin.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="settings-title">
+      <div class="section-head">
+        <h2 id="settings-title">The automation settings</h2>
+      </div>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Setting">Trigger 1</td><td data-label="Value">Issue opened in the parent repo, any author.</td></tr>
+            <tr><td data-label="Setting">Trigger 2</td><td data-label="Value">Issue comment created, author is the sales lead or me.</td></tr>
+            <tr><td data-label="Setting">Auto reply</td><td data-label="Value">Removed; Devin posts its own comments.</td></tr>
+            <tr><td data-label="Setting">Agent</td><td data-label="Value">New session per event. &ldquo;Message existing session&rdquo; sends every event to one fixed session, so it can't follow separate issues.</td></tr>
+            <tr><td data-label="Setting">Memory</td><td data-label="Value">Issue thread plus Devin's handover page in the company brain.</td></tr>
+            <tr><td data-label="Setting">Budget</td><td data-label="Value">30 ACUs per session.</td></tr>
+            <tr><td data-label="Setting">Brain connection</td><td data-label="Value">The company brain, over MCP.</td></tr>
+            <tr><td data-label="Setting">Old <code>@devin</code> automation</td><td data-label="Value">Disabled once the smoke test passes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="approve-title">
+      <div class="section-head">
+        <h2 id="approve-title">Decisions baked into the design</h2>
+        <p>The points worth arguing about, and where they landed.</p>
+      </div>
+      <ol>
+        <li>
+          <strong>Only the two of us can wake Devin with a comment.</strong> Everyone else's comments are read,
+          not triggers.
+        </li>
+        <li>
+          <strong>Issues filed by our support bot go to Devin too</strong>, unless the bot has claimed them with
+          its own <code>agent:</code> label.
+        </li>
+        <li>
+          <strong>After I merge, I comment <code>merged</code> on the issue.</strong> That wakes Devin to check
+          dev and post the test steps.
+        </li>
+        <li>
+          <strong>Devin closes the issue after the sales lead replies <code>works</code></strong> - recording the
+          fix in the company brain first.
+        </li>
+        <li>
+          <strong>Smoke test:</strong> one issue titled <code>[Devin pilot test]</code>, then close it. The sales
+          lead may get a GitHub notification for it. Not yet checked: whether Devin's GitHub app can add labels
+          in the parent repo - to be confirmed during the smoke test.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="related-title">
+      <div class="section-head">
+        <h2 id="related-title">Related</h2>
+        <p>The systems this pilot sits on.</p>
+      </div>
+      <ul>
+        <li>
+          <a href="./devin-fusion-company-brain-cutover.html">How Devin Fusion Ran a Five-Day Company-Brain Cutover</a> -
+          the company brain this pilot's memory leans on, and how it got into production shape.
+        </li>
+        <li>
+          <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a> - why personal and company
+          agent memory split, and the fenced design behind both.
+        </li>
+        <li>
+          <a href="./codegraph-tour.html">From Company Knowledge to Verified Changes</a> - how the company brain,
+          CodeGraph and verifiers guide agentic engineering.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer>
+</body>
+</html>
