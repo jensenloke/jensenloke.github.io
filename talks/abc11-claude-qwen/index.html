@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Qwen in Claude Code, via ModelScope — ABC #11</title>
+  <meta name="description" content="A five-minute ABC #11 introduction: get a ModelScope API key, connect Claude Code, and register for ModelScope access.">
+  <style>
+    :root { color-scheme: light; --paper:#f4f5f2; --ink:#15212c; --blue:#214ce5; --muted:#5c6873; --rule:#d2d8dd; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#121b24; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    a { color:inherit; text-underline-offset:.2em; }
+    button:focus-visible,a:focus-visible { outline:3px solid #fdad38; outline-offset:5px; }
+    .stage { min-height:100svh; display:grid; place-items:center; }
+    .deck { position:relative; width:min(100vw,177.7778svh); aspect-ratio:16/9; container-type:inline-size; background:var(--paper); overflow:hidden; }
+    .slide { position:absolute; inset:0; padding:4cqw 5cqw 3cqw; display:flex; flex-direction:column; }
+    .slide[hidden] { display:none; }
+    .top { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--rule); padding-bottom:1.1cqw; font-size:.95cqw; font-weight:650; letter-spacing:.11em; text-transform:uppercase; }
+    .brand { display:flex; align-items:center; gap:1cqw; }
+    .abc { background:var(--blue); color:white; padding:.4cqw .6cqw; letter-spacing:.04em; }
+    .draft { color:var(--muted); font-size:.8cqw; letter-spacing:.08em; }
+    .content { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center; }
+    h1,h2,h3,p { margin:0; }
+    h1 { font-size:7cqw; line-height:.99; letter-spacing:-.065em; font-weight:750; }
+    h2 { font-size:4.8cqw; line-height:1.04; letter-spacing:-.055em; font-weight:720; }
+    .blue { color:var(--blue); }
+    .eyebrow { color:var(--blue); text-transform:uppercase; font-weight:700; font-size:1cqw; letter-spacing:.14em; margin-bottom:1.4cqw; }
+    .intro { font-size:1.65cqw; line-height:1.45; color:var(--muted); margin-top:1.7cqw; max-width:58cqw; }
+    .flow { display:flex; align-items:center; gap:1.1cqw; margin-top:3cqw; font-size:1.3cqw; }
+    .flow strong { border:1px solid var(--rule); padding:1.05cqw 1.4cqw; background:white; font-weight:650; }
+    .flow .model { background:var(--blue); color:white; border-color:var(--blue); }
+    .arrow { color:var(--muted); }
+    .footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule); padding-top:1cqw; font-size:.95cqw; color:var(--muted); }
+    .footer strong { color:var(--ink); font-weight:550; }
+    .columns { display:grid; grid-template-columns:1fr 1fr; gap:4cqw; align-items:center; margin-top:2.4cqw; }
+    .steps { margin:0; padding:0; list-style:none; counter-reset:step; }
+    .steps li { counter-increment:step; display:grid; grid-template-columns:2.8cqw 1fr; gap:1cqw; padding:1.35cqw 0; border-bottom:1px solid var(--rule); }
+    .steps li::before { content:"0" counter(step); font-size:1cqw; color:var(--blue); font-weight:650; padding-top:.3cqw; }
+    .steps strong { font-size:1.65cqw; font-weight:650; display:block; }
+    .steps p { font-size:1.15cqw; line-height:1.5; color:var(--muted); margin-top:.4cqw; }
+    .key-card { background:white; border:1px solid var(--rule); padding:2cqw; box-shadow:.5cqw .5cqw 0 #e4e8ec; }
+    .key-card .label { color:var(--muted); font-size:1cqw; }
+    .key-card .masked { margin:2cqw 0; color:var(--blue); font-size:2.8cqw; letter-spacing:.15em; }
+    .small { font-size:1cqw; line-height:1.5; color:var(--muted); }
+    .privacy { font-size:1.1cqw; margin-top:1.4cqw; font-weight:600; }
+    .terminal { background:#14212e; color:#eaf0f8; border-radius:.5cqw; padding:1.7cqw; min-height:16cqw; }
+    .terminal-bar { display:flex; align-items:center; gap:.4cqw; color:#9fafbf; font-size:.8cqw; border-bottom:1px solid #3a4754; padding-bottom:1cqw; margin-bottom:1.5cqw; }
+    .dot { width:.5cqw; height:.5cqw; border-radius:50%; background:#8799af; }
+    .terminal-bar span:last-child { margin-left:auto; }
+    pre { margin:0; font:1.45cqw/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .prompt { color:#8fbcff; }
+    .comment { color:#a3b3c4; font-size:1cqw; }
+    .connection { margin-top:1.4cqw; border-top:1px solid var(--rule); padding-top:1cqw; }
+    .connection dt { font-size:.85cqw; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-top:1cqw; }
+    .connection dd { margin:.35cqw 0 0; font:1.05cqw/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+    .pending { margin-top:1.4cqw; font-size:.95cqw; color:var(--muted); border-left:3px solid var(--blue); padding-left:1cqw; }
+    .signup { display:grid; grid-template-columns:1.1fr .9fr; gap:3cqw; align-items:center; }
+    .signup h2 { font-size:5.4cqw; }
+    .grains { display:flex; align-items:baseline; gap:.9cqw; margin-top:1.7cqw; color:var(--blue); }
+    .grains strong { font-size:5.5cqw; line-height:1; font-weight:750; letter-spacing:-.07em; }
+    .grains span { font-size:1.45cqw; }
+    .signup-list { margin:1.5cqw 0; padding-left:1.3cqw; font-size:1.25cqw; line-height:1.8; }
+    .deadline { font-size:1.1cqw; font-weight:650; }
+    .qr { margin:0; text-align:center; width:100%; max-width:33cqw; justify-self:end; }
+    .qr > a { display:block; background:white; padding:1.3cqw; border:1px solid var(--rule); }
+    .qr img { display:block; width:100%; height:auto; aspect-ratio:1; }
+    .qr figcaption { font-size:1.05cqw; margin-top:.8cqw; font-weight:600; }
+    .notes { display:none; }
+    .show-notes .notes { display:block; position:absolute; z-index:3; left:5cqw; right:5cqw; bottom:5cqw; background:#15212cf5; color:white; padding:1.2cqw; font-size:1cqw; line-height:1.5; box-shadow:0 .3cqw 2cqw #0003; }
+    .controls { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:8px; background:#14212ef2; color:white; border-radius:24px; padding:5px 9px; z-index:5; }
+    .controls button { background:none; border:0; color:white; font:16px system-ui; padding:5px 10px; cursor:pointer; border-radius:12px; }
+    .controls button:hover { background:#ffffff20; }
+    .counter { font-size:12px; min-width:30px; text-align:center; font-variant-numeric:tabular-nums; }
+    .progress { position:fixed; bottom:0; left:0; height:3px; background:#6d96ff; z-index:6; }
+    @media print {
+      @page { size:landscape; margin:0; }
+      body { background:white; }
+      .stage { display:block; }
+      .deck { width:100vw; overflow:visible; aspect-ratio:auto; }
+      .slide,.slide[hidden] { display:flex; position:relative; width:100vw; aspect-ratio:16/9; break-after:page; print-color-adjust:exact; }
+      .controls,.progress,.notes { display:none!important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" aria-label="ABC number 11 presentation">
+    <div class="deck">
+      <section class="slide active" aria-label="Slide 1 of 4: Qwen in Claude Code" data-title="Qwen in Claude Code">
+        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>Agentic Builders Collective</span></div><span class="draft">Working draft · 5 minutes</span></div>
+        <div class="content">
+          <p class="eyebrow">A setup you can take home</p>
+          <h1>Qwen in<br>Claude Code.<br><span class="blue">Via ModelScope.</span></h1>
+          <p class="intro">Get an API key. Connect your coding harness.<br>Run your first prompt.</p>
+          <div class="flow" aria-label="Claude Code connects to ModelScope, which serves Qwen"><strong>Claude Code</strong><span class="arrow" aria-hidden="true">→</span><strong>ModelScope API</strong><span class="arrow" aria-hidden="true">→</span><strong class="model">Qwen</strong></div>
+        </div>
+        <div class="footer"><strong>Jensen Loke · Qwen Ambassador</strong><span>01 / 04</span></div>
+        <aside class="notes">0:00–0:30. “I wanted to use Qwen through ModelScope while keeping Claude Code as my coding interface. Here are the three pieces. Claude Code is the harness: the terminal, files and agent loop. ModelScope is the API provider. Qwen is the model answering.”</aside>
+      </section>
+
+      <section class="slide" hidden inert aria-label="Slide 2 of 4: Get your API key" data-title="Get your API key">
+        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>01 · Get connected</span></div><span class="draft">Live account walkthrough</span></div>
+        <div class="content">
+          <h2>Your account.<br><span class="blue">Your API key.</span></h2>
+          <div class="columns">
+            <ol class="steps">
+              <li><div><strong>Create a ModelScope account</strong><p><a href="https://www.modelscope.ai/" target="_blank" rel="noopener">modelscope.ai ↗</a></p></div></li>
+              <li><div><strong>Open your account settings</strong><p><a href="https://www.modelscope.ai/my/settings/account" target="_blank" rel="noopener">Find the API-key section ↗</a></p></div></li>
+              <li><div><strong>Generate and save an API key</strong><p>Use it when configuring your local launcher.</p></div></li>
+            </ol>
+            <div class="key-card">
+              <p class="label">ModelScope API key · illustrative</p>
+              <p class="masked" aria-label="Masked API key">•••• •••• ••••</p>
+              <p class="small">Your launcher reads the key from a protected file on your computer.</p>
+              <p class="privacy">Keep your API key private.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><strong>Have your ModelScope user ID ready for the registration form.</strong><span>02 / 04</span></div>
+        <aside class="notes">0:30–1:30. Open ModelScope and show the signup/account path. Walk through where to generate a key, keeping any existing key masked and out of screen sharing. Show where to find the ModelScope user ID. The account-settings URL should be checked again before presenting because provider UI can change.</aside>
+      </section>
+
+      <section class="slide" hidden inert aria-label="Slide 3 of 4: Connect Claude Code" data-title="Connect Claude Code">
+        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>02 · Use your familiar harness</span></div><span class="draft">Live terminal demo</span></div>
+        <div class="content">
+          <h2>Launch Claude Code.<br><span class="blue">Let Qwen answer.</span></h2>
+          <div class="columns">
+            <div>
+              <div class="terminal">
+                <div class="terminal-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>Terminal · prepared demo project</span></div>
+                <pre><span class="comment"># After configuring the launcher</span>
+<span class="prompt">$</span> claude-qwen
+
+<span class="prompt">❯</span> Read README.md and
+  summarise this project.</pre>
+              </div>
+              <p class="pending">Take-home launcher + setup guide: companion repository link to be added.</p>
+            </div>
+            <div>
+              <p class="small">The launcher connects these settings:</p>
+              <dl class="connection">
+                <dt>API endpoint</dt><dd>https://api-inference.modelscope.ai</dd>
+                <dt>Model</dt><dd>A Qwen model available to your account</dd>
+                <dt>Separate Claude Code profile</dt><dd>~/.claude-qwen</dd>
+              </dl>
+              <p class="small" style="margin-top:1.3cqw">Configure it once. Then launch with <strong>claude-qwen</strong>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><strong>Claude Code → ModelScope → Qwen</strong><span>03 / 04</span></div>
+        <aside class="notes">1:30–3:30. Switch to a terminal in a small public demo project and run the command. Show an actual response and a Read tool call. Explain that the launcher supplies the ModelScope key, endpoint, model ID and isolated profile. The public guide must let attendees choose a model their account can access; do not assume everyone has the Qwen-Ambassador variant. The repo has not been created, so replace the draft placeholder with a verified link before publication. Thinking, 1M context and Brave search belong in the take-home guide.</aside>
+      </section>
+
+      <section class="slide" hidden inert aria-label="Slide 4 of 4: Register for ModelScope access" data-title="Register for ModelScope access">
+        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>03 · Register your details</span></div><span class="draft">ModelScope Access Form</span></div>
+        <div class="content signup">
+          <div>
+            <p class="eyebrow">Scan to register</p>
+            <h2>Try it<br><span class="blue">for yourself.</span></h2>
+            <p class="grains"><strong>1,000</strong><span>grains per participant</span></p>
+            <ul class="signup-list"><li>Your ModelScope user ID</li><li>Your Luma registration email</li></ul>
+            <p class="deadline">Submit by 2 November 2026 · 23:59</p>
+            <p class="small" style="margin-top:1cqw">Use the same email you used to register for the event.</p>
+          </div>
+          <figure class="qr">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_O5RR-HOCSwqS2BqYkVdwjd_95HQvyku63GtFPmyEGp-r-A/viewform?usp=dialog" target="_blank" rel="noopener" aria-label="Open the ABC number 11 ModelScope Access Form"><img src="public-assets/modelscope-access-qr.svg" alt="QR code linking to the ABC number 11 ModelScope Access Form" width="660" height="660"></a>
+            <figcaption>Scan the QR or <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_O5RR-HOCSwqS2BqYkVdwjd_95HQvyku63GtFPmyEGp-r-A/viewform?usp=dialog" target="_blank" rel="noopener">open the registration form ↗</a></figcaption>
+          </figure>
+        </div>
+        <div class="footer"><strong>Jensen Loke · Agentic Builders Collective</strong><span>04 / 04</span></div>
+        <aside class="notes">3:30–5:00. Leave this slide on screen while attendees scan. The form is titled “ModelScope Access Form” and describes “ABC #11 Modelscope Access.” It states “Each participant gets 1000 grains” and “Must be submitted by 2nd Nov 2026 23:59.” It asks for the ModelScope user ID and the email used for Luma registration. Details were read from the supplied form on 26 October 2026; the form does not state a timezone. Keep the QR destination unchanged unless Jensen supplies a replacement.</aside>
+      </section>
+    </div>
+  </main>
+  <nav class="controls" aria-label="Presentation controls">
+    <button id="prev" type="button" aria-label="Previous slide">←</button><span class="counter" id="counter" aria-live="polite">1 / 4</span><button id="next" type="button" aria-label="Next slide">→</button><button id="notes" type="button" aria-label="Toggle speaker notes" aria-pressed="false">N</button><button id="fullscreen" type="button" aria-label="Toggle fullscreen">⛶</button>
+  </nav>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const previous = document.getElementById('prev');
+      const next = document.getElementById('next');
+      const notes = document.getElementById('notes');
+      let index = 0;
+      function show(value, updateHash = true) {
+        index = Math.max(0, Math.min(slides.length - 1, value));
+        slides.forEach((slide, i) => {
+          slide.hidden = i !== index;
+          slide.inert = i !== index;
+          slide.classList.toggle('active', i === index);
+        });
+        document.getElementById('counter').textContent = `${index + 1} / ${slides.length}`;
+        document.getElementById('progress').style.width = `${(index + 1) / slides.length * 100}%`;
+        document.title = `${slides[index].dataset.title} — ABC #11 · Jensen Loke`;
+        previous.disabled = index === 0;
+        next.disabled = index === slides.length - 1;
+        if (updateHash) history.replaceState(null, '', `#slide-${index + 1}`);
+      }
+      function fromHash() { show((Number(location.hash.match(/^#slide-(\d+)$/)?.[1]) || 1) - 1, false); }
+      previous.addEventListener('click', () => show(index - 1));
+      next.addEventListener('click', () => show(index + 1));
+      notes.addEventListener('click', () => { const open = document.body.classList.toggle('show-notes'); notes.setAttribute('aria-pressed', String(open)); });
+      document.getElementById('fullscreen').addEventListener('click', async () => {
+        try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch (_) { /* Navigation remains available without fullscreen. */ }
+      });
+      document.addEventListener('keydown', event => {
+        if (event.ctrlKey || event.metaKey || event.altKey || event.target.closest('input,textarea,select,[contenteditable]')) return;
+        if (event.target.closest('a,button') && [' ', 'Enter'].includes(event.key)) return;
+        if (['ArrowRight','PageDown',' '].includes(event.key)) { event.preventDefault(); show(index + 1); }
+        if (['ArrowLeft','PageUp'].includes(event.key)) { event.preventDefault(); show(index - 1); }
+        if (event.key === 'Home') show(0);
+        if (event.key === 'End') show(slides.length - 1);
+        if (event.key.toLowerCase() === 'n') notes.click();
+        if (event.key.toLowerCase() === 'f') document.getElementById('fullscreen').click();
+      });
+      window.addEventListener('hashchange', fromHash);
+      fromHash();
+    })();
+  </script>
+</body>
+</html>
