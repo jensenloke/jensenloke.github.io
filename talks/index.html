@@ -16,6 +16,22 @@
     <meta property="og:url" content="https://jensenloke.github.io/talks/" />
       <link rel="stylesheet" href="/assets/cues.css">
     <script src="/assets/cues.js" defer></script>
+    <style>
+      .page-head { max-width:none; padding:44px 0 28px; }
+      .page-head h1 { font-size:clamp(38px,4.6vw,64px); margin:16px 0 18px; line-height:1.08; }
+      .page-head > p:last-child { max-width:900px; font-size:18px; line-height:1.6; }
+      .talk-spotlight { display:grid; grid-template-columns:minmax(0,1fr) 170px; align-items:center; gap:28px; margin:0 0 48px; padding:28px 32px; color:var(--ink,#162331); text-decoration:none; border:1px solid #cbd5fb; border-left:4px solid #082dff; background:linear-gradient(115deg,#f0f3ff,#fafbff); }
+      .talk-spotlight .spotlight-label { margin:0 0 10px; color:#082dff; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+      .talk-spotlight h2 { margin:0 0 12px; font-size:clamp(24px,3.4vw,38px); letter-spacing:-.04em; line-height:1.12; }
+      .talk-spotlight p { max-width:620px; margin:0 0 14px; color:#526171; line-height:1.6; }
+      .talk-spotlight .spotlight-link { color:#082dff; font-size:14px; font-weight:650; }
+      .spotlight-art { display:flex; flex-direction:column; align-items:center; gap:10px; }
+      .spotlight-art .spotlight-logo { width:96px; height:auto; }
+      .spotlight-art .spotlight-capybara { width:150px; height:auto; }
+      .talk-spotlight:hover { border-color:#082dff; }
+      .talk-spotlight:focus-visible { outline:3px solid #082dff; outline-offset:5px; }
+      @media(max-width:600px) { .talk-spotlight { grid-template-columns:minmax(0,1fr) 88px; gap:12px; padding:22px 18px; }.spotlight-art .spotlight-logo { width:75px; }.spotlight-art .spotlight-capybara { width:88px; } }
+    </style>
 </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -40,6 +56,19 @@
       </div>
 
       <main class="section-main" id="main">
+        <a class="talk-spotlight" href="./abc11-claude-qwen/" aria-label="View ABC number 11: Qwen in Claude Code, via ModelScope">
+          <div>
+            <p class="spotlight-label">Featured walkthrough · ABC #11</p>
+            <h2>Qwen in Claude Code,<br>via ModelScope</h2>
+            <p>Get your ModelScope API key, connect your familiar coding harness,
+              and take home the launcher, thinking adapter, and setup guide.</p>
+            <span class="spotlight-link">View the five-minute presentation →</span>
+          </div>
+          <div class="spotlight-art" aria-hidden="true">
+            <img class="spotlight-logo" src="./abc11-claude-qwen/public-assets/qwen-lockup.svg" alt="" width="868" height="232">
+            <img class="spotlight-capybara" src="./abc11-claude-qwen/public-assets/qwen-coding.png" alt="" width="851" height="851">
+          </div>
+        </a>
         <section class="section-block" aria-labelledby="conf-title">
           <p class="section-label" id="conf-title">Conference talks</p>
           <div class="entry-list">
