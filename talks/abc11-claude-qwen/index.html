@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
   <title>Qwen in Claude Code, via ModelScope — ABC #11</title>
   <meta name="description" content="A five-minute ABC #11 introduction: get a ModelScope API key, connect Claude Code, and register for ModelScope access.">
   <style>
@@ -67,6 +66,7 @@
     .qr > a { display:block; background:white; padding:1.3cqw; border:1px solid var(--rule); }
     .qr img { display:block; width:100%; height:auto; aspect-ratio:1; }
     .qr figcaption { font-size:1.05cqw; margin-top:.8cqw; font-weight:600; }
+    .setup-qr { max-width:23cqw; justify-self:center; }
     .notes { display:none; }
     .show-notes .notes { display:block; position:absolute; z-index:3; left:5cqw; right:5cqw; bottom:5cqw; background:#15212cf5; color:white; padding:1.2cqw; font-size:1cqw; line-height:1.5; box-shadow:0 .3cqw 2cqw #0003; }
     .controls { position:fixed; bottom:10px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:8px; background:#14212ef2; color:white; border-radius:24px; padding:5px 9px; z-index:5; }
@@ -88,7 +88,7 @@
   <main class="stage" aria-label="ABC number 11 presentation">
     <div class="deck">
       <section class="slide active" aria-label="Slide 1 of 4: Qwen in Claude Code" data-title="Qwen in Claude Code">
-        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>Agentic Builders Collective</span></div><span class="draft">Working draft · 5 minutes</span></div>
+        <div class="top"><div class="brand"><span class="abc">ABC #11</span><span>Agentic Builders Collective</span></div><span class="draft">5-minute walkthrough</span></div>
         <div class="content">
           <p class="eyebrow">A setup you can take home</p>
           <h1>Qwen in<br>Claude Code.<br><span class="blue">Via ModelScope.</span></h1>
@@ -135,21 +135,16 @@
 <span class="prompt">❯</span> Read README.md and
   summarise this project.</pre>
               </div>
-              <p class="pending">Take-home launcher + setup guide: companion repository link to be added.</p>
+              <p class="pending"><a href="https://github.com/jensenloke/claude-qwen-modelscope" target="_blank" rel="noopener">Get the launcher + setup guide ↗</a><br>Thinking adapter · Brave search · Chrome DevTools</p>
             </div>
-            <div>
-              <p class="small">The launcher connects these settings:</p>
-              <dl class="connection">
-                <dt>API endpoint</dt><dd>https://api-inference.modelscope.ai</dd>
-                <dt>Model</dt><dd>A Qwen model available to your account</dd>
-                <dt>Separate Claude Code profile</dt><dd>~/.claude-qwen</dd>
-              </dl>
-              <p class="small" style="margin-top:1.3cqw">Configure it once. Then launch with <strong>claude-qwen</strong>.</p>
-            </div>
+            <figure class="qr setup-qr">
+              <a href="https://github.com/jensenloke/claude-qwen-modelscope" target="_blank" rel="noopener" aria-label="Open the public Claude Qwen ModelScope setup repository"><img src="public-assets/claude-qwen-repo-qr.svg" alt="QR code to github.com/jensenloke/claude-qwen-modelscope" width="370" height="370"></a>
+              <figcaption>Scan for the <a href="https://github.com/jensenloke/claude-qwen-modelscope" target="_blank" rel="noopener">code + setup instructions ↗</a></figcaption>
+            </figure>
           </div>
         </div>
         <div class="footer"><strong>Claude Code → ModelScope → Qwen</strong><span>03 / 04</span></div>
-        <aside class="notes">1:30–3:30. Switch to a terminal in a small public demo project and run the command. Show an actual response and a Read tool call. Explain that the launcher supplies the ModelScope key, endpoint, model ID and isolated profile. The public guide must let attendees choose a model their account can access; do not assume everyone has the Qwen-Ambassador variant. The repo has not been created, so replace the draft placeholder with a verified link before publication. Thinking, 1M context and Brave search belong in the take-home guide.</aside>
+        <aside class="notes">1:30–3:30. Switch to a terminal in a small public demo project and run the command. Show an actual response and a Read tool call. The launcher supplies the ModelScope key, endpoint, model ID and isolated profile. Scan this QR for the public repository: clone it, run the setup command with an accessible model ID, enter your own API key, and add the shell alias. The guide includes the thinking adapter, optional Brave search and Chrome DevTools. Claude in Chrome requires a separate eligible Anthropic login and does not work inside the ModelScope API-key session; the browser guide explains that distinction. Do not assume everyone has the Qwen-Ambassador model.</aside>
       </section>
 
       <section class="slide" hidden inert aria-label="Slide 4 of 4: Register for ModelScope access" data-title="Register for ModelScope access">
@@ -162,6 +157,7 @@
             <ul class="signup-list"><li>Your ModelScope user ID</li><li>Your Luma registration email</li></ul>
             <p class="deadline">Submit by 2 November 2026 · 23:59</p>
             <p class="small" style="margin-top:1cqw">Use the same email you used to register for the event.</p>
+            <p class="small" style="margin-top:1cqw"><a href="https://github.com/jensenloke/claude-qwen-modelscope" target="_blank" rel="noopener">Setup repo: claude-qwen-modelscope ↗</a><br>The repository QR is on slide 3.</p>
           </div>
           <figure class="qr">
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_O5RR-HOCSwqS2BqYkVdwjd_95HQvyku63GtFPmyEGp-r-A/viewform?usp=dialog" target="_blank" rel="noopener" aria-label="Open the ABC number 11 ModelScope Access Form"><img src="public-assets/modelscope-access-qr.svg" alt="QR code linking to the ABC number 11 ModelScope Access Form" width="660" height="660"></a>
