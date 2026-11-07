@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Teaching Every Harness the Same Skills - Jensen Loke</title>
+    <meta
+      name="description"
+      content="How I adopted Lauren Tan's pstack skill collection for my own use: the daily verbs I run, the eighteen skills every harness now loads, and exactly where my setup differs from upstream."
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+    <meta property="og:title" content="Teaching Every Harness the Same Skills - Jensen Loke" />
+    <meta property="og:description" content="How I adopted Lauren Tan's pstack skill collection for my own use: the daily verbs, the shared roster, and the deliberate differences." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jensenloke.github.io/essays/teaching-every-harness-the-same-skills.html" />
+    <link rel="stylesheet" href="/assets/cues.css" />
+    <script src="/assets/cues.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav">
+      <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/essays/" aria-current="page">Essays</a>
+        <a href="/talks/">Talks &amp; Trainings</a>
+        <a href="/work/">Projects</a>
+      </nav>
+    </header>
+
+    <header class="site-header">
+      <div class="article-header">
+        <p class="article-kicker">Building a Second Brain &middot; Agent skills &middot; Local models &amp; harnesses</p>
+        <h1 class="article-title">Teaching Every Harness the Same Skills</h1>
+        <p class="article-subtitle">
+          I adopted an open-source skill collection for my own use: three weeks,
+          eighteen skills, every harness on two machines. This is what I run daily,
+          what I changed, and what I deliberately did not copy.
+        </p>
+        <p class="article-byline">Jensen Loke &middot; <time datetime="2026-11-07">7 November 2026</time> &middot; ~10 min read</p>
+      </div>
+    </header>
+
+    <main class="article" id="main">
+      <section>
+        <p class="note">
+          This essay describes how I adopted Lauren Tan&rsquo;s pstack skill
+          collection into my own agent setup between late October and early
+          November 2026. Every install was verified byte-for-byte and the parallel
+          worker contract was exercised end to end before rollout. It is about what
+          I run, not a survey of what is possible.
+        </p>
+      </section>
+
+      <section aria-labelledby="borrow-title">
+        <div class="section-head">
+          <h2 id="borrow-title">The method I borrowed</h2>
+        </div>
+        <p>
+          In September I came across Lauren Tan&rsquo;s pstack: a collection of
+          engineering skills a coding agent can load and follow &mdash; restate the
+          problem before acting, recall context before starting, spawn competing
+          designs and judge them, prove the work by running it. The ideas were not
+          new. What was new was the form: small markdown contracts that live on
+          disk, that any harness can read, and that survive the next model upgrade.
+        </p>
+        <p>
+          That distinction matters more than it sounds. A habit lives in a model
+          version. A skill lives on disk. When the model changes next quarter, the
+          skill survives. When I find a better way to run a design review, I edit
+          one file and every agent that loads it inherits the improvement.
+        </p>
+        <p>
+          So I adopted it the way I adopt anything I intend to keep: not by
+          admiring it, but by wiring it into everything I run. This essay is about
+          how that went.
+        </p>
+      </section>
+
+      <section aria-labelledby="daily-title">
+        <div class="section-head">
+          <h2 id="daily-title">What I actually run every day</h2>
+        </div>
+        <p>
+          Before any of this, I already lived on a handful of personal skills of my
+          own &mdash; the ones I type by name without thinking. Two of them came
+          first and do the most work:
+        </p>
+        <p>
+          <strong><code>remember</code></strong> and <strong><code>recall</code></strong>
+          are my two memory verbs. Remember saves a fact, decision, or correction
+          into the right brain &mdash; personal for my own work and consulting,
+          company for the products I support &mdash; with provenance attached.
+          Recall is the read side: it picks the right brain, retrieves by entity,
+          date, or question, and hands back a sourced answer. Every durable thing I
+          know went through remember; every session that avoids re-explaining my
+          life went through recall.
+        </p>
+        <p>
+          The other two I added during this program, and they turned out to be the
+          glue for everything else:
+        </p>
+        <p>
+          <strong><code>readback</code></strong> restates what it understood from my
+          dictated, half-formed request as a structured card &mdash; my goal in its
+          own words, the numbered asks, the assumptions it made without asking
+          &mdash; and stops. I confirm with one word or correct one item. And
+          <strong><code>recommend</code></strong> turns any open decision into
+          options with one recommendation marked, so I answer with a letter instead
+          of typing prose. These four &mdash; remember, recall, readback, recommend
+          &mdash; are the verbs I use most by an order of magnitude.
+        </p>
+        <p>
+          The adoption program did not replace them. It gave them a fleet to
+          command.
+        </p>
+      </section>
+
+      <section aria-labelledby="inventory-title">
+        <div class="section-head">
+          <h2 id="inventory-title">The inventory problem</h2>
+        </div>
+        <p>
+          The first surprise was how many surfaces the word
+          &ldquo;installed&rdquo; covers. I run several harnesses &mdash; OMP,
+          Claude Code in a few configurations, Codex, a Devin CLI &mdash; across a
+          MacBook and a Mac Mini. Each has its own skills directory. A skill is not
+          installed until it exists, byte-identical, in every root that should
+          serve it. My first rollout missed the Mac Mini entirely. My second missed
+          reference files: the skill body loaded fine while the prompt templates it
+          needed silently did not exist.
+        </p>
+        <p>
+          Both failures taught the same lesson, which I now consider the core
+          engineering rule of skills: <strong>a skill is a distribution problem,
+          not a writing problem.</strong> The markdown is the easy part. The hard
+          part is the installer, the checksums, the idempotent re-runs, the backups
+          taken before replacement, and the verification pass that compares every
+          copy against the source of truth and refuses to trust an unverified
+          claim.
+        </p>
+        <p>
+          My installer now copies the body plus every asset directory, replaces
+          them cleanly on re-run, skips anything marked retired, and takes a dated
+          backup before it overwrites. It is forty-odd lines of shell. It has
+          caught more mistakes than any review.
+        </p>
+      </section>
+
+      <section aria-labelledby="roster-title">
+        <div class="section-head">
+          <h2 id="roster-title">The roster now</h2>
+        </div>
+        <p>
+          Eighteen skills now load identically in every harness I run, on both
+          machines. They fall into four layers &mdash; memory verbs, request
+          handling, engineering method, and orchestration &mdash; and the arrows
+          show how they hand work to each other during a real session.
+        </p>
+        <figure class="article-wide" aria-label="How the adopted skills hand work to each other during a session">
+          <svg viewBox="0 0 900 640" role="img" aria-labelledby="roster-svg-title roster-svg-desc" style="width:100%;height:auto">
+            <title id="roster-svg-title">Four layers of skills and their handoffs</title>
+            <desc id="roster-svg-desc">Memory verbs remember, recall and forget feed request handling: readback and recommend. Request handling routes to the engineering method layer: how, why, teach, architect, sharpen, correct, interrogate, blast-radius, ketchup, show-me-your-work and the principles bundle. Orchestration skills arena and swarm invoke the fleet lane for material work. Every write is recorded back through remember.</desc>
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#8a8f98"/>
+              </marker>
+              <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#5b7cfa"/>
+              </marker>
+            </defs>
+            <style>
+              .ll { font-size: 12px; font-weight: 700; letter-spacing: .08em; fill: #8a8f98; }
+              .bx { fill: #fbfbfd; stroke: #d8dbe2; stroke-width: 1; }
+              .bxa { stroke: #5b7cfa; stroke-width: 1.5; }
+              .nm { font-size: 15px; font-weight: 600; fill: #16202b; }
+              .ds { font-size: 11.5px; fill: #6b7280; }
+              .fw { stroke: #b9bec8; stroke-width: 1.3; fill: none; marker-end: url(#arr); }
+              .fa { stroke: #5b7cfa; stroke-width: 1.6; fill: none; marker-end: url(#arrA); }
+              text { font-family: inherit; }
+            </style>
+
+            <text x="30" y="30" class="ll">LAYER 1 · MEMORY — ALWAYS ON</text>
+            <rect x="30" y="42" width="256" height="72" class="bx bxa" rx="10"/>
+            <text x="46" y="71" class="nm">remember</text>
+            <text x="46" y="91" class="ds">save facts + decisions, with provenance</text>
+            <rect x="322" y="42" width="256" height="72" class="bx bxa" rx="10"/>
+            <text x="338" y="71" class="nm">recall</text>
+            <text x="338" y="91" class="ds">pick the brain, return sourced answers</text>
+            <rect x="614" y="42" width="256" height="72" class="bx" rx="10"/>
+            <text x="630" y="71" class="nm">forget</text>
+            <text x="630" y="91" class="ds">expire a fact, keep the audit trail</text>
+
+            <text x="30" y="152" class="ll">LAYER 2 · REQUEST HANDLING — EVERY CONVERSATION</text>
+            <rect x="30" y="164" width="380" height="82" class="bx bxa" rx="10"/>
+            <text x="46" y="193" class="nm">readback</text>
+            <text x="46" y="213" class="ds">restate the request as a card, name matching skills,</text>
+            <text x="46" y="229" class="ds">stop for one-word confirmation</text>
+            <rect x="490" y="164" width="380" height="82" class="bx bxa" rx="10"/>
+            <text x="506" y="193" class="nm">recommend</text>
+            <text x="506" y="213" class="ds">open decisions as options, one recommendation,</text>
+            <text x="506" y="229" class="ds">answered by letter not prose</text>
+
+            <text x="30" y="288" class="ll">LAYER 3 · ENGINEERING METHOD — PER DOUBT</text>
+            <rect x="30" y="300" width="196" height="62" class="bx" rx="10"/>
+            <text x="46" y="326" class="nm">how / why</text>
+            <text x="46" y="346" class="ds">mechanism / motivation</text>
+            <rect x="246" y="300" width="146" height="62" class="bx" rx="10"/>
+            <text x="262" y="326" class="nm">teach</text>
+            <text x="262" y="346" class="ds">how + why woven</text>
+            <rect x="412" y="300" width="156" height="62" class="bx" rx="10"/>
+            <text x="428" y="326" class="nm">architect</text>
+            <text x="428" y="346" class="ds">design before code</text>
+            <rect x="588" y="300" width="146" height="62" class="bx" rx="10"/>
+            <text x="604" y="326" class="nm">sharpen</text>
+            <text x="604" y="346" class="ds">deeper, not bigger</text>
+            <rect x="754" y="300" width="116" height="62" class="bx" rx="10"/>
+            <text x="770" y="326" class="nm">correct</text>
+            <text x="770" y="346" class="ds">fix the lesson</text>
+            <rect x="30" y="376" width="176" height="62" class="bx" rx="10"/>
+            <text x="46" y="402" class="nm">interrogate</text>
+            <text x="46" y="422" class="ds">adversarial review</text>
+            <rect x="226" y="376" width="166" height="62" class="bx" rx="10"/>
+            <text x="242" y="402" class="nm">blast-radius</text>
+            <text x="242" y="422" class="ds">what could break</text>
+            <rect x="412" y="376" width="146" height="62" class="bx" rx="10"/>
+            <text x="428" y="402" class="nm">ketchup</text>
+            <text x="428" y="422" class="ds">catch-up summary</text>
+            <rect x="578" y="376" width="292" height="62" class="bx" rx="10"/>
+            <text x="594" y="402" class="nm">show-me-your-work · principles</text>
+            <text x="594" y="422" class="ds">decision trail · 24 indexed principles</text>
+
+            <text x="30" y="480" class="ll">LAYER 4 · ORCHESTRATION — MATERIAL WORK ONLY</text>
+            <rect x="30" y="492" width="256" height="72" class="bx bxa" rx="10"/>
+            <text x="46" y="521" class="nm">arena</text>
+            <text x="46" y="541" class="ds">competing candidates, judged, grafted</text>
+            <rect x="322" y="492" width="256" height="72" class="bx bxa" rx="10"/>
+            <text x="338" y="521" class="nm">swarm</text>
+            <text x="338" y="541" class="ds">fan out workers, drain, one report</text>
+            <rect x="614" y="492" width="256" height="72" class="bx" rx="10"/>
+            <text x="630" y="521" class="nm">fleet lane</text>
+            <text x="630" y="541" class="ds">tmux + local model, file sentinels</text>
+
+            <path class="fw" d="M 158 114 L 158 164"/>
+            <path class="fw" d="M 450 114 C 450 140, 300 140, 270 164"/>
+            <path class="fw" d="M 700 246 C 700 270, 470 275, 430 300"/>
+            <path class="fa" d="M 220 246 L 110 300"/>
+            <path class="fa" d="M 320 246 L 480 300"/>
+            <path class="fa" d="M 620 246 L 800 300"/>
+            <path class="fw" d="M 490 362 C 560 420, 600 460, 490 492"/>
+            <path class="fw" d="M 118 438 L 150 492"/>
+            <path class="fa" d="M 578 528 L 614 528"/>
+            <path class="fw" d="M 600 564 C 480 616, 180 616, 158 570" opacity="0"/>
+            <path class="fw" d="M 742 564 C 742 612, 200 616, 160 580" opacity="0"/>
+            <text x="330" y="600" class="ds">every result is written back through remember</text>
+            <path class="fw" d="M 320 596 C 240 596, 170 580, 158 566"/>
+          </svg>
+          <figcaption style="font-size:13px;color:#6b7280;margin-top:8px">
+            The four verbs I live on (blue) hand work to the method layer; orchestration runs only on material work, and every result is written back through <code>remember</code>.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="differences-title">
+        <div class="section-head">
+          <h2 id="differences-title">Where mine differs from upstream</h2>
+        </div>
+        <p>
+          I did not copy pstack. I adopted it the way you adopt a dependency:
+          keeping what works, changing what does not fit my setup, and writing the
+          differences down. Six changes are load-bearing.
+        </p>
+        <div class="comparison article-wide" aria-label="Upstream versus my deployment">
+          <article class="card">
+            <h3>Memory verbs are mine</h3>
+            <p>Remember, recall and forget are not pstack skills. They route to my two-brain setup &mdash; personal and company &mdash; with provenance and write receipts. Upstream has no memory layer at all.</p>
+          </article>
+          <article class="card">
+            <h3>Readback absorbed in-your-own-words</h3>
+            <p>Upstream&rsquo;s restatement skill became a section of my readback card: restate the goal in my own framing, keep the literal asks numbered. One card, one confirmation.</p>
+          </article>
+          <article class="card">
+            <h3>Principles are one bundle</h3>
+            <p>Twenty-four upstream principle files became one skill with an index and one asset per principle. The skill list stays readable; nothing was lost.</p>
+          </article>
+          <article class="card">
+            <h3>Fleet lane added</h3>
+            <p>Swarm and arena gained a second spawn lane: local models in terminal sessions against brief files, collected by file sentinels. Upstream assumes a cloud subagent API I do not always have.</p>
+          </article>
+          <article class="card">
+            <h3>How and why route memory</h3>
+            <p>Upstream&rsquo;s how and why read saved knowledge directly. Mine may only reach memory through recall, so the ownership boundary &mdash; personal versus company &mdash; holds no matter which skill runs.</p>
+          </article>
+          <article class="card">
+            <h3>Invocation flag stripped</h3>
+            <p>Upstream marks skills invoke-only in a way that one of my harnesses reads as deregistered &mdash; installed but invisible. The invoke-only intent now lives in each skill&rsquo;s description text instead.</p>
+          </article>
+        </div>
+        <p>
+          Everything else is upstream verbatim, pinned to a dated commit. When
+          upstream improves a skill, I diff my copy against the new version,
+          re-apply my small deltas, and roll it out in one command. Divergence is
+          budgeted, recorded, and cheap to audit.
+        </p>
+      </section>
+
+      <section aria-labelledby="trigger-title">
+        <div class="section-head">
+          <h2 id="trigger-title">The trigger is the hard part</h2>
+        </div>
+        <p>
+          A skill that never fires is a document. The skills are
+          explicit-invocation: nothing auto-runs. That is deliberate &mdash; I do
+          not want an agent deciding on its own to spawn six parallel workers
+          &mdash; but it created a dependency on me remembering which skill fits
+          which moment, across every harness, at the speed of conversation.
+        </p>
+        <p>
+          The fix was not a bigger menu. It was wiring the invocation into the four
+          verbs I already use daily. Readback&rsquo;s card now has a section that
+          names the installed skills matching each stated intent. Recommend&rsquo;s
+          contract already requires picking the right tool for a decision.
+          Together they form a loop: I talk, the restatement surfaces the matching
+          skills, I confirm with a letter, the work runs.
+        </p>
+        <p>
+          The pattern generalizes: <strong>don&rsquo;t build a selector, build the
+          habit loop.</strong> A selector that auto-executes removes the human gate
+          exactly where judgement matters most. A suggestion line in a card I
+          already read keeps the gate and adds the recall. The cost is one
+          confirmation word; the benefit is that I never have to memorize an
+          inventory.
+        </p>
+      </section>
+
+      <section aria-labelledby="lessons-title">
+        <div class="section-head">
+          <h2 id="lessons-title">What I would tell myself at the start</h2>
+        </div>
+        <ul>
+          <li>
+            <strong>Skills are a distribution problem.</strong> Budget for the
+            installer, the verification, and the backups before you write the
+            first body. The writing is the small half.
+          </li>
+          <li>
+            <strong>Byte-identical or it isn&rsquo;t installed.</strong>
+            &ldquo;Roughly the same files in most directories&rdquo; is how
+            reference templates go missing. One checksum across every root, or it
+            did not happen.
+          </li>
+          <li>
+            <strong>Deleting is part of adopting.</strong> Nine directories
+            replaced by one indexed bundle; a router retired the day its coverage
+            map was complete. A skill list you cannot read is a skill list you
+            will not use.
+          </li>
+          <li>
+            <strong>Write your differences down.</strong> Six deltas from
+            upstream, each recorded with a reason. The diffs are the documentation
+            of how the method was adapted to a different life.
+          </li>
+          <li>
+            <strong>Wire invocation into habits, not menus.</strong> The verbs
+            that already run daily &mdash; remember, recall, readback, recommend
+            &mdash; carry the rest of the roster.
+          </li>
+          <li>
+            <strong>Prove the contract, then ship the proof.</strong> The
+            alias-model bug was found in twenty-four seconds because the contract
+            was exercised before rollout, not after.
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="close-title">
+        <div class="section-head">
+          <h2 id="close-title">What it adds up to</h2>
+        </div>
+        <p>
+          Every harness I run now shares one skill roster, one installer, one
+          source of truth, and one registry. A new session on either machine loads
+          the same contracts: remember and recall for memory, readback and
+          recommend for every request, the method layer for doubt, orchestration
+          for material work. When I adopt the next skill, it is a directory copy
+          and an installer run &mdash; minutes, not an evening.
+        </p>
+        <p>
+          But the real shift is smaller and more personal. The skills I rely on
+          are no longer scattered across tool configs in my head. They are files I
+          can read, checksums I can verify, a registry I can search, and a write
+          protocol that refuses to let me be casually wrong. The method stopped
+          being something one model happens to do well and became something my
+          infrastructure does by default.
+        </p>
+        <p>
+          That is what I mean by teaching every harness the same skills. Not the
+          same model, not the same context window &mdash; those stay different,
+          and should. The same method. The same proof. The same memory of why.
+        </p>
+      </section>
+
+      <section aria-labelledby="related-title">
+        <div class="section-head">
+          <h2 id="related-title">Related</h2>
+        </div>
+        <ul>
+          <li><a href="../second-brain/the-last-project-you-build-alone.html">The Last Project You Build Alone</a> &mdash; why the memory layer is custom, harness-independent, and never finished.</li>
+          <li><a href="./two-brains-one-operator.html">Two Brains, One Operator</a> &mdash; the personal and company split behind the routing in this essay.</li>
+          <li><a href="/engineering/devin-issue-pilot.html">The Devin Issue Pilot</a> &mdash; the same verification discipline applied to an agent teammate.</li>
+          <li><a href="/local-models/">Local Models &amp; Harnesses</a> &mdash; reviews of the runtimes this roster runs on.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Jensen Loke<br /><span>Useful systems. Considered writing.</span></p>
+      <div class="footer-socials" aria-label="Social profiles">
+        <a href="https://github.com/jensenloke">GitHub ↗</a>
+        <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+        <a href="https://x.com/jensenloke">X ↗</a>
+        <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+        <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+        <a href="https://github.com/Success-IT">Success IT ↗</a>
+      </div>
+      <p>Singapore<br />© 2026</p>
+    </footer>
+  </body>
+</html>
