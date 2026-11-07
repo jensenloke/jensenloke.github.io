@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>An Interactive Singapore Map, Built in One Conversation - Jensen Loke</title>
+  <meta
+    name="description"
+    content="A self-contained interactive map of Singapore - official planning boundaries, the full MRT network with an offline journey planner, statistics, historical maps and walking tours - built with an AI agent from open data, in a single HTML file."
+  />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
+  <meta property="og:title" content="An Interactive Singapore Map, Built in One Conversation - Jensen Loke" />
+  <meta property="og:description" content="A self-contained interactive map of Singapore built with an AI agent from open data - one HTML file, no API keys." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jensenloke.github.io/engineering/interactive-singapore-map.html" />
+    <link rel="stylesheet" href="/assets/cues.css">
+    <script src="/assets/cues.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav">
+  <a class="brand" href="/">Jensen Loke<span class="brand-dot" aria-hidden="true">●</span></a>
+  <nav aria-label="Main navigation">
+    <a href="/essays/" aria-current="page">Essays</a>
+    <a href="/talks/">Talks &amp; Trainings</a>
+    <a href="/work/">Projects</a>
+  </nav>
+</header>
+<header class="site-header">
+    <div class="article-header">
+      <p class="article-kicker">Success IT Engineering &middot; Agentic engineering &middot; Qwen</p>
+      <h1 class="article-title">An Interactive Singapore Map, Built in One Conversation</h1>
+      <p class="article-subtitle">
+        Official planning boundaries, the whole MRT network with an offline journey
+        planner, statistics choropleths, georeferenced historical maps and walking
+        tours &mdash; assembled from open data into a single self-contained HTML file,
+        with no API keys and no build step.
+      </p>
+      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-11-07">7 November 2026</time> &middot; ~7 min read</p>
+    </div>
+  </header>
+
+  <main class="article" id="main">
+    <section aria-labelledby="try-title">
+      <div class="section-head">
+        <h2 id="try-title">Try it first</h2>
+      </div>
+      <p>
+        The result is a live demo: <a class="text-link" href="../lab/singapore-map/">an interactive map of Singapore<span aria-hidden="true"> ↗</span></a>.
+        Search a place, plan a train journey between two stations, colour the island
+        by population density or HDB resale price, drop a 1953 survey map over the
+        modern streets, or walk one of five heritage routes. Everything except the
+        basemap tiles, rain radar and historical maps is embedded in one file you
+        could email to someone.
+      </p>
+      <p>
+        I did not write it by hand. I built it by talking to an AI coding agent
+        (Qwen, running in the opencode harness) across a single session &mdash; first
+        a base map, then a second phase of features I picked from a menu the agent
+        proposed. This piece is about what that process produced, how it worked, and
+        where the honest limits are.
+      </p>
+    </section>
+
+    <section aria-labelledby="why-title">
+      <div class="section-head">
+        <h2 id="why-title">Why build a map when Google Maps exists</h2>
+      </div>
+      <p>
+        Google Maps is better at being Google Maps: routing, live traffic, Street
+        View, reviews, business hours. I was not trying to replace it. I wanted
+        something it does not give you &mdash; a map you can own, inspect and extend,
+        built on Singapore&rsquo;s open government data rather than a proprietary
+        platform.
+      </p>
+      <p>
+        Three properties drove the design. It is <strong>self-contained</strong>:
+        the boundaries, stations and points of interest live inside the file, so it
+        works offline apart from imagery. It is <strong>key-free</strong>: no API
+        key, no billing account, no quota &mdash; just open data and free tile
+        servers. And it is <strong>private and hackable</strong>: search runs in the
+        browser, nothing is tracked, and the whole thing is plain HTML and JavaScript
+        with a reproducible data pipeline beside it.
+      </p>
+    </section>
+
+    <section aria-labelledby="how-title">
+      <div class="section-head">
+        <h2 id="how-title">How the build actually ran</h2>
+      </div>
+      <p>
+        The loop was conversational but disciplined. For each feature the agent
+        researched a data source, downloaded it, wrote a small Python script to
+        clean and compact it, embedded the result, and then tested the page in a
+        headless browser before moving on. The testing mattered: it drove real
+        Chrome over the DevTools protocol, clicked the controls, and asserted on the
+        DOM, so bugs surfaced as failures rather than as guesses.
+      </p>
+      <p>
+        Several fixes came straight from that loop. The first default basemap
+        rendered with an &ldquo;API key required&rdquo; watermark; we switched to
+        Esri&rsquo;s key-free tiles. OpenStreetMap&rsquo;s own tiles then returned
+        <code>403 Access blocked</code> when the file was opened locally, because
+        their volunteer servers require a web referer that a <code>file://</code>
+        page does not send &mdash; so Esri became the default and OSM an option. A
+        geocoder matched &ldquo;St Andrew&rsquo;s Cathedral&rdquo; to a namesake
+        childcare centre in Jurong, inflating a walking tour to 33&nbsp;km; the
+        coordinate was corrected and the tour dropped back to 1.4&nbsp;km.
+      </p>
+      <p>
+        The journey planner is a good example of doing more with data already in
+        hand. Rather than call a routing API, the agent built a graph from the
+        station codes &mdash; 184 stations, 212 edges, with the branch connections
+        (the Changi extension, the Circle Line closing loop, Punggol Coast) wired in
+        by hand &mdash; and ran a shortest-path search over it with a transfer
+        penalty. It runs entirely offline.
+      </p>
+    </section>
+
+    <section aria-labelledby="inside-title">
+      <div class="section-head">
+        <h2 id="inside-title">What is inside</h2>
+      </div>
+      <p>
+        The map layers come from official and open sources, each fetched and
+        simplified by a script so the single file stays around 1.4&nbsp;MB:
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Layer</th><th>Source</th><th>What it adds</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Layer">Planning boundaries</td><td data-label="Source">URA Master Plan (data.gov.sg)</td><td data-label="What it adds">5 regions, 55 planning areas, 332 subzones, with area and subzone counts</td></tr>
+            <tr><td data-label="Layer">Rail network</td><td data-label="Source">OneMap / LTA</td><td data-label="What it adds">Every MRT/LRT line and station, plus an offline journey planner</td></tr>
+            <tr><td data-label="Layer">Statistics</td><td data-label="Source">SingStat Census 2020; HDB resale</td><td data-label="What it adds">Choropleths of population density and median resale price</td></tr>
+            <tr><td data-label="Layer">Amenities</td><td data-label="Source">NParks, NEA, NLB, OpenStreetMap</td><td data-label="What it adds">Parks, park connectors, 129 hawker centres, libraries, hospitals, schools</td></tr>
+            <tr><td data-label="Layer">Historical maps</td><td data-label="Source">NUS Libraries / SLA</td><td data-label="What it adds">Georeferenced survey maps, 1914&ndash;2010, as an opacity overlay</td></tr>
+            <tr><td data-label="Layer">Places &amp; tours</td><td data-label="Source">Curated, geocoded via OneMap</td><td data-label="What it adds">108 points of interest and five walking routes</td></tr>
+            <tr><td data-label="Layer">Rain radar</td><td data-label="Source">RainViewer</td><td data-label="What it adds">Live, key-free radar with playback</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        On top sit the quality-of-life features: marker clustering, a dark mode, PNG
+        export, favourites saved in the browser, and shareable deep links to a
+        specific place.
+      </p>
+    </section>
+
+    <section aria-labelledby="tokens-title">
+      <div class="section-head">
+        <h2 id="tokens-title">The token economics</h2>
+      </div>
+      <p>
+        The cost shape is the interesting part, and it echoes what I found in
+        <a href="devin-fusion-company-brain-cutover.html">the Devin Fusion cutover</a>:
+        the expense is overwhelmingly input, not output. By the end of this build
+        the session had produced roughly 170,000 tokens of output and reasoning
+        across about 150 tool calls, but had processed tens of millions of input
+        tokens &mdash; most of it the same growing context re-read on every turn,
+        served largely from cache. The &ldquo;new work&rdquo; was a rounding error
+        next to the context. On the invite model the dollar cost was zero.
+      </p>
+      <p class="note">
+        A practical lesson: for long agent sessions, caching and context discipline
+        matter far more than the length of the model&rsquo;s replies. The output is
+        cheap; carrying the whole conversation forward each turn is not.
+      </p>
+    </section>
+
+    <section aria-labelledby="limits-title">
+      <div class="section-head">
+        <h2 id="limits-title">Where it falls short</h2>
+      </div>
+      <p>
+        It is a reference and exploration tool, not a navigation product. There is
+        no turn-by-turn routing, live traffic, Street View or business data. Journey
+        times and fares are estimates. The boundaries are indicative. A handful of
+        geocoded coordinates are approximate, and the data is a snapshot that needs
+        a rebuild to refresh.
+      </p>
+      <p>
+        The one feature I could not make work from a local file is live LTA data
+        (carpark availability, traffic incidents). LTA&rsquo;s API needs a free key
+        <em>and</em> sends no CORS headers, so a browser blocks direct calls from a
+        static page. The map has a slot for the key and reports the block honestly;
+        making it live would need a small proxy. The rain radar, which does send CORS
+        headers, works fully key-free.
+      </p>
+      <p>
+        None of this diminishes the point. In one conversation, an agent turned a
+        pile of open data into a polished, owned, extensible artifact &mdash; and
+        tested its own work along the way. The file is small enough to keep, the
+        pipeline is small enough to re-run, and the whole thing is independent of
+        any one platform. That is the kind of system I like building.
+      </p>
+    </section>
+
+    <section aria-labelledby="related-title">
+      <div class="section-head">
+        <h2 id="related-title">Related</h2>
+        <p>The demo, and the writing behind the method.</p>
+      </div>
+      <ul>
+        <li>
+          <a href="../lab/singapore-map/">The live Singapore map</a> &mdash; the
+          self-contained demo this piece describes.
+        </li>
+        <li>
+          <a href="devin-fusion-company-brain-cutover.html">How Devin Fusion Ran a
+          Five-Day Company-Brain Cutover</a> &mdash; the same input-heavy token
+          economics, at much larger scale.
+        </li>
+        <li>
+          <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a>
+          &mdash; Qwen-tagged work on personal and corporate agent memory.
+        </li>
+        <li>
+          <a href="../work/">Work catalogue</a> &mdash; other repositories and tools.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+  <p>Jensen Loke<br><span>Useful systems. Considered writing.</span></p>
+  <div class="footer-socials" aria-label="Social profiles">
+    <a href="https://github.com/jensenloke">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/jensenloke/">LinkedIn ↗</a>
+    <a href="https://x.com/jensenloke">X ↗</a>
+    <a href="https://www.youtube.com/@jensenloke">YouTube ↗</a>
+    <a href="https://huggingface.co/jensenloke">Hugging Face ↗</a>
+    <a href="https://github.com/Success-IT">Success IT ↗</a>
+  </div>
+  <p>Singapore<br>© 2026</p>
+</footer>
+</body>
+</html>

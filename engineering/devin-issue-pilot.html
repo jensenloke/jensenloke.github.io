@@ -6,12 +6,12 @@
   <title>The Devin Issue Pilot - Jensen Loke</title>
   <meta
     name="description"
-    content="A design for issue-driven Devin automation: every new issue in the parent repo starts a Devin session that asks its questions on the issue, opens PRs, and never merges. The flow, the guards, and the exact automation settings."
+    content="Five days of turning Devin into an issue-driven teammate, 2 to 6 October 2026: what we tried, why a second Devin now reviews every change before a PR exists, how close that gets to Claude Code on Opus 5.5, the key learnings, and how the pilot works now."
   />
   <link rel="stylesheet" href="../assets/styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162331'/%3E%3Ctext x='32' y='45' font-family='Inter,system-ui,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%235b7cfa'%3EJ%3C/text%3E%3C/svg%3E" />
   <meta property="og:title" content="The Devin Issue Pilot - Jensen Loke" />
-  <meta property="og:description" content="Every new issue starts a Devin session. It asks its questions on the issue, opens PRs, and never merges. The flow, the guards, and the settings." />
+  <meta property="og:description" content="Seven PRs merged after midnight, a sales lead who merged on sight, a second Devin that reviews before any PR exists, and a weekly quota burned to 86% on a mode nobody checked. The timeline, the key learnings, and how the pilot works now." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://jensenloke.github.io/engineering/devin-issue-pilot.html" />
     <link rel="stylesheet" href="/assets/cues.css">
@@ -33,235 +33,341 @@
       <p class="article-kicker">Success IT Engineering &middot; Devin Ambassador field report &middot; Agentic engineering</p>
       <h1 class="article-title">The Devin Issue Pilot</h1>
       <p class="article-subtitle">
-        Every new issue in the parent repo starts a Devin session. Devin asks its questions on the issue,
-        a reply from one of two named humans wakes it to carry on, and it opens PRs but never merges.
-        The full flow, the guards, and the automation settings.
+        From seven PRs merged after midnight to an automation in which a second Devin reviews every change
+        before a PR exists, and a human merges. What we tried from 2 to 6 October, what we learnt, and how it
+        works now.
       </p>
-      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-10-05">5 October 2026</time> &middot; ~6 min read</p>
+      <p class="article-byline">Jensen Loke &middot; <time datetime="2026-10-06">6 October 2026</time> &middot; ~15 min read</p>
     </div>
   </header>
 
   <main class="article" id="main">
-    <section aria-labelledby="idea-title">
+    <section aria-labelledby="intro-title">
       <div class="section-head">
-        <h2 id="idea-title">The idea</h2>
+        <h2 id="intro-title">Only the exceptions</h2>
       </div>
       <p>
-        We already run Devin as a coding agent; the question this pilot answers is whether it can own the
-        <em>issue</em> as well as the fix. The design: our sales lead files issues exactly as she does today -
-        a screen name, a document number, a screenshot, no tags to remember. Every new issue in the parent repo
-        triggers a Devin session. Devin reads the issue, the playbook and past fixes, then either asks numbered
-        questions in plain English, flags that a business decision is needed, or claims the issue and works it.
-        It opens PRs to <code>dev</code>/<code>develop</code> but never merges; I merge. After the merge, Devin
-        verifies the dev deploy and posts test steps, and the issue only closes once the fix is confirmed working
-        and recorded in the company brain.
+        In October I wanted Devin to own an issue the way Claude Code already could on my laptop: read what our
+        sales lead filed, ask what it needs to ask, fix it, prove it, and come to me only for the exceptions.
+        Devin had worked on our product briefly in late August and early September, then gone quiet. Almost every
+        fix still went through Claude Code in a terminal on my MacBook, so every fix waited for me.
       </p>
-      <p class="note">
-        <strong>Disclosure.</strong> I am a Devin ambassador. This describes a real production design; repository
-        names, usernames, customer data and internal identifiers are omitted.
+      <p>
+        This is what happened from Friday 2 to Tuesday 6 October 2026, when I tried again.
       </p>
-    </section>
 
-    <section aria-labelledby="flow-title">
-      <div class="section-head">
-        <h2 id="flow-title">The flow</h2>
-        <p>One issue, start to close.</p>
-      </div>
-      <ol>
-        <li>
-          <strong>The sales lead opens an issue.</strong> Screen name, document number, screenshot. Nothing to tag.
-        </li>
-        <li>
-          <strong>A Devin session starts.</strong> It reads the issue, the playbook, and past fixes.
-        </li>
-        <li>
-          <strong>Triage.</strong> Labelled <code>devin:skip</code>, or claimed by another agent? Devin stays silent.
-        </li>
-        <li>
-          <strong>Three exits from triage.</strong> Needs info &rarr; Devin comments numbered questions in plain
-          English, with options to pick from. Needs a business decision &rarr; Devin comments
-          <em>Needs a decision</em>, with the reason. Clear enough &rarr; Devin claims it: label
-          <code>agent:devin</code>, status In progress.
-        </li>
-        <li>
-          <strong>A reply wakes it.</strong> The sales lead or I answer in a comment, and Devin carries on:
-          fixes, tests, self-reviews, opens a PR.
-        </li>
-        <li>
-          <strong>PR ready.</strong> Devin comments <em>PR ready for review</em>, with links.
-        </li>
-        <li>
-          <strong>I review and merge</strong>, then comment <code>merged</code> on the issue.
-        </li>
-        <li>
-          <strong>Devin verifies dev.</strong> The comment wakes it to confirm the dev deploy and check it on dev.
-        </li>
-        <li>
-          <strong>Ready to test.</strong> Devin comments test steps for the sales lead and sets the status
-          <em>Ready to test in dev</em>.
-        </li>
-        <li>
-          <strong>She tests.</strong> Works &rarr; she comments with a works screenshot; Devin records the fix in
-          the company brain and closes the issue. Still broken &rarr; she comments what went wrong, and a new
-          Devin session reads the thread and the handover notes.
-        </li>
-      </ol>
-    </section>
-
-    <section aria-labelledby="lead-title">
-      <div class="section-head">
-        <h2 id="lead-title">What the sales lead does</h2>
-        <p>The whole point is that her workflow barely changes.</p>
-      </div>
-      <div class="scorecard article-wide">
-        <table>
-          <thead><tr><th>She wants to&hellip;</th><th>She does this</th><th>Example</th></tr></thead>
-          <tbody>
-            <tr>
-              <td data-label="She wants to…">Report a problem</td>
-              <td data-label="She does this">Open an issue as now. Name the screen and the document number, and attach a screenshot. Nothing to tag.</td>
-              <td data-label="Example">an issue</td>
-            </tr>
-            <tr>
-              <td data-label="She wants to…">Answer Devin</td>
-              <td data-label="She does this">Reply in a comment. Don't edit the issue text: an edit does not wake Devin, a comment does.</td>
-              <td data-label="Example"><code>1a, 2b</code></td>
-            </tr>
-            <tr>
-              <td data-label="She wants to…">Test the fix</td>
-              <td data-label="She does this">Wait for the <em>Ready to test in dev</em> comment, follow its steps on dev, then reply <code>works</code> or with what she saw and a screenshot.</td>
-              <td data-label="Example"><code>works</code></td>
-            </tr>
-            <tr>
-              <td data-label="She wants to…">Keep Devin off an issue</td>
-              <td data-label="She does this">Comment <code>devin stop</code>, or add the <code>devin:skip</code> label. Devin replies once to confirm and then stays out.</td>
-              <td data-label="Example"><code>devin stop</code></td>
-            </tr>
-            <tr>
-              <td data-label="She wants to…">Bring Devin to an old issue</td>
-              <td data-label="She does this">Issues opened before the pilot are left alone. Mention <code>@devin</code> in a comment to hand one over.</td>
-              <td data-label="Example"><code>@devin</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section aria-labelledby="posts-title">
-      <div class="section-head">
-        <h2 id="posts-title">What Devin posts on the issue</h2>
-        <p>Four comment shapes, each with one job.</p>
-      </div>
-      <div class="scorecard article-wide">
-        <table>
-          <thead><tr><th>Comment</th><th>Audience</th><th>Contents</th></tr></thead>
-          <tbody>
-            <tr>
-              <td data-label="Comment"><strong>Question</strong></td>
-              <td data-label="Audience">Sales lead</td>
-              <td data-label="Contents">Numbered, one decision each, options to pick from. No code terms. Reply with e.g. &ldquo;1a&rdquo;.</td>
-            </tr>
-            <tr>
-              <td data-label="Comment"><strong>PR ready for review</strong></td>
-              <td data-label="Audience">Me</td>
-              <td data-label="Contents">PR links, what changed, the tests Devin broke on purpose and what it could not verify.</td>
-            </tr>
-            <tr>
-              <td data-label="Comment"><strong>Ready to test in dev</strong></td>
-              <td data-label="Audience">Sales lead</td>
-              <td data-label="Contents">Where to click, which test document to use, what she should see.</td>
-            </tr>
-            <tr>
-              <td data-label="Comment"><strong>Needs a decision</strong></td>
-              <td data-label="Audience">Either of us</td>
-              <td data-label="Contents">A business rule, price or customer data change. The sales lead answers, and calls me when unsure. Anything needing production or UAT data still goes to me.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <blockquote class="callout">
-        1. Should the Due Date also show on the printed invoice? a) Yes, same as the long-form printout
-        b) No, long-form only. Reply with e.g. &ldquo;1a&rdquo;.
-      </blockquote>
-      <p class="figcap">A real question shape: one decision, lettered options, no code terms.</p>
-    </section>
-
-    <section aria-labelledby="guards-title">
-      <div class="section-head">
-        <h2 id="guards-title">Guards</h2>
-      </div>
+      <h3>In short</h3>
       <ul>
-        <li>
-          <strong>Only comments by the two of us wake Devin.</strong> Devin's own comments - and our support
-          bot's - don't, so two bots can't loop.
-        </li>
-        <li>
-          <strong>One Devin at a time per issue.</strong> A working session holds the <code>devin:working</code>
-          label and re-reads the thread before it stops, so a second quick reply is still answered.
-        </li>
-        <li>
-          <strong>Each session is capped at 30 ACUs.</strong> A comment on an issue Devin isn't handling costs
-          only a short silent session. Devin writes its own comments, so a session with nothing to say posts nothing.
-        </li>
-        <li>
-          <strong>Same rules as today.</strong> PRs to <code>dev</code>/<code>develop</code> only, no merges,
-          dev database only, never UAT or production.
-        </li>
-        <li>
-          <strong>Off switch for everything:</strong> disable the automation in Devin.
-        </li>
+        <li><strong>What happened.</strong> Devin merged its own fixes, a review found something wrong in every one, and the rule for who merges took five positions in four days.</li>
+        <li><strong>What works now.</strong> Every new issue starts a Devin session. A second Devin reviews the change before any PR exists, and a human merges.</li>
+        <li><strong>Why a reviewer.</strong> Devin caught every defect we planted in code it had not written, but its own work kept passing its own checks and failing review.</li>
+        <li><strong>The cost.</strong> We used 86% of a weekly quota on a mode we had never checked. It now runs on SWE-2.</li>
+        <li><strong>Still open.</strong> Whether a Devin reviewer is as good as Claude Code on Opus 5.5. We compared them once, and Devin found about half.</li>
+      </ul>
+
+      <h3>Terms used here</h3>
+      <ul>
+        <li><strong>Claude</strong> - Claude Code on Opus 5.5, in a terminal on my MacBook. My usual coding agent, and the reviewer in this story.</li>
+        <li><strong>The playbook</strong> - the agent fix playbook in our company brain: rules every fix must follow, such as listing every place that reads or writes the data, and proving each new test fails without the fix. Scores such as "4 of 8" count the rules a change met, out of those that applied to it; a half point means partly met.</li>
+        <li><strong>Guards and the bypass</strong> - checks that run before every push and block it on a known bad pattern. A bypass skips them for one push.</li>
+        <li><strong>Reviewer child</strong> - a second Devin session that the working session starts to review its branch with fresh context, before any PR exists.</li>
+        <li><strong>Verdicts</strong> - the reviewer's answer: PASS, PASS WITH GAPS (fine, with the gaps listed) or FIX FIRST. NEEDS JENSEN means the issue is waiting for me.</li>
+        <li><strong>SMALL and STANDARD</strong> - size tiers. A STANDARD change gets the full test suites re-run.</li>
+        <li><strong>Fusion, Normal and SWE-2</strong> - Devin's agent modes. Fusion pairs a frontier lead model with a cheaper sidekick, Normal balances cost and intelligence across frontier models, and SWE-2 High is where we ended up.</li>
+        <li><strong>ACU</strong> - Devin's unit of compute. Budgets are set in ACUs.</li>
+      </ul>
+
+      <p class="note">
+        <strong>Disclosure.</strong> I am a Devin ambassador. This account comes from my Claude Code transcripts,
+        Devin's session records, our company brain and the Git history. Repository names, usernames, issue and PR
+        numbers, customer data and internal identifiers are left out, and other people are described by role. My
+        quotes are copied as I typed them; square brackets mark a replaced name. Times are Singapore time (UTC+8).
+      </p>
+    </section>
+
+    <section aria-labelledby="timeline-title">
+      <div class="section-head">
+        <h2 id="timeline-title">Timeline: 2 to 6 October</h2>
+        <p>The turning points. The details are in Key learnings.</p>
+      </div>
+
+      <h3>Friday 2 October</h3>
+      <ul>
+        <li><strong>21:31</strong> - "ok i'm planning to use devin cloud." Claude turned every past Claude session into a readiness checklist in the company brain, where Devin can read it.</li>
+        <li><strong>21:49</strong> - I let Devin open PRs and merge them into the development branches: merge rule 1. Two minutes later Claude warned that nothing else would stop a bad change.</li>
+      </ul>
+
+      <h3>Saturday 3 October</h3>
+      <ul>
+        <li><strong>01:07</strong> - Devin merged six of its seven overnight PRs within 30 seconds. CI was green.</li>
+        <li><strong>07:42</strong> - Claude's review found something wrong in every fix, including tests that still passed with the fix removed. Six repairs were merged by 11:42, and Claude wrote the playbook.</li>
+        <li><strong>11:41 to 15:00</strong> - Merge rules 2 and 3: first a separate reviewer or a human approves, then Devin never merges. GitHub could only enforce either on a paid plan.</li>
+        <li><strong>17:35</strong> - Asked to review branches in which we had planted five defects, Devin caught all five with no false alarm.</li>
+      </ul>
+
+      <h3>Sunday 4 October</h3>
+      <ul>
+        <li><strong>08:36</strong> - Merge rule 4: agents may merge into the development branches again, with a backup and a reverse script for any data change.</li>
+        <li><strong>08:46</strong> - I merged two of Devin's PRs unreviewed. Send could never open its dialog. Score: 4 of 8.</li>
+        <li><strong>12:03</strong> - "how can we make sure devin when assigned a task can perform up to your standards without our supervision?" Four minutes later: "Ideally we start an independent devin session".</li>
+        <li><strong>19:33</strong> - A blind second Devin reviewed one fix alongside Claude and found about half of what Claude found.</li>
+      </ul>
+
+      <h3>Monday 5 October</h3>
+      <ul>
+        <li><strong>00:51</strong> - I approved the automation design with merge rule 5: the sales lead or I merge. The form said "Org default (Normal)". Neither of us noticed.</li>
+        <li><strong>By 07:51</strong> - The automation was live.</li>
+        <li><strong>13:52 to 14:07</strong> - The sales lead merged four of Devin's PRs within minutes. A review afterwards found false claims in the PRs and a data change nobody had disclosed.</li>
+        <li><strong>17:10 to 17:35</strong> - "None of your suggestions will solve the problem. I'm NOT buying github teams". Review moved before the PR, done by a second Devin (prompt v4).</li>
+        <li><strong>23:46</strong> - "my devin is at 86% usage. so let's switch to SWE 2 instead?" Claude found the automation had run on Normal all day, not Fusion. I set SWE-2 High as the default; Claude confirmed it at 23:51.</li>
+      </ul>
+
+      <h3>Tuesday 6 October</h3>
+      <ul>
+        <li><strong>00:27</strong> - Prompt v5.1 saved: a softer verdict, PASS WITH GAPS, and sessions that archive themselves when they finish.</li>
+        <li><strong>00:31</strong> - I let Devin reach the deployed development site, which its network policy had blocked all day.</li>
       </ul>
     </section>
 
-    <section aria-labelledby="settings-title">
+    <section aria-labelledby="design-title">
       <div class="section-head">
-        <h2 id="settings-title">The automation settings</h2>
+        <h2 id="design-title">Why Devin needs a reviewer</h2>
+        <p>And how close that gets it to Claude Code on Opus 5.5.</p>
       </div>
+      <p>
+        My Sunday question set the bar: "up to your standards". "Your" meant Claude Code, and every Claude Code
+        session and reviewer in this story ran Opus 5.5. The bar was not the model alone. It was a fresh reviewer
+        for each change, briefed to find what green CI misses and to break the code on purpose, and a lead session
+        that re-checked its evidence. Against that bar, Devin's own checks kept passing work the reviews then
+        failed:
+      </p>
       <div class="scorecard article-wide">
         <table>
-          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <thead><tr><th>Work</th><th>Devin's own checks</th><th>What the review found</th><th>Score</th></tr></thead>
           <tbody>
-            <tr><td data-label="Setting">Trigger 1</td><td data-label="Value">Issue opened in the parent repo, any author.</td></tr>
-            <tr><td data-label="Setting">Trigger 2</td><td data-label="Value">Issue comment created, author is the sales lead or me.</td></tr>
-            <tr><td data-label="Setting">Auto reply</td><td data-label="Value">Removed; Devin posts its own comments.</td></tr>
-            <tr><td data-label="Setting">Agent</td><td data-label="Value">New session per event. &ldquo;Message existing session&rdquo; sends every event to one fixed session, so it can't follow separate issues.</td></tr>
-            <tr><td data-label="Setting">Memory</td><td data-label="Value">Issue thread plus Devin's handover page in the company brain.</td></tr>
-            <tr><td data-label="Setting">Budget</td><td data-label="Value">30 ACUs per session.</td></tr>
-            <tr><td data-label="Setting">Brain connection</td><td data-label="Value">The company brain, over MCP.</td></tr>
-            <tr><td data-label="Setting">Old <code>@devin</code> automation</td><td data-label="Value">Disabled once the smoke test passes.</td></tr>
+            <tr><td data-label="Work">Friday's batch</td><td data-label="Devin's own checks">CI green</td><td data-label="What the review found">Something wrong in every fix</td><td data-label="Score">Not scored</td></tr>
+            <tr><td data-label="Work">Receipt email</td><td data-label="Devin's own checks">Tests passing</td><td data-label="What the review found">Send could never open its dialog</td><td data-label="Score">4 of 8, then 5 of 7</td></tr>
+            <tr><td data-label="Work">REVISED colour</td><td data-label="Devin's own checks">Tests passing</td><td data-label="What the review found">Tests that skipped the real wiring; a side effect under-reported about tenfold</td><td data-label="Score">5.5 of 7, then 6 of 7</td></tr>
+            <tr><td data-label="Work">Guard hook</td><td data-label="Devin's own checks">"Fails closed"</td><td data-label="What the review found">Failed open on a crash</td><td data-label="Score">2.5 of 4, then passed</td></tr>
+            <tr><td data-label="Work">Monday's pilot PRs</td><td data-label="Devin's own checks">Tested on dev by the sales lead</td><td data-label="What the review found">False claims and an undisclosed data change</td><td data-label="Score">Not scored</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Yet reviewing code it had not written, Devin caught every planted defect. Claude's diagnosis on Sunday:
+        "Devin reviews others' code well, but it does not apply that adversarial review to its own work." When I
+        said they were "actually the same model", Claude answered: "It's the setup, not ability". Devin started
+        each session without the lessons, on a half-built machine with no browser test tools, and nothing made it
+        back up its claims. More instructions would not fix that; the playbook already said it all. A second
+        session briefed to find fault would. (Whether they really were the same model I could not tell: Devin does
+        not show which model runs a step.)
+      </p>
+      <p>
+        Opus 5.5 was not flawless either; Claude's mistakes are in the table further down. What made the Claude
+        Code side trustworthy was a separate reviewer, not a model that never errs. The reviewer child copies that.
+      </p>
+
+      <h3>How we got to the design</h3>
+      <p>
+        Three things ruled out the obvious answers. The sales lead merged within minutes, so a human merge step was
+        not a review. GitHub's branch protection needed a paid plan I would not buy. And I did not want Claude in
+        the loop. Devin's own PR review only starts after a PR opens, but Managed Devins let one session start
+        another. So the review moved before the PR: the working session starts a reviewer child, and only a pass
+        opens a PR. The automation prompt went through seven versions in under a day:
+      </p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Prompt</th><th>Saved</th><th>What it changed</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Prompt">Go-live</td><td data-label="Saved">By 07:51 Mon</td><td data-label="What it changed">Claim, ask, fix, hand over, check on dev after merge, close on "works". Never merges.</td></tr>
+            <tr><td data-label="Prompt">v2</td><td data-label="Saved">13:25</td><td data-label="What it changed">Product facts from the brain; test data is never the reporter's job.</td></tr>
+            <tr><td data-label="Prompt">v3</td><td data-label="Saved">Partly</td><td data-label="What it changed">Only an OK on the issue counts as approval.</td></tr>
+            <tr><td data-label="Prompt">v4</td><td data-label="Saved">17:35</td><td data-label="What it changed">A reviewer child before any PR; after two failed rounds, NEEDS JENSEN.</td></tr>
+            <tr><td data-label="Prompt">v4.1</td><td data-label="Saved">18:02</td><td data-label="What it changed">A soft spend cap for the reviewer; eight sessions at once.</td></tr>
+            <tr><td data-label="Prompt">v5</td><td data-label="Saved">18:15</td><td data-label="What it changed">SMALL and STANDARD tiers; a resume block on each handover page.</td></tr>
+            <tr><td data-label="Prompt">v5.1</td><td data-label="Saved">00:27 Tue</td><td data-label="What it changed">Labelled findings, PASS WITH GAPS, sessions that archive themselves.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Is it on par with Claude Code on Opus 5.5?</h3>
+      <p><strong>Not measured,</strong> beyond one blind review. What we have:</p>
+      <ul>
+        <li><strong>Devin reviewing planted defects:</strong> five of five, no false alarm. The defects were modelled on what the Opus 5.5 review had caught.</li>
+        <li><strong>Devin reviewing real work, blind:</strong> about half of the Opus 5.5 findings, one real problem Claude missed, and a more lenient grade. One fix, so not like for like: Claude's reviewers tried 18 to 35 deliberate breakages per round.</li>
+        <li><strong>Devin's own work:</strong> the scores above.</li>
+      </ul>
+      <p>
+        So the reviewer was necessary: working alone, Devin fell short of the bar, while reviewing others it met
+        much of it. Whether builder plus reviewer closes the gap is not measured yet. I will lighten review once
+        about five PRs in a row pass with no blocker found.
+      </p>
+    </section>
+
+    <section aria-labelledby="learnings-title">
+      <div class="section-head">
+        <h2 id="learnings-title">Key learnings</h2>
+        <p>What went wrong, what we did, and what we learnt.</p>
+      </div>
+
+      <h3>1. A green build is not a reviewed change</h3>
+      <p><strong>What went wrong.</strong> Devin merged six PRs in 30 seconds with CI green. Every one had a flaw CI could not see.</p>
+      <p><strong>What we did.</strong> Repaired them, and wrote the playbook: list every reader, writer and render path; prove each test fails without the fix; script every data change; say what you could not verify.</p>
+      <p><strong>What we learnt.</strong> CI and the author's tests check what the author thought of. The defects were in what it did not.</p>
+
+      <h3>2. Devin reviews others well, not itself</h3>
+      <p><strong>What went wrong.</strong> Devin caught every planted defect in code it had not written, then shipped a blocker in its own, on a machine without browser test tools.</p>
+      <p><strong>What we did.</strong> Fixed the machine, then made review someone else's job: a reviewer child with fresh context and a brief to find fault.</p>
+      <p><strong>What we learnt.</strong> Instructions do not create scepticism about your own work; a separate session does. Check the environment before blaming the model.</p>
+
+      <h3>3. Stay a grader</h3>
+      <p><strong>What went wrong.</strong> On Sunday morning Claude began lining up Devin's remaining tasks for itself.</p>
+      <p><strong>What we did.</strong> I stopped it: "don’t forget you are grading Devin’s work. So.. Devin should be the one doing the tasks not u". A coordination board in the company brain replaced my hand-relaying, with one rule: a message from Devin is a request, never an approval.</p>
+      <p><strong>What we learnt.</strong> If the grader finishes the job, you never learn what the agent cannot do.</p>
+
+      <h3>4. Decide who merges, and how fast</h3>
+      <p><strong>What went wrong.</strong> Mine. The merge rule took five positions in four days. I merged two PRs unreviewed, and they carried a blocker. I made the sales lead a merger against Claude's advice, without thinking about speed; they merged four PRs within minutes, which broke no rule.</p>
+      <p><strong>What we did.</strong> Moved review before the PR exists. No paid plan, no Claude in the loop. "this is all part of the learning process", I wrote at 17:05.</p>
+      <p><strong>What we learnt.</strong> A human merge step is only a review if that human reviews.</p>
+
+      <h3>5. Fix the cause of a recurring bypass</h3>
+      <p><strong>What went wrong.</strong> For weeks I approved the guard bypass push by push. Old failures had reached the development branch through merges on GitHub, where the guards never run, so every push was blocked. Only 3 of the 47 blocking checks also ran in CI.</p>
+      <p><strong>What we did.</strong> Cleared the old failures, made the guards block only new problems, and required a written reason for any bypass.</p>
+      <p><strong>What we learnt.</strong> Every approved bypass teaches every agent that bypassing is normal.</p>
+
+      <h3>6. Read the live setting, not the one you remember</h3>
+      <p><strong>What went wrong.</strong> I assumed Devin ran on Fusion, because almost all my own Devin sessions did. The automation form said "Org default (Normal)" at 00:57 on Monday, and Claude read it twice more that day without flagging it. Claude also reported prompt v3 saved when only part of it was.</p>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Monday</th><th>Weekly quota used</th><th>What was happening</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Monday">00:05</td><td data-label="Weekly quota used">22%</td><td data-label="What was happening">Automation not yet built.</td></tr>
+            <tr><td data-label="Monday">18:04</td><td data-label="Weekly quota used">64%</td><td data-label="What was happening">Thirteen issues in, reviewer children running.</td></tr>
+            <tr><td data-label="Monday">18:16</td><td data-label="Weekly quota used">69%</td><td data-label="What was happening">v5 saved; "let's monitor it first".</td></tr>
+            <tr><td data-label="Monday">23:46</td><td data-label="Weekly quota used">86%</td><td data-label="What was happening">Still on Normal. SWE-2 High from 23:51.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>What we did.</strong> SWE-2 is not on the automation's own menu, so I set it as the organisation default and the API default, which reviewer children use. Every prompt save is now reloaded and compared with the file.</p>
+      <p><strong>What we learnt.</strong> Before reasoning about cost or behaviour, read the value on the page that sets it. "this is a learnable mistake.", I wrote at 23:53.</p>
+
+      <h3>7. Every restart costs a full read</h3>
+      <p><strong>What went wrong.</strong> Each reply starts a fresh session that re-reads everything and re-runs the baseline tests. One issue took four sessions. Claude twice posted new instructions on issues already in progress, restarting each one.</p>
+      <p><strong>What we did.</strong> v5 added size tiers, a resume block and a leaner reviewer, and we stopped posting instructions mid-flight.</p>
+      <p><strong>What we learnt.</strong> When every event starts a session, a human comment is the expensive unit. Batch them.</p>
+
+      <h3>8. A strict reviewer creates a second queue</h3>
+      <p><strong>What went wrong.</strong> Two failed review rounds sent an issue to me. By midnight almost everything was waiting for me, mostly over test strength. One change failed only on its PR wording.</p>
+      <p><strong>What we did.</strong> In v5.1, defects, process gaps and test gaps on a STANDARD change still mean FIX FIRST. Wording problems, and test gaps on a SMALL change, mean PASS WITH GAPS: fix what is cheap, list the rest.</p>
+      <p><strong>What we learnt.</strong> Block on what changes users or stored data; list the rest.</p>
+
+      <h3>9. The work was better than the report</h3>
+      <p><strong>What went wrong.</strong> PR descriptions claimed results a re-run did not reproduce. A handover said "browser-tested" about a local build.</p>
+      <p><strong>What we did.</strong> The reviewer marks every claim TRUE, FALSE or UNVERIFIED with evidence, and a false claim is fixed before the PR opens.</p>
+      <p><strong>What we learnt.</strong> Read the claims before the diff.</p>
+
+      <h3>10. The issue is the record; sessions are disposable</h3>
+      <p><strong>What went wrong.</strong> By Monday night 68 sessions sat sleeping, and an old session wakes on a PR comment, outside the issue flow. My question at midnight: "but how do we know when it's DONE?"</p>
+      <p><strong>What we did.</strong> GitHub already knows: a closed issue with a DONE comment. In v5.1 every session archives its reviewers and then itself. Archiving never touches a PR.</p>
+      <p><strong>What we learnt.</strong> Keep state where people already look.</p>
+
+      <h3>Who made which mistake</h3>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Who</th><th>Mistakes</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Who">Me</td><td data-label="Mistakes">Let Devin self-merge after Claude's warning. Gave the merge rule five positions in four days. Merged two PRs unreviewed. Made the sales lead a merger without thinking about speed. Approved bypasses for weeks. Assumed Fusion. Left the review rule too strict.</td></tr>
+            <tr><td data-label="Who">Claude</td><td data-label="Mistakes">Shipped a printout fix without checking the deployed render. Recommended and used the bypass. Reported v3 saved. Read "Normal" three times without flagging it. Misread my "2. done", leaving a fix idle for nine hours. Restarted sessions in progress. Started doing Devin's work while grading it.</td></tr>
+            <tr><td data-label="Who">Devin</td><td data-label="Mistakes">Six merges in 30 seconds, each with a flaw. Read a stale copy of the playbook. Asked the sales lead to choose test data. Recorded an approval nobody could find. Made PR claims a re-run did not reproduce. To be fair, it stopped at questions instead of guessing, found older defects nobody had reported, and listed what it could not verify.</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <section aria-labelledby="approve-title">
+    <section aria-labelledby="now-title">
       <div class="section-head">
-        <h2 id="approve-title">Decisions baked into the design</h2>
-        <p>The points worth arguing about, and where they landed.</p>
+        <h2 id="now-title">How it works now</h2>
+        <p>As it runs from 6 October, on prompt v5.1.</p>
       </div>
+
+      <h3>The flow</h3>
       <ol>
-        <li>
-          <strong>Only the two of us can wake Devin with a comment.</strong> Everyone else's comments are read,
-          not triggers.
-        </li>
-        <li>
-          <strong>Issues filed by our support bot go to Devin too</strong>, unless the bot has claimed them with
-          its own <code>agent:</code> label.
-        </li>
-        <li>
-          <strong>After I merge, I comment <code>merged</code> on the issue.</strong> That wakes Devin to check
-          dev and post the test steps.
-        </li>
-        <li>
-          <strong>Devin closes the issue after the sales lead replies <code>works</code></strong> - recording the
-          fix in the company brain first.
-        </li>
-        <li>
-          <strong>Smoke test:</strong> one issue titled <code>[Devin pilot test]</code>, then close it. The sales
-          lead may get a GitHub notification for it. Not yet checked: whether Devin's GitHub app can add labels
-          in the parent repo - to be confirmed during the smoke test.
-        </li>
+        <li><strong>The sales lead opens an issue:</strong> screen, document number, screenshot. Nothing to tag.</li>
+        <li><strong>A Devin session claims it,</strong> or ends quietly if the issue is not for it.</li>
+        <li><strong>It asks, if it must:</strong> one headed comment, then it ends. A reply starts a fresh session.</li>
+        <li><strong>It fixes,</strong> sized SMALL or STANDARD, and breaks its own fix on purpose to test the tests.</li>
+        <li><strong>A reviewer child checks it</strong> before any PR. PASS or PASS WITH GAPS opens the PR. FIX FIRST means another round; after two, NEEDS JENSEN.</li>
+        <li><strong>A human merges</strong> and comments <code>merged</code>. Devin checks the change on the development site and posts test steps.</li>
+        <li><strong>The sales lead tests.</strong> <code>works</code> closes the issue with DONE, and Devin records the fix in the company brain. Each session ends by archiving its reviewers and itself.</li>
       </ol>
+
+      <h3>What the sales lead does</h3>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>To…</th><th>The sales lead does this</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td data-label="To…">Report a problem</td><td data-label="The sales lead does this">Opens an issue: screen, document number, screenshot.</td><td data-label="Example">an issue</td></tr>
+            <tr><td data-label="To…">Answer Devin</td><td data-label="The sales lead does this">Replies in a comment. Editing the issue text does not wake Devin.</td><td data-label="Example"><code>1a, 2b</code></td></tr>
+            <tr><td data-label="To…">Test the fix</td><td data-label="The sales lead does this">Follows the <em>Ready to test in dev</em> steps, then replies <code>works</code> or what they saw.</td><td data-label="Example"><code>works</code></td></tr>
+            <tr><td data-label="To…">Keep Devin off an issue</td><td data-label="The sales lead does this">Comments <code>devin stop</code> or adds <code>devin:skip</code>.</td><td data-label="Example"><code>devin stop</code></td></tr>
+            <tr><td data-label="To…">Bring Devin to an old issue</td><td data-label="The sales lead does this">Mentions <code>@devin</code> in a comment.</td><td data-label="Example"><code>@devin</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>What Devin posts on the issue</h3>
+      <div class="scorecard article-wide">
+        <table>
+          <thead><tr><th>Heading</th><th>For</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Heading"><strong>QUESTION</strong></td><td data-label="For">Sales lead</td><td data-label="Contents">Up to five numbered questions with lettered options, no code terms.</td></tr>
+            <tr><td data-label="Heading"><strong>NEEDS A DECISION</strong></td><td data-label="For">Either of us</td><td data-label="Contents">A business rule, price or data change, with options and a recommendation.</td></tr>
+            <tr><td data-label="Heading"><strong>NEEDS OK</strong></td><td data-label="For">Either of us</td><td data-label="Contents">The risk, and the exact reply that approves it.</td></tr>
+            <tr><td data-label="Heading"><strong>NEEDS JENSEN</strong></td><td data-label="For">Me</td><td data-label="Contents">Production or UAT data, missing access, or two failed review rounds.</td></tr>
+            <tr><td data-label="Heading"><strong>REVIEW</strong></td><td data-label="For">Both</td><td data-label="Contents">PASS, PASS WITH GAPS or FIX FIRST, with labelled findings.</td></tr>
+            <tr><td data-label="Heading"><strong>PR READY FOR REVIEW</strong></td><td data-label="For">Both</td><td data-label="Contents">PR links, merge order, checks, and what Devin could not verify.</td></tr>
+            <tr><td data-label="Heading"><strong>READY TO TEST IN DEV</strong></td><td data-label="For">Sales lead</td><td data-label="Contents">Where to click, which test record, what they should see.</td></tr>
+            <tr><td data-label="Heading"><strong>DONE / STOPPED</strong></td><td data-label="For">Both</td><td data-label="Contents">A one-line summary, or confirmation that Devin will stay out.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The reviewer</h3>
+      <ul>
+        <li><strong>It gets only</strong> the issue, the branches, the draft PR description and the handover page, never the builder's conclusions.</li>
+        <li><strong>It breaks the code</strong> in its own small ways and records which breakages the tests catch.</li>
+        <li><strong>It marks every claim</strong> TRUE, FALSE or UNVERIFIED, and checks tenant isolation and every place that reads, writes or prints the data.</li>
+        <li><strong>It never</strong> pushes, comments, merges or writes to a database.</li>
+      </ul>
+
+      <h3>Guards and settings</h3>
+      <ul>
+        <li><strong>Triggers:</strong> any new issue in the parent repository, and comments from the sales lead or me. Devin's and the support agent's comments do not wake it, so bots cannot loop.</li>
+        <li><strong>One Devin per issue,</strong> held by a working label, and at most eight sessions at once.</li>
+        <li><strong>Budgets:</strong> about 15 ACUs for a SMALL change and 30 for a STANDARD one.</li>
+        <li><strong>Mode:</strong> SWE-2 High, the organisation default since 5 October.</li>
+        <li><strong>Limits:</strong> development branches and the development database only, with backups and reverse scripts; never UAT or production. <code>devin stop</code> keeps Devin off one issue; disabling the automation stops everything.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="unconfirmed-title">
+      <div class="section-head">
+        <h2 id="unconfirmed-title">What I could not confirm</h2>
+      </div>
+      <ul>
+        <li>Whether SWE-2 stops the quota climbing from 86%, and whether it changes how often reviews pass.</li>
+        <li>Which model Devin's Normal mode actually ran.</li>
+        <li>Whether a Devin reviewer matches Claude Code on Opus 5.5. One blind review is all we have.</li>
+        <li>The first v5.1 runs: self-archiving, PASS WITH GAPS, and the check on the development site.</li>
+        <li>The stop command, a reply arriving mid-session, and an issue filed by the support agent: none tested end to end.</li>
+        <li>Cost per issue. We only measured the weekly percentage.</li>
+      </ul>
+      <p>
+        Early on Saturday Devin merged six PRs in 30 seconds. Now it takes an issue from a sales lead, asks in
+        plain English, fixes, has a second Devin review the change, and waits for a human. It still sends too much
+        back to me, and it spent most of a week's quota showing me why. Both are fixable, and both are mine to fix.
+        If you are building something similar, I would love to compare notes.
+      </p>
     </section>
 
     <section aria-labelledby="related-title">
@@ -269,20 +375,24 @@
         <h2 id="related-title">Related</h2>
         <p>The systems this pilot sits on.</p>
       </div>
-      <ul>
-        <li>
-          <a href="./devin-fusion-company-brain-cutover.html">How Devin Fusion Ran a Five-Day Company-Brain Cutover</a> -
-          the company brain this pilot's memory leans on, and how it got into production shape.
-        </li>
-        <li>
-          <a href="../essays/two-brains-one-operator.html">Two Brains, One Operator</a> - why personal and company
-          agent memory split, and the fenced design behind both.
-        </li>
-        <li>
-          <a href="./codegraph-tour.html">From Company Knowledge to Verified Changes</a> - how the company brain,
-          CodeGraph and verifiers guide agentic engineering.
-        </li>
-      </ul>
+      <div class="explore-grid">
+        <a class="hub-card featured-card" href="/engineering/devin-fusion-company-brain-cutover.html">
+          <h2>How Devin Fusion Ran a Five-Day Company-Brain Cutover</h2>
+          <p>The company brain this pilot's memory leans on, and the Fusion mode I thought we were using.</p>
+        </a>
+        <a class="hub-card featured-card" href="/essays/two-brains-one-operator.html">
+          <h2>Two Brains, One Operator</h2>
+          <p>Why personal and company agent memory split, and the fenced design behind both.</p>
+        </a>
+        <a class="hub-card featured-card" href="/engineering/codegraph-tour.html">
+          <h2>From Company Knowledge to Verified Changes</h2>
+          <p>How the company brain, CodeGraph, pattern linting and verifiers guide agentic engineering.</p>
+        </a>
+        <a class="hub-card featured-card" href="/essays/">
+          <h2>Essays</h2>
+          <p>Every article across the tracks, searchable by title, excerpt and date.</p>
+        </a>
+      </div>
     </section>
   </main>
 
