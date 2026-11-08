@@ -55,6 +55,14 @@
         could email to someone.
       </p>
       <p>
+        A second push added the showcase pieces: a
+        <a class="text-link" href="../lab/singapore-map/3d.html">3D flythrough of every building in Singapore<span aria-hidden="true"> ↗</span></a>
+        (WebGL extrusion of OpenStreetMap footprints, streamed as vector tiles),
+        a then-and-now slider that swipes between a 1914 survey map and today, and
+        15-minute isochrones showing how far the MRT network reaches from any
+        station. All of it works on a phone.
+      </p>
+      <p>
         I did not write it by hand. I built it by talking to an AI coding agent
         (Qwen, running in the opencode harness) across a single session &mdash; first
         a base map, then a second phase of features I picked from a menu the agent
@@ -137,6 +145,7 @@
             <tr><td data-label="Layer">Historical maps</td><td data-label="Source">NUS Libraries / SLA</td><td data-label="What it adds">Georeferenced survey maps, 1914&ndash;2010, as an opacity overlay</td></tr>
             <tr><td data-label="Layer">Places &amp; tours</td><td data-label="Source">Curated, geocoded via OneMap</td><td data-label="What it adds">108 points of interest and five walking routes</td></tr>
             <tr><td data-label="Layer">Rain radar</td><td data-label="Source">RainViewer</td><td data-label="What it adds">Live, key-free radar with playback</td></tr>
+            <tr><td data-label="Layer">3D buildings</td><td data-label="Source">OpenStreetMap via HDX (PMTiles)</td><td data-label="What it adds">A WebGL flythrough extruding every building by its storeys</td></tr>
           </tbody>
         </table>
       </div>

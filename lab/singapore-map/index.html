@@ -849,14 +849,29 @@ body.dark .pp-actions a,body.dark .pp-actions button{color:#6cb2ff}
 .choro-grad{height:12px;border-radius:6px;margin:6px 0 3px}
 .choro-lbl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
 .empty-note{font-size:12.5px;color:var(--muted);padding:6px 0}
+#swipe-divider{position:absolute;top:0;bottom:0;left:50%;z-index:800;width:0;cursor:ew-resize;touch-action:none}
+.swipe-line{position:absolute;top:0;bottom:0;left:-1.5px;width:3px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.5)}
+.swipe-handle{position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#fff;color:#1c2733;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(0,0,0,.4);border:2px solid var(--accent)}
+.swipe-label{position:absolute;top:64px;background:rgba(28,39,51,.85);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap}
+.swipe-left{right:12px}
+.swipe-right{left:12px}
+#mobile-bar{display:none;position:fixed;left:8px;right:8px;bottom:8px;z-index:1000;padding:6px;gap:4px;justify-content:space-between}
+#mobile-bar button{flex:1;border:none;background:transparent;color:var(--ink);font-size:11px;font-weight:600;padding:8px 2px;border-radius:8px;cursor:pointer;font-family:inherit}
+#mobile-bar button.active{background:var(--accent);color:#fff}
+.iso-stat{display:flex;gap:16px;margin:10px 0;font-size:12px}
+.iso-stat b{display:block;font-size:17px}
 @media (max-width:720px){
 #brand{display:none}
 #brand .brand-sub{display:none}
 #searchbox{left:12px;transform:none;width:calc(100vw - 130px)}
-#legend{width:180px}
+#legend{display:none}
+#toolbar{top:58px;max-height:calc(100vh - 150px)}
 #toolbar button{width:34px;height:34px}
 #statusbar{display:none}
-.tool-panel{width:calc(100vw - 80px)}
+.tool-panel{width:calc(100vw - 24px);top:58px;max-height:calc(100vh - 150px)}
+#mobile-bar{display:flex}
+.leaflet-control-zoom,.leaflet-control-scale{display:none}
+.swipe-label{top:54px}
 }
 </style>
 </head>
@@ -866,7 +881,7 @@ body.dark .pp-actions a,body.dark .pp-actions button{color:#6cb2ff}
 
 <header id="brand" class="panel">
   <h1>Singapore</h1>
-  <div class="brand-sub">Interactive map · Phase 2</div>
+  <div class="brand-sub">Interactive map · 3D · open data</div>
 </header>
 
 <div id="searchbox">
@@ -885,6 +900,9 @@ body.dark .pp-actions a,body.dark .pp-actions button{color:#6cb2ff}
   <button id="btn-favorites" title="Favourites" aria-label="Favourites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z"/></svg></button>
   <button id="btn-historical" title="Historical maps" aria-label="Historical maps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10M9 21V10M15 21V10M19 21V10M3 10l9-7 9 7z"/></svg></button>
   <button id="btn-rain" title="Rain radar" aria-label="Rain radar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 15a4 4 0 0 0 0-8 5 5 0 0 0-9.6-1.5A3.5 3.5 0 0 0 6 15"/><path d="M8 18v2M12 17v3M16 18v2"/></svg></button>
+  <button id="btn-thennow" title="Then &amp; now time travel" aria-label="Then and now time travel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+  <button id="btn-isochrone" title="15-minute city isochrone" aria-label="15-minute city isochrone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7" opacity=".55"/><circle cx="12" cy="12" r="10" opacity=".3"/></svg></button>
+  <button id="btn-3d" title="Open 3D flythrough" aria-label="Open 3D flythrough"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg></button>
   <button id="btn-dark" title="Dark mode" aria-label="Dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button>
   <button id="btn-export" title="Export PNG" aria-label="Export PNG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4M5 21h14"/></svg></button>
   <button id="btn-measure" title="Measure distance" aria-label="Measure distance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 1.5 1.5M10 10l1.5 1.5M13 7l1.5 1.5"/></svg></button>
@@ -943,6 +961,38 @@ body.dark .pp-actions a,body.dark .pp-actions button{color:#6cb2ff}
   <p class="empty-note" id="rain-time">Live rain radar from RainViewer (key-free).</p>
 </div>
 
+<div id="panel-thennow" class="tool-panel panel">
+  <h2>Then &amp; now <button class="close-x" data-close aria-label="Close panel">&times;</button></h2>
+  <label for="tn-year">Historical year (left)</label>
+  <select id="tn-year"><option>1914</option><option>1945</option><option>1950</option><option selected>1953</option><option>1975</option><option>2005</option><option>2010</option></select>
+  <div class="row"><button class="btn small" id="tn-play">&#9654; Play century</button><button class="btn small secondary" id="tn-exit">Exit</button></div>
+  <label>Historical opacity <span id="tn-op-val">85%</span></label>
+  <input type="range" id="tn-opacity" min="20" max="100" value="85"/>
+  <p class="empty-note">Drag the divider to compare the historical survey map (left) with today (right). Georeferenced maps: NUS Libraries / SLA.</p>
+</div>
+
+<div id="panel-isochrone" class="tool-panel panel">
+  <h2>15-minute city <button class="close-x" data-close aria-label="Close panel">&times;</button></h2>
+  <label for="iso-origin">From station</label>
+  <select id="iso-origin"></select>
+  <label for="iso-mins">Travel budget</label>
+  <select id="iso-mins"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option></select>
+  <div class="row"><button class="btn small" id="iso-go">Show reach</button><button class="btn small secondary" id="iso-clear">Clear</button></div>
+  <div id="iso-result"></div>
+  <p class="empty-note">How far you can ride the MRT/LRT within the budget (travel time + transfers). The shaded area is the convex hull of reachable stations.</p>
+</div>
+
+<div id="swipe-divider" hidden><div class="swipe-line"></div><div class="swipe-handle" aria-hidden="true">&#8596;</div><span class="swipe-label swipe-left" id="swipe-year-label">1953</span><span class="swipe-label swipe-right">Today</span></div>
+
+<div id="mobile-bar" class="panel">
+  <button data-m="planner">Journey</button>
+  <button data-m="thennow">Then&amp;Now</button>
+  <button data-m="isochrone">15-min</button>
+  <button data-m="choropleth">Stats</button>
+  <button data-m="tours">Tours</button>
+  <button id="mb-3d">3D</button>
+</div>
+
 <div id="legend" class="panel">
   <div id="legend-head"><span>Legend</span><span id="legend-toggle">&minus;</span></div>
   <div id="legend-body"></div>
@@ -965,6 +1015,7 @@ body.dark .pp-actions a,body.dark .pp-actions button{color:#6cb2ff}
       <li><b>Historical maps</b> — georeferenced NUS Libraries maps (1914–2010).</li>
       <li><b>Walking tours</b> — five curated heritage routes.</li>
       <li><b>Live rain radar</b> — RainViewer. Favourites, dark mode, PNG export and deep links.</li>
+      <li><b>3D &amp; analysis</b> — a WebGL building flythrough, then-and-now historical time travel, and 15-minute MRT isochrones. Mobile-friendly throughout.</li>
     </ul>
     <h3>LTA live data (optional)</h3>
     <p>Carpark availability and traffic incidents need a free <a href="https://datamall.lta.gov.sg/content/datamall/en/request-for-api.html" target="_blank" rel="noopener">LTA DataMall API key</a>. Paste it below to try. Note: LTA's API does not send CORS headers, so browsers usually block direct calls from a local file — a small proxy/server is needed for these to work.</p>
@@ -1178,8 +1229,8 @@ function stopRainPlay(){if(rainTimer){clearInterval(rainTimer);rainTimer=null;$(
 $("rain-play").addEventListener("click",function(){if(rainTimer){stopRainPlay();return;}if(!rainOn){rainOn=true;$("rain-toggle").textContent="Hide radar";}if(!rainFrames.length){loadRain(function(){startRainPlay();});}else startRainPlay();});
 function startRainPlay(){rainIdx=0;$("rain-play").textContent="Pause";showRainFrame();rainTimer=setInterval(function(){rainIdx=(rainIdx+1)%rainFrames.length;showRainFrame();},600);}
 
-var PANELS=["planner","tours","choropleth","favorites","historical","rain"];
-function openPanel(name){PANELS.forEach(function(p){var el=$("panel-"+p);var on=p===name&&!el.classList.contains("open");el.classList.toggle("open",on);var btn=$("btn-"+p);if(btn)btn.classList.toggle("active",on);});}
+var PANELS=["planner","tours","choropleth","favorites","historical","rain","thennow","isochrone"];
+function openPanel(name){PANELS.forEach(function(p){var el=$("panel-"+p);var on=p===name&&!el.classList.contains("open");el.classList.toggle("open",on);var btn=$("btn-"+p);if(btn)btn.classList.toggle("active",on);if(p==="thennow"){if(on)startSwipe();else stopSwipe();}});Array.prototype.forEach.call(document.querySelectorAll("#mobile-bar [data-m]"),function(b){b.classList.toggle("active",b.dataset.m===name&&$("panel-"+name).classList.contains("open"));});}
 PANELS.forEach(function(p){$("btn-"+p).addEventListener("click",function(){openPanel(p);});});
 Array.prototype.forEach.call(document.querySelectorAll("[data-close]"),function(b){b.addEventListener("click",function(){var panel=b.closest(".tool-panel");var name=panel.id.replace("panel-","");panel.classList.remove("open");var btn=$("btn-"+name);if(btn)btn.classList.remove("active");});});
 
@@ -1217,6 +1268,31 @@ map.on("mousemove",function(e){coordsEl.textContent=e.latlng.lat.toFixed(5)+", "
 map.on("mouseout",function(){coordsEl.textContent="Move the mouse to see coordinates";});
 map.on("moveend",function(){var c=map.getCenter();history.replaceState(null,"","#map="+map.getZoom()+"/"+c.lat.toFixed(5)+"/"+c.lng.toFixed(5));});
 syncZoom();
+
+var tnLayer=null,tnActive=false,tnPane=null,tnTimer=null,tnX=0.5,tnDragging=false;
+var TN_YEARS=["1914","1945","1950","1953","1975","2005","2010"];
+function buildTnLayer(){if(tnLayer){map.removeLayer(tnLayer);}var year=$("tn-year").value;tnLayer=L.tileLayer("https://libmaps.nus.edu.sg/services/"+year+"/{z}/{y}/{x}",{pane:"tnSwipe",minZoom:9,maxZoom:18,opacity:+$("tn-opacity").value/100,attribution:"Historical map: NUS Libraries / SLA"}).addTo(map);$("swipe-year-label").textContent=year;updateClip();}
+function updateClip(){if(!tnActive||!tnPane)return;var x=tnX*map.getSize().x;var pr=tnPane.getBoundingClientRect();var cr=map.getContainer().getBoundingClientRect();var dx=pr.left-cr.left,dy=pr.top-cr.top;tnPane.style.clip="rect("+(-dy)+"px,"+(x-dx)+"px,"+(map.getSize().y-dy)+"px,"+(-dx)+"px)";var div=$("swipe-divider");div.style.left=x+"px";}
+function startSwipe(){if(tnActive)return;tnActive=true;if(!tnPane){tnPane=map.createPane("tnSwipe");tnPane.style.zIndex=350;tnPane.style.pointerEvents="none";}var div=$("swipe-divider");map.getContainer().appendChild(div);div.hidden=false;buildTnLayer();tnX=0.5;updateClip();}
+function stopSwipe(){if(!tnActive)return;tnActive=false;if(tnTimer){clearInterval(tnTimer);tnTimer=null;$("tn-play").innerHTML="&#9654; Play century";}if(tnLayer){map.removeLayer(tnLayer);tnLayer=null;}$("swipe-divider").hidden=true;}
+$("tn-year").addEventListener("change",buildTnLayer);
+$("tn-opacity").addEventListener("input",function(){$("tn-op-val").textContent=this.value+"%";if(tnLayer)tnLayer.setOpacity(+this.value/100);});
+$("tn-exit").addEventListener("click",function(){openPanel("thennow");});
+$("tn-play").addEventListener("click",function(){if(tnTimer){clearInterval(tnTimer);tnTimer=null;this.innerHTML="&#9654; Play century";return;}var i=TN_YEARS.indexOf($("tn-year").value);this.innerHTML="&#9632; Pause";var self=this;tnTimer=setInterval(function(){i=(i+1)%TN_YEARS.length;$("tn-year").value=TN_YEARS[i];buildTnLayer();},1800);});
+(function(){var div=$("swipe-divider");div.addEventListener("pointerdown",function(e){tnDragging=true;div.setPointerCapture(e.pointerId);e.preventDefault();});div.addEventListener("pointermove",function(e){if(!tnDragging)return;var cr=map.getContainer().getBoundingClientRect();tnX=(e.clientX-cr.left)/cr.width;updateClip();});div.addEventListener("pointerup",function(){tnDragging=false;});div.addEventListener("pointercancel",function(){tnDragging=false;});map.on("move zoom resize",updateClip);})();
+
+var isoLayer=L.layerGroup().addTo(map);
+$("iso-origin").innerHTML=stationNames.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join("");
+$("iso-origin").value="Dhoby Ghaut";
+function computeReach(src){var adj=D.railGraph.adj;var best={};var pq=[];best[src+"|"]={cost:0,station:src,line:null};pq.push({key:src+"|",cost:0});while(pq.length){pq.sort(function(a,b){return a.cost-b.cost;});var cur=pq.shift();var st=best[cur.key];if(cur.cost>st.cost)continue;(adj[st.station]||[]).forEach(function(e){var to=e[0],line=e[1],km=e[2];var transfer=(st.line&&st.line!==line)?4:0;var nc=st.cost+Math.max(1.5,km*2.2)+transfer;var nk=to+"|"+line;if(!best[nk]||nc<best[nk].cost){best[nk]={cost:nc,station:to,line:line};pq.push({key:nk,cost:nc});}});}var times={};Object.keys(best).forEach(function(k){var s=best[k];if(times[s.station]==null||s.cost<times[s.station])times[s.station]=s.cost;});return times;}
+function convexHull(pts){pts=pts.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1];});if(pts.length<3)return pts;function cross(o,a,b){return(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);}var lower=[];pts.forEach(function(p){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],p)<=0)lower.pop();lower.push(p);});var upper=[];pts.slice().reverse().forEach(function(p){while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],p)<=0)upper.pop();upper.push(p);});lower.pop();upper.pop();return lower.concat(upper);}
+function showIso(){var src=$("iso-origin").value,budget=+$("iso-mins").value;if(!src)return;var times=computeReach(src);var nodes=D.railGraph.nodes;var reach=Object.keys(times).filter(function(n){return times[n]<=budget;});isoLayer.clearLayers();var pts=reach.map(function(n){return[nodes[n].lng,nodes[n].lat];});var hull=convexHull(pts);if(hull.length>=3){L.polygon(hull.map(function(c){return[c[1],c[0]];}),{color:"#ef3340",weight:2,fillColor:"#ef3340",fillOpacity:.14,dashArray:"6 4"}).addTo(isoLayer);}reach.forEach(function(n){var nd=nodes[n];L.circleMarker([nd.lat,nd.lng],{radius:4,color:"#fff",weight:1.5,fillColor:"#ef3340",fillOpacity:.9}).addTo(isoLayer).bindTooltip(esc(n)+" · "+Math.round(times[n])+" min",{className:"area-tip",direction:"top",opacity:1});});var o=nodes[src];L.circleMarker([o.lat,o.lng],{radius:8,color:"#1c2733",weight:2,fillColor:"#2a9d8f",fillOpacity:1}).addTo(isoLayer).bindTooltip("From: "+esc(src),{className:"area-tip",direction:"top",opacity:1});if(pts.length)map.flyToBounds(L.latLngBounds(pts.map(function(c){return[c[1],c[0]];})),{padding:[50,50],maxZoom:13,duration:.8});$("iso-result").innerHTML='<div class="iso-stat"><span><b>'+reach.length+'</b>stations reachable</span><span><b>'+budget+' min</b>travel budget</span></div>';}
+$("iso-go").addEventListener("click",showIso);
+$("iso-clear").addEventListener("click",function(){isoLayer.clearLayers();$("iso-result").innerHTML="";});
+
+$("btn-3d").addEventListener("click",function(){location.href="3d.html";});
+$("mb-3d").addEventListener("click",function(){location.href="3d.html";});
+Array.prototype.forEach.call(document.querySelectorAll("#mobile-bar [data-m]"),function(b){b.addEventListener("click",function(){openPanel(b.dataset.m);});});
 
 var placeParam=location.hash.match(/place=([^&]+)/);
 if(placeParam){var pname=decodeURIComponent(placeParam[1]);var hit=idx.filter(function(it){return it.name===pname;})[0];if(hit)setTimeout(function(){pick(hit);},600);}
