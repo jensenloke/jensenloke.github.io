@@ -1955,19 +1955,22 @@ var WAYPOINTS=[
 {name:"Tampines",center:[103.9447,1.3526],zoom:15.2,pitch:58,bearing:20},
 {name:"Changi Airport",center:[103.989,1.359],zoom:14.6,pitch:55,bearing:-30}
 ];
-var touring=false,tourStep=0;
+var touring=false,tourStep=0,tourList=WAYPOINTS;
 var chip=document.getElementById("tour-chip");
 function stopTour(){touring=false;chip.style.display="none";document.getElementById("tour").classList.remove("active");document.getElementById("tour").innerHTML="&#9654; Fly through";}
 function runTourStep(){
 if(!touring)return;
-if(tourStep>=WAYPOINTS.length){stopTour();return;}
-var w=WAYPOINTS[tourStep];chip.textContent=(tourStep+1)+"/"+WAYPOINTS.length+" · "+w.name;chip.style.display="block";
+if(tourStep>=tourList.length){stopTour();return;}
+var w=tourList[tourStep];chip.textContent=(tourStep+1)+"/"+tourList.length+" · "+w.name;chip.style.display="block";
 map.flyTo({center:w.center,zoom:w.zoom,pitch:w.pitch,bearing:w.bearing,duration:3200,essential:true});
 map.once("moveend",function(){if(!touring)return;tourStep++;setTimeout(runTourStep,900);});
 }
 document.getElementById("tour").addEventListener("click",function(){
 if(touring){stopTour();return;}
-stopSpin();touring=true;tourStep=0;this.classList.add("active");this.innerHTML="&#9632; Stop";runTourStep();
+stopSpin();touring=true;tourStep=0;this.classList.add("active");this.innerHTML="&#9632; Stop";
+var c=map.getCenter();
+tourList=[{name:"Your location",center:[c.lng,c.lat],zoom:Math.min(map.getZoom(),15.5),pitch:60,bearing:map.getBearing()}].concat(WAYPOINTS);
+runTourStep();
 });
 map.on("dragstart",function(){stopTour();stopSpin();});
 })();
