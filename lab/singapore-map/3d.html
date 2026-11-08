@@ -1886,6 +1886,9 @@ var REGION_COLORS={"CENTRAL REGION":"#e63946","EAST REGION":"#f77f00","NORTH REG
 var heightExpr=["interpolate",["linear"],["*",["to-number",["coalesce",["get","building_levels"],2]],3],0,"#2c7fb8",30,"#7fcdbb",60,"#edf8b1",120,"#fdae61",200,"#f03b20",320,"#bd0026"];
 function regionExpr(){var e=["match",["get","adm1_name"]];Object.keys(REGION_COLORS).forEach(function(k){e.push(k,REGION_COLORS[k]);});e.push("#8593a6");return e;}
 var typeExpr=["match",["get","building"],"residential","#5b8def","house","#5b8def","apartments","#5b8def","commercial","#f7b32b","retail","#f7b32b","office","#f77f00","industrial","#9aa7b8","hospital","#e63946","school","#8338ec","university","#8338ec","place_of_worship","#c9a227","transportation","#495057","#7fcdbb"];
+var start={center:[103.859,1.283],zoom:15.2};
+var hm=location.hash.match(/([\d.]+)\/(-?[\d.]+)\/(-?[\d.]+)/);
+if(hm){start.center=[+hm[3],+hm[2]];start.zoom=Math.min(18,Math.max(13,+hm[1]));}
 var map=new maplibregl.Map({
 container:"map",
 style:{version:8,sources:{
@@ -1900,7 +1903,7 @@ buildings:{type:"vector",url:PMTILES}
 "fill-extrusion-base":0,
 "fill-extrusion-opacity":0.92
 }}]},
-center:[103.859,1.283],zoom:15.2,pitch:60,bearing:-40,minZoom:10,maxZoom:19,attributionControl:false
+center:start.center,zoom:start.zoom,pitch:60,bearing:-40,minZoom:10,maxZoom:19,attributionControl:false
 });
 map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),"top-right");
 map.addControl(new maplibregl.AttributionControl({compact:true}),"bottom-right");
@@ -1930,7 +1933,7 @@ map.on("mouseenter","buildings",function(){map.getCanvas().style.cursor="pointer
 map.on("mouseleave","buildings",function(){map.getCanvas().style.cursor="";});
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-var HOME={center:[103.859,1.283],zoom:15.2,pitch:60,bearing:-40};
+var HOME={center:start.center,zoom:start.zoom,pitch:60,bearing:-40};
 document.getElementById("reset").addEventListener("click",function(){stopTour();stopSpin();map.flyTo(Object.assign({duration:1200},HOME));});
 
 var spinTimer=null;

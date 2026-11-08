@@ -1290,8 +1290,9 @@ function showIso(){var src=$("iso-origin").value,budget=+$("iso-mins").value;if(
 $("iso-go").addEventListener("click",showIso);
 $("iso-clear").addEventListener("click",function(){isoLayer.clearLayers();$("iso-result").innerHTML="";});
 
-$("btn-3d").addEventListener("click",function(){location.href="3d.html";});
-$("mb-3d").addEventListener("click",function(){location.href="3d.html";});
+function open3d(){var c=map.getCenter();var z=Math.max(map.getZoom(),15);location.href="3d.html#"+z.toFixed(1)+"/"+c.lat.toFixed(5)+"/"+c.lng.toFixed(5);}
+$("btn-3d").addEventListener("click",open3d);
+$("mb-3d").addEventListener("click",open3d);
 Array.prototype.forEach.call(document.querySelectorAll("#mobile-bar [data-m]"),function(b){b.addEventListener("click",function(){openPanel(b.dataset.m);});});
 
 var placeParam=location.hash.match(/place=([^&]+)/);
