@@ -1,0 +1,22 @@
+{
+  "name": "Singapore Map Open Data",
+  "base": "https://jensenloke.github.io/lab/singapore-map/",
+  "description": "Static JSON backend for the interactive Singapore map. Fetch over HTTPS; no key, no server. Snapshot dated Nov 2026.",
+  "map_viewer": "https://jensenloke.github.io/lab/singapore-map/index.html",
+  "map_3d": "https://jensenloke.github.io/lab/singapore-map/3d.html",
+  "deep_links": {
+    "place": "index.html#place=<URL-encoded place name>",
+    "view": "index.html#map=<zoom>/<lat>/<lng>",
+    "3d_view": "3d.html#<zoom>/<lat>/<lng>"
+  },
+  "endpoints": {
+    "pois.json": "108 curated points of interest: {name, category, desc, lat, lng, address, postal}. Categories: attractions, museums, nature, food, worship, shopping, districts, transport, landmarks, beaches.",
+    "rail-graph.json": "MRT/LRT graph for routing: {adj: {stationName: [[toStation, lineCode, km], ...]}, nodes: {stationName: {lat, lng, codes}}}. 184 stations. Run Dijkstra with a 4-min transfer penalty and ~2.2 min/km to plan journeys or isochrones.",
+    "phase2.json": "{hawker[], libraries[], hospitals[], schools[], parks(GeoJSON), pcn(GeoJSON), choropleth{}}. choropleth is keyed by URA planning area name -> {pop, density, hdb, hdbN} (Census 2020 population; median HDB resale price last 24 months).",
+    "tours.json": "5 walking tours: [{name, desc, km, stops:[{name, lat, lng, note}]}].",
+    "sg-planning-areas.geojson": "55 URA planning areas (GeoJSON). properties: PLN_AREA_N, REGION_N, AREA_KM2, SUBZONE_CT.",
+    "sg-regions.geojson": "5 URA regions (GeoJSON). properties: REGION_N, AREA_KM2."
+  },
+  "line_codes": {"NS":"North South","EW":"East West","NE":"North East","CC":"Circle","DT":"Downtown","TE":"Thomson-East Coast","CG":"Changi Extension","CE":"Circle Extension","BP":"Bukit Panjang LRT","SE":"Sengkang LRT East","SW":"Sengkang LRT West","PE":"Punggol LRT East","PW":"Punggol LRT West"},
+  "caveats": ["Indicative boundaries; not for navigation or legal use.", "Journey times/fares are estimates.", "Data is a Nov 2026 snapshot."]
+}
